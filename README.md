@@ -1,4 +1,4 @@
-# Gymnasiearbete-AI
+# Gymnasiearbete
 
 Idéer:
 

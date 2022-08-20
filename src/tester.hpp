@@ -9,11 +9,7 @@ namespace gya {
     gya::board test_game(player1_t &player1, player2_t &player2) {
         board b;
         int turn = 0;
-        while (!b.has_won_test()) {
-//            if (b.has_won() != b.has_won_test()) {
-//                std::cout << "Error:\n" << b.to_string() << ' ' << b.has_won() << ' ' << b.has_won_test() << std::endl;
-//                exit(-1);
-//            }
+        while (!b.has_won()) {
             turn ^= 1;
             if (turn) {
                 b.play(player1(b), 1);

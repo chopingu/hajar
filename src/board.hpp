@@ -134,7 +134,7 @@ namespace gya {
             return ret;
         }
 
-        [[nodiscard]] int has_won_test() const {
+        [[nodiscard]] int has_won() const {
             if (!winner) {
                 return size == 42 ? -1 : 0;
             } else {
@@ -142,7 +142,7 @@ namespace gya {
             }
         }
 
-        [[nodiscard]] int has_won() const {
+        [[nodiscard]] int has_won_test() const {
             /*
             X
             X

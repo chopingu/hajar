@@ -25,15 +25,27 @@ namespace gya {
     }
 
     struct random_player {
-        std::uint64_t state;
+        std::uint64_t x = 123456789, y = 362436069, z = 521288629;
 
         random_player() {
             static std::uint64_t offs = 0;
-            state = ++offs * (std::chrono::system_clock::now().time_since_epoch().count() & 0xffffffff);
+            std::uint64_t t = ++offs * (std::chrono::system_clock::now().time_since_epoch().count() & 0xffffffff);
+            x ^= t;
+            y ^= (t >> 32) ^ (t << 32);
+            z ^= (t >> 16) ^ (t << 48);
         }
 
-        std::uint64_t get_num() {
-            return state = state * 6446109739 + 1743737587;
+        std::uint64_t get_num() { // based on George Marsaglia's xorshift
+            x ^= x << 16;
+            x ^= x >> 5;
+            x ^= x << 1;
+
+            std::uint64_t t = x;
+            x = y;
+            y = z;
+            z = t ^ x ^ y;
+
+            return z;
         }
 
         [[nodiscard]] int operator()(gya::board const &b) {

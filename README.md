@@ -1,6 +1,5 @@
 # Gymnasiearbete
 
-Idéer:
+Connect four 
 
-- 2 spel och analys av inlärningsmetoder
-- ...
+

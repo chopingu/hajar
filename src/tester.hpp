@@ -33,6 +33,9 @@ namespace gya {
             x ^= t;
             y ^= (t >> 32) ^ (t << 32);
             z ^= (t >> 16) ^ (t << 48);
+
+            for (int i = 0; i < 128; ++i)
+                get_num();
         }
 
         std::uint64_t get_num() { // based on George Marsaglia's xorshift

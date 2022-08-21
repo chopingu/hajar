@@ -2,5 +2,4 @@
 
 ```
 Connect four
-
 ```

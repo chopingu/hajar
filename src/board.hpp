@@ -1,35 +1,69 @@
 #pragma once
 
 #include <array>
-#include <cstdint>
 #include <string>
+#include <string_view>
 #include <algorithm>
+#include <cassert>
+
+#include "defines.hpp"
 
 namespace gya {
 
     struct board_column {
-        std::array<std::uint8_t, 6> data{};
-        std::uint8_t height{};
-
-        auto &push(std::uint8_t value) {
+        std::array<i8, 6> data{};
+        i8 height{};
+        constexpr auto &push(i8 value) {
             return data[height++] = value;
         }
 
-        auto &operator[](int idx) {
+        constexpr auto &operator[](int idx) {
             return data[idx];
         }
 
-        auto &operator[](int idx) const {
+        constexpr auto &operator[](int idx) const {
             return data[idx];
+        }
+
+        constexpr bool operator==(board_column const &other) const {
+            return height == other.height && data == other.data;
         }
     };
 
     struct board {
         std::array<board_column, 7> data{};
-        std::int8_t winner = 0;
-        std::int8_t size = 0;
+        i8 winner = 0;
+        i8 size = 0;
+        /*
+requires function input to be formatted as such (same as provided by board::to_string()):
+| | | | | | | |
+| | | | | | | |
+|X| | | | | | |
+|O|X| | | | | |
+|O|O|X| | | | |
+|X|O|O|X| | | |
+|1|2|3|4|5|6|7|
+         */
+        static constexpr auto from_string(std::string_view str) {
+            assert(str.size() == 112);
 
-        auto &play(std::uint8_t column, std::uint8_t value) {
+            board b;
+
+            for (int row = 6; row-- > 0;) {
+                for (int col = 0; col < 7; ++col) {
+                    const auto curr = std::tolower(str[row * 16 + col * 2 + 1]);
+                    if (curr == 'x') {
+                        b.play(col, 1);
+                    } else if (curr == 'o') {
+                        b.play(col, 2);
+                    }
+                }
+            }
+
+            return b;
+        }
+
+        constexpr i8 &play(u8 column, i8 value) {
             auto &ret = data[column].push(value);
             ++size;
 
@@ -134,7 +168,7 @@ namespace gya {
             return ret;
         }
 
-        [[nodiscard]] int has_won() const {
+        [[nodiscard]] constexpr int has_won() const {
             if (!winner) {
                 return size == 42 ? -1 : 0;
             } else {
@@ -142,7 +176,7 @@ namespace gya {
             }
         }
 
-        [[nodiscard]] int has_won_test() const {
+        [[nodiscard]] constexpr int has_won_test() const {
             /*
             X
             X
@@ -227,11 +261,15 @@ namespace gya {
             }
             ret += '|';
             for (int j = 0; j < 7; ++j) {
-                ret += std::to_string(j + 1);
+                ret += j + 1 + '0';
                 ret += '|';
             }
             ret += '\n';
             return ret;
+        }
+
+        constexpr bool operator==(board const &other) const {
+            return size == other.size && winner == other.winner && data == other.data;
         }
     };
 } // namespace gya

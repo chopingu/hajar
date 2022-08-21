@@ -9,12 +9,12 @@ namespace gya {
     gya::board test_game(player1_t &player1, player2_t &player2) {
         board b;
         int turn = 0;
-        while (!b.has_won()) {
+        while (!b.has_won().is_game_over()) {
             turn ^= 1;
             if (turn) {
                 b.play(player1(b), 1);
             } else {
-                b.play(player2(b), 2);
+                b.play(player2(b), -1);
             }
         }
         return b;

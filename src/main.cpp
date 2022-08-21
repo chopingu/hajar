@@ -31,19 +31,23 @@ int main() {
             return 0;
         }
 
-        if (a.has_won() != 1 || a.has_won_test() != 1) {
-            std::cout << "game logic broken, should be win for X" << a.to_string() << std::endl;
+        if (!a.has_won().player_1_won() || !a.has_won_test().player_1_won()) {
+            std::cout << "game logic broken, should be win for X\n" << a.to_string() << std::endl;
+            return 0;
         }
-        if (b.has_won() != 1 || b.has_won_test() != 1) {
-            std::cout << "game logic broken, should be win for X" << b.to_string() << std::endl;
+        if (!b.has_won().player_1_won() || !b.has_won_test().player_1_won()) {
+            std::cout << "game logic broken, should be win for X\n" << b.to_string() << std::endl;
+            return 0;
         }
 
         gya::random_player p1, p2;
         gya::board c = gya::test_game(p1, p2);
-        while (c.has_won() != -1) {
+        while (!c.has_won().is_tie()) {
             c = gya::test_game(p1, p2);
+
         }
-        if (c.has_won_test() != -1) {
+
+        if (!c.has_won_test().is_tie()) {
             std::cout << "game logic is broken, should be tie:\n" << c.to_string() << std::endl;
             return 0;
         }
@@ -54,15 +58,14 @@ int main() {
         // test performance
         gya::random_player p1, p2;
         for (int i = 0; i < 10; i++) {
-            gya::board c = gya::test_game(p1, p2);
-
             auto t1 = std::chrono::high_resolution_clock::now();
-            for (int j = 0; j < (1 << 18); ++j)
-                c = gya::test_game(p1, p2);
+            for (int j = 0; j < (1 << 20); ++j)
+                volatile gya::board c = gya::test_game(p1, p2);
             auto t2 = std::chrono::high_resolution_clock::now();
-            auto time = (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 18);
+            auto time = (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 20);
 
-            using std::chrono_literals::operator""ns;
+            using std::chrono_literals::operator ""ns;
+            std::cout << "time: " << time.count() << "ns" << std::endl;
             if (time > 4000ns) {
                 std::cout << "performance is too slow: " << time.count() << " ns" << std::endl;
                 return 0;

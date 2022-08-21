@@ -65,6 +65,7 @@ int main() {
             auto time = (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 20);
 
             using std::chrono_literals::operator ""ns;
+            std::cout << "time: " << time.count() << "ns" << std::endl;
             if (time > 4000ns) {
                 std::cout << "performance is too slow: " << time.count() << " ns" << std::endl;
                 return 0;

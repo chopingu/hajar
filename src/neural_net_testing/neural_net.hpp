@@ -25,7 +25,7 @@ namespace gya {
                 v = dist(rng);
         }
 
-        static float activation(float x) {
+        static f32 activation(f32 x) {
             return std::clamp(0.0f, 1.0f, x * 0.2f + 0.5f); // 867.696ns to infer
             return 1.0f / (1.0f + std::exp(-x)); // 454727ns to infer
         }

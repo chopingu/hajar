@@ -4,10 +4,10 @@
 
 namespace gya {
     struct neural_net_player {
-        neural_net<float, 42, 80, 64, 7> net;
+        neural_net<f32, 42, 80, 64, 7> net;
 
         [[nodiscard]] u8 operator()(gya::board const &b) {
-            std::array<float, 42> input{};
+            std::array<f32, 42> input{};
             for (u64 i = 0; i < 6; ++i) {
                 for (u64 j = 0; j < 7; ++j) {
                     input[i * 7 + j] = b.data[i][j];

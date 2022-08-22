@@ -25,6 +25,8 @@ namespace gya {
             state = -1;
         }
 
+        constexpr int winner() const noexcept { return state; }
+
         constexpr bool player_1_won() const { return state == 1; }
 
         constexpr bool player_2_won() const { return state == 2; }

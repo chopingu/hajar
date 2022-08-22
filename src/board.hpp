@@ -11,12 +11,7 @@
 
 namespace gya {
     struct game_result {
-        i64 state{};
-
-//        bool p1_won     /*: 1*/ = false;
-//        bool p2_won     /*: 1*/ = false;
-//        bool tie        /*: 1*/ = false;
-
+        i8 state{};
 
         constexpr void set_player_1_won() noexcept {
             state = 1;

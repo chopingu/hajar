@@ -2,7 +2,7 @@
 #include "board.hpp"
 #include "tester.hpp"
 #include <iostream>
-#include "neural_net_testing/neural_net.hpp"
+#include "neural_net_testing/neural_net_player.hpp"
 
 int main() {
     {

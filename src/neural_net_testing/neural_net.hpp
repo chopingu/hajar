@@ -1,4 +1,5 @@
 #include <random>
+#include "board.hpp"
 #include "layer_array.hpp"
 #include "weight_array.hpp"
 #include "defines.hpp"

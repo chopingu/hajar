@@ -2,7 +2,7 @@
 #include "board.hpp"
 #include "tester.hpp"
 #include <iostream>
-#include "neural_net_testing/neural_net.hpp"
+#include "neural_net_testing/neural_net_player.hpp"
 
 int main() {
     {
@@ -85,7 +85,7 @@ int main() {
     {
         // test neural net performance
         gya::random_player p1;
-        neural_net<float, 42, 86, 64, 7> p2;
+        gya::neural_net_player p2;
 
         using dur_type = std::chrono::duration<double, std::ratio<1, 1000000000>>;
         dur_type avg{0};

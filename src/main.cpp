@@ -2,6 +2,7 @@
 #include "board.hpp"
 #include "tester.hpp"
 #include <iostream>
+#include "neural_net_testing/neural_net.hpp"
 
 int main() {
     {
@@ -55,26 +56,6 @@ int main() {
     }
 
     {
-        // test performance
-        gya::random_player p1, p2;
-        for (int i = 0; i < 10; i++) {
-            auto t1 = std::chrono::high_resolution_clock::now();
-            for (int j = 0; j < (1 << 20); ++j)
-                volatile gya::board c = gya::test_game(p1, p2);
-            auto t2 = std::chrono::high_resolution_clock::now();
-            auto time = (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 20);
-
-            using std::chrono_literals::operator ""ns;
-            std::cout << "time: " << time.count() << "ns" << std::endl;
-            if (time > 4000ns) {
-                std::cout << "performance is too slow: " << time.count() << " ns" << std::endl;
-                return 0;
-            }
-        }
-        std::cout << "performance is ok" << std::endl;
-    }
-
-    {
         // test randomness
         gya::random_player p;
         std::unordered_map<u64, u64> prev_vals;
@@ -85,6 +66,52 @@ int main() {
             }
         }
         std::cout << "randomness is ok" << std::endl;
+    }
+
+    {
+        // test performance
+        gya::random_player p1, p2;
+        auto t1 = std::chrono::high_resolution_clock::now();
+        for (int j = 0; j < (1 << 20); ++j)
+            volatile gya::board c = gya::test_game(p1, p2);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        auto time = (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 20);
+        using std::chrono_literals::operator ""ns;
+        std::cout << "random player:\n";
+        std::cout << "avg: " << time.count() << "ns" << std::endl;
+
+    }
+
+    {
+        // test neural net performance
+        gya::random_player p1;
+        neural_net<float, 42, 86, 64, 7> p2;
+
+        using dur_type = std::chrono::duration<double, std::ratio<1, 1000000000>>;
+        dur_type avg{0};
+        dur_type min{1e9};
+        dur_type max{0};
+        constexpr int iters = 1 << 14;
+        double avg_num_moves = 0;
+        for (int i = 0; i < iters; ++i) {
+            const auto t1 = std::chrono::high_resolution_clock::now();
+            int move_count = 0;
+            for (int j = 0; j < 16; ++j) {
+                gya::board b = gya::test_game(p1, p2);
+                move_count += b.size / 2;
+            }
+            const auto t2 = std::chrono::high_resolution_clock::now();
+            const auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1) / 16.0;
+            avg_num_moves += move_count / 16.0;
+            min = std::min(min, time);
+            max = std::max(max, time);
+            avg += time;
+        }
+        std::cout << "neural net:\n";
+        std::cout << "avg_num_moves: " << avg_num_moves / iters << std::endl;
+        std::cout << "avg: " << (avg / iters).count() << "ns" << std::endl;
+        std::cout << "min: " << (min).count() << "ns" << std::endl;
+        std::cout << "max: " << (max).count() << "ns" << std::endl;
     }
 
     std::cout << "tests passed" << std::endl;

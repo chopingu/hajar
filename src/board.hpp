@@ -44,14 +44,14 @@ namespace gya {
         i8 height{};
 
         constexpr auto &push(i8 value) {
-            return data[height++] = value;
+            return data.at(height++) = value;
         }
 
-        constexpr auto &operator[](int idx) {
+        constexpr auto &operator[](u64 idx) {
             return data[idx];
         }
 
-        constexpr auto &operator[](int idx) const {
+        constexpr auto &operator[](u64 idx) const {
             return data[idx];
         }
 
@@ -134,15 +134,6 @@ requires function input to be formatted as such (same as provided by board::to_s
                     }
                 }
             }
-            if (row < 5 && data[col][row + 1] == value) {
-                ver++;
-                if (row < 4 && data[col][row + 2] == value) {
-                    ver++;
-                    if (row < 3 && data[col][row + 3] == value) {
-                        ver++;
-                    }
-                }
-            }
             if (ver >= 4) {
                 winner = value;
                 return ret;
@@ -201,8 +192,8 @@ requires function input to be formatted as such (same as provided by board::to_s
 
         [[nodiscard]] constexpr game_result has_won() const {
             return winner != 0 ?
-                 winner == 1 ? game_result{1} : game_result{2} :
-                 size == 42 ? game_result{-1} : game_result{0};
+                   winner == 1 ? game_result{1} : game_result{2} :
+                   size == 42 ? game_result{-1} : game_result{0};
         }
 
         [[nodiscard]] constexpr game_result has_won_test() const {

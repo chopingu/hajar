@@ -4,7 +4,7 @@
 
 namespace gya {
     struct neural_net_player {
-        neural_net<f32, 42, 80, 64, 7> net;
+        neural_net<f32, 42, 7> net;
 
         [[nodiscard]] u8 operator()(gya::board const &b) {
             std::array<f32, 42> input{};
@@ -15,12 +15,19 @@ namespace gya {
             }
             auto net_output = net.evaluate(input);
 
-            u8 res = 0;
+            std::array<u8, 7> indices;
+            std::iota(indices.begin(), indices.end(), 0);
+            std::default_random_engine rng;
+            static i32 m = 1;
+            rng.seed(clock() * m++);
+            u8 res = std::uniform_int_distribution<u8>{0, 7}(rng);
+
+            std::shuffle(indices.begin(), indices.end(), rng);
             for (u8 i = 0; i < net_output.size(); ++i) {
-                if (b.data[res].height == 6 && b.data[i].height < 6) {
-                    res = i;
-                } else if (net_output[i] > net_output[res] && b.data[i].height < 6) {
-                    res = i;
+                if (b.data[res].height == 6 && b.data[indices[i]].height < 6) {
+                    res = indices[i];
+                } else if (net_output[indices[i]] > net_output[res] && b.data[indices[i]].height < 6) {
+                    res = indices[i];
                 }
             }
             return res;

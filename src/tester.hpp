@@ -6,9 +6,8 @@
 
 namespace gya {
     template<class player1_t, class player2_t>
-    gya::board test_game(player1_t &&player1, player2_t &&player2) {
-        board b;
-        int turn = 0;
+    gya::board test_game(player1_t &&player1, player2_t &&player2, gya::board b = {}) {
+        i32 turn = 0;
         while (!b.has_won().is_game_over()) {
             turn ^= 1;
             if (turn) {

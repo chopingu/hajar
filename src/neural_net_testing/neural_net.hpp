@@ -7,18 +7,16 @@
 namespace gya {
     template<class T, u64... sizes>
     struct neural_net {
-        layer_array<T, sizes...> m_values;
         layer_array<T, sizes...> m_biases;
         weight_array<T, sizes...> m_weights;
-        std::span<T> input{m_values.front()}, output{m_values.back()};
 
         neural_net() {
-            fill_randomly();
+//            fill_randomly();
         }
 
         void fill_randomly() {
             std::mt19937_64 rng{std::random_device{}()};
-            std::uniform_real_distribution<T> dist{0.0f, 1.0f};
+            std::uniform_real_distribution<T> dist{-0.5f, 0.5f};
             for (auto &v: m_weights.data)
                 v = dist(rng);
             for (auto &v: m_biases.data)
@@ -26,13 +24,14 @@ namespace gya {
         }
 
         static f32 activation(f32 x) {
+            return std::clamp(x, -5.0f, 5.0f);
             return std::clamp(x * 0.2f + 0.5f, 0.0f, 1.0f); // 867.696ns to infer
             return 1.0f / (1.0f + std::exp(-x)); // 454727ns to infer
         }
 
-        [[nodiscard]] std::span<T> evaluate(std::span<T> inp) {
-            // 1 2 3 4 5 6 7
-            // 8 9 . . .
+        [[nodiscard]] std::span<T> evaluate(std::span<T> inp) const {
+            layer_array<T, sizes...> m_values;
+            std::span<T> input{m_values.front()}, output{m_values.back()};
             std::copy(inp.begin(), inp.end(), input.begin());
 
             for (u64 i = 0; i + 1 < m_values.size(); ++i) {

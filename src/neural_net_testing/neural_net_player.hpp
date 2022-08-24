@@ -5,9 +5,9 @@
 
 namespace gya {
     struct neural_net_player {
-//        using net_type = neural_net<f32, 42, 36, 30, 24, 18, 12, 7>;
-//        using net_type = neural_net<f32, 42, 7>;
-        using net_type = neural_net<f32, 42, 39, 36, 33, 30, 27, 24, 21, 18, 15, 12, 9 , 7>;
+//        using net_type = neural_net<f32, 43, 36, 30, 24, 18, 12, 7>;
+//        using net_type = neural_net<f32, 43, 7>;
+        using net_type = neural_net<f32, 43, 35, 30, 25, 20, 15, 10, 7>;
 
         net_type net;
 
@@ -19,12 +19,13 @@ namespace gya {
             if (std::all_of(b.data.begin(), b.data.end(), [](auto& x) { return x.height == 6; }))
                 throw std::runtime_error("board is full");
 
-            std::array<f32, 42> input{};
+            std::array<f32, 43> input{};
             for (u64 i = 0; i < 6; ++i) {
                 for (u64 j = 0; j < 7; ++j) {
                     input[i * 7 + j] = b.data[i][j];
                 }
             }
+            input.back() = b.size % 2;
             auto net_output = net.evaluate(input);
 
             std::array<u8, 7> indices;

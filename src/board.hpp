@@ -41,6 +41,10 @@ namespace gya {
         i8 height{};
 
         constexpr auto &push(i8 value) {
+            if (height == 6) {
+                std::cerr << "invalid move" << std::endl;
+                exit(0);
+            }
             return data.at(height++) = value;
         }
 

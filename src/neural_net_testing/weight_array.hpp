@@ -39,7 +39,7 @@ private:
     }();
 
 public:
-    std::array<T, indices.back()> data;
+    std::array<T, indices.back()> data{};
 
     constexpr matrix_ref<T> operator[](u64 idx) {
         return matrix_ref{data.data() + indices[idx], layer_sizes[idx + 1]};

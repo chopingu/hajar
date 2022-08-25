@@ -37,7 +37,7 @@ namespace gya {
             for (u64 i = 0; i + 1 < m_values.size(); ++i) {
                 for (u64 j = 0; j < m_values[i].size(); ++j) {
                     for (u64 k = 0; k < m_values[i + 1].size(); ++k) {
-                        m_values[i + 1][k] = activation(m_values[i][j] * m_weights[i][j][k] + m_biases[i + 1][k]);
+                        m_values[i + 1][k] += activation(m_values[i][j] * m_weights[i][j][k] + m_biases[i + 1][k]);
                     }
                 }
             }

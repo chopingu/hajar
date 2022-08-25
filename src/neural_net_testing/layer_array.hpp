@@ -18,7 +18,7 @@ private:
         return arr;
     }();
 public:
-    std::array<T, (sizes + ...)> data;
+    std::array<T, (sizes + ...)> data{};
 
     constexpr std::span<T> operator[](u64 idx) {
         return std::span<T>(data.data() + indices[idx], data.data() + indices[idx] + layer_sizes[idx]);

@@ -24,8 +24,8 @@ namespace gya {
         }
 
         static f32 activation(f32 x) {
-            return std::clamp(x, -5.0f, 5.0f);
             return std::clamp(x * 0.2f + 0.5f, 0.0f, 1.0f); // 867.696ns to infer
+            return std::clamp(x, -5.0f, 5.0f);
             return 1.0f / (1.0f + std::exp(-x)); // 454727ns to infer
         }
 

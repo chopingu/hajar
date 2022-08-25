@@ -25,7 +25,7 @@ namespace gya {
                     input[i * 7 + j] = b.data[i][j];
                 }
             }
-            input.back() = b.size % 2;
+            input.back() = b.size % 2 ? 1 : -1;
             auto net_output = net.evaluate(input);
 
             std::array<u8, 7> indices;

@@ -3,32 +3,34 @@
 
 \hfuzz=50pt
 
-% packages 
+% packages
 \usepackage[cmintegrals,cmbraces]{newtxmath}
 \usepackage{ebgaramond-maths}
 \usepackage[T1]{fontenc}
 \usepackage{hyperref}
 
 % keywords command
-\providecommand{\keywords}[1] { 
+\providecommand{\keywords}[1] {
     \small
     \textbf{\textit{Keywords ---}} #1
 }
 
-% title 
+% title
 \title{\textbf{ANALYSIS OF REINFORCED \\NEURAL NETWORKS}}
 
 % author and supervisors
-\author{\rule{8cm}{0.5mm} \\[0.5in] \textit{Adam Amanbaev, Hugo Åkerfeldt, Jonathan Hallström, Romeo Patzer} \\\\
+\author{\rule{8cm}{0.3mm} \\[0.5in] \textit{Adam Amanbaev, Hugo Åkerfeldt, Jonathan Hallström, Romeo Patzer} \\\\
     \small \textit{Supervisors: Ulf Backlund \& Bertil Lundberg}
 }
 
 % date-specification
 \date{}
 
-
 % specify font of abstract-title
-\renewcommand\abstractname{\textbf{Abstract \\[0.17in] \rule{3cm}{0.3mm}}}
+\renewcommand\abstractname{\textbf{Abstract \\[0.13in] \rule{3cm}{0.2mm}}}
+
+% change size of contents-title
+\renewcommand\contentsname{\Huge Contents \\[5mm]}
 
 % begin document
 \begin{document}
@@ -42,7 +44,7 @@
 % abstract page
 \begin{abstract}
     In late 2017 DeepMind announced a groundbreaking system in a preprint \cite{alphazero} and the results were astonishing. The system was called AlphaZero and utilized \emph{artificial neural networks} in order to teach itself the game chess without any proprietary knowledge, except the rules. After approximately 9 hours it was able to beat the strongest hand-crafted engines, such as Stockfish and it had learned centuries of human knowledge of chess. In this paper we aim to study the effectiveness of different \emph{neural networks} such as the one used in AlphaZero. To be precise, we will analyze the efficiency of those networks in combination with varying \emph{algorithms, optimizations, hyperparameters} and \emph {architectures} applied to the classic game and variations of connect-four. \\[0.5in]
-\centerline{\keywords{Machine Learning, AI, Reinforcement Learning, Neural Network, Deep Learning}} 
+\centerline{\keywords{Machine Learning, AI, Reinforcement Learning, Neural Network, Deep Learning}}
 \end{abstract}
 
 % table of contents
@@ -51,12 +53,24 @@
 % separate table of contents from sections
 \newpage
 
-% create sections 
+% Motivation section before actual content
+\section{Motivation}
+
+\newpage
+
 \section{Introduction}
 
-% subsection under nearest section above
-\subsection{subsection}
+\subsection{What is Reinforcement Learning}
+\subsection{What is Deep Learning}
+\subsubsection{Artificial Neural Networks}
+\subsubsection{Deep Reinforcement Learning}
 
+\newpage
+
+\section{Notation and Definitions}
+\subsection{Notation}
+
+\newpage
 
 % references
 \begin{thebibliography}{100}

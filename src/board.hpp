@@ -42,7 +42,8 @@ namespace gya {
 
         constexpr auto &push(i8 value) {
             if (height == 6) {
-                std::cerr << "invalid move" << std::endl;
+                std::cout << std::flush;
+                std::cerr << "invalid column to push into (column full)" << std::endl;
                 exit(0);
             }
             return data.at(height++) = value;
@@ -96,6 +97,11 @@ requires function input to be formatted as such (same as provided by board::to_s
         }
 
         constexpr i8 &play(u8 column, i8 value) {
+            if (value != 1 && value != -1) {
+                std::cout << std::flush;
+                std::cerr << "invalid player value\n";
+                exit(-1);
+            }
             auto &ret = data[column].push(value);
             ++size;
 

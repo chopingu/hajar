@@ -4,31 +4,11 @@
 #include <iostream>
 #include "neural_net_testing/neural_net_player.hpp"
 #include "heuristic_solutions/one_move_solver.hpp"
+#include "heuristic_solutions/two_move_solver.hpp"
 
 int main() {
-    constexpr bool run_tests = false;
-
-    {
-        gya::board b;
-        std::cout << b.to_string() << std::endl;
-        i8 turn = 1;
-        while (!b.has_won_test().is_game_over()) {
-            if (turn == 1) {
-                u16 move;
-                std::cin >> move;
-                std::cout << "move: " << move << '\n';
-                b.play(move - 1, 1);
-            } else {
-                b.play(gya::one_move_solver{}(b), 2);
-                std::cout << b.to_string() << std::endl;
-            }
-            turn ^= 3;
-        }
-        std::cout << b.to_string() << std::endl;
-    }
-
-    if constexpr (run_tests) {
-        {
+    tests: {
+        logic_testing: {
             // test logic
             auto a = gya::board::from_string(
                     "| | | | | | | |\n"
@@ -78,7 +58,7 @@ int main() {
             std::cout << "game logic is ok" << std::endl;
         }
 
-        {
+        randomness_testing: {
             // test randomness
             gya::random_player p;
             std::unordered_map<u64, u64> prev_vals;
@@ -91,7 +71,7 @@ int main() {
             std::cout << "randomness is ok" << std::endl;
         }
 
-        {
+        random_player_perf: {
             // test performance
             gya::random_player p1, p2;
             auto t1 = std::chrono::high_resolution_clock::now();
@@ -105,7 +85,7 @@ int main() {
 
         }
 
-        {
+        neural_net_perf: {
             // test neural net runtime  performance
             gya::random_player p1;
             gya::neural_net_player p2;
@@ -137,18 +117,48 @@ int main() {
             std::cout << "max: " << (max).count() << "ns" << std::endl;
         }
 
-        {
-            // test one move solver
-            gya::one_move_solver s;
-            gya::random_player p;
-            int iters = 100;
-            double games = iters * 2;
-            int wins = 0;
-            for (int i = 0; i < iters; ++i) {
-                wins += gya::test_game(s, p).has_won_test().player_1_won();
-                wins += gya::test_game(p, s).has_won_test().player_2_won();
+        heuristic_solver_testing: {
+            // test heuristic solvers
+            {
+
+                gya::two_move_solver s;
+                gya::random_player p;
+                int iters = 10000;
+                double games = iters * 2;
+                int wins = 0;
+                for (int i = 0; i < iters; ++i) {
+                    wins += gya::test_game(s, p).has_won_test().player_1_won();
+                    wins += gya::test_game(p, s).has_won_test().player_2_won();
+                }
+                std::cout << "two move solver winrate against random player: " << wins / games * 1e2 << "%"
+                          << std::endl;
             }
-            std::cout << "one move solver winrate against random player: " << wins / games * 1e2 << "%" << std::endl;
+            {
+                gya::one_move_solver s;
+                gya::board board_1 = gya::board::from_string(
+                        "| | | | | | | |\n"
+                        "| | | | | | | |\n"
+                        "| | | | | | | |\n"
+                        "|O|X| | | | | |\n"
+                        "|O|O|X| | | | |\n"
+                        "|X|O|O|X| | | |\n"
+                        "|1|2|3|4|5|6|7|\n"
+                );
+                board_1.play(s(board_1), 1);
+                assert(board_1.has_won_test().player_1_won());
+
+                board_1 = gya::board::from_string(
+                        "| | | | | | | |\n"
+                        "| | | | | | | |\n"
+                        "| | | | | | | |\n"
+                        "| | | | | | | |\n"
+                        "| | | |O| |O| |\n"
+                        "| |O|X|X| |X| |\n"
+                        "|1|2|3|4|5|6|7|\n"
+                );
+                board_1.play(s(board_1), 1);
+                assert(board_1.has_won_test().player_1_won());
+            }
         }
 
         std::cout << "tests passed" << std::endl;

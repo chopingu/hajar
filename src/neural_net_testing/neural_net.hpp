@@ -7,7 +7,7 @@
 namespace gya {
     template<class T, class F1, class F2, u64... sizes>
     struct neural_net {
-        layer_array<T, sizes...> m_values;
+        layer_array<T, sizes...> values;
         layer_array<T, sizes...> m_biases;
         weight_array<T, sizes...> m_weights;
         F1 activation_function;
@@ -25,7 +25,7 @@ namespace gya {
         }
 
         layer_array<T, sizes...> calculate_deltas(std::span<T> correct_output) const {
-            std::span<T> input{m_values.front()}, output{m_values.back()};
+            std::span<T> input{values.front()}, output{values.back()};
             layer_array < T, sizes...> deltas;
             for (u64 i = 0; i < output.size(); ++i) {
                 deltas[i] = output[i] - correct_output[i];
@@ -37,18 +37,18 @@ namespace gya {
 
         auto back_propagate(std::span<T> correct_output) {
             const auto deltas = calculate_deltas(correct_output);
-            std::span<T> input{m_values.front()}, output{m_values.back()};
+            std::span<T> input{values.front()}, output{values.back()};
 
         }
 
         [[nodiscard]] auto evaluate(std::span<T> inp) {
-            std::span<T> input{m_values.front()}, output{m_values.back()};
+            std::span<T> input{values.front()}, output{values.back()};
             std::copy(inp.begin(), inp.end(), input.begin());
 
-            for (u64 i = 0; i + 1 < m_values.size(); ++i) {
-                for (u64 j = 0; j < m_values[i].size(); ++j) {
-                    for (u64 k = 0; k < m_values[i + 1].size(); ++k) {
-                        m_values[i + 1][k] += activation_function(m_values[i][j] * m_weights[i][j][k] + m_biases[i + 1][k]);
+            for (u64 i = 0; i + 1 < values.size(); ++i) {
+                for (u64 j = 0; j < values[i].size(); ++j) {
+                    for (u64 k = 0; k < values[i + 1].size(); ++k) {
+                        values[i + 1][k] += activation_function(values[i][j] * m_weights[i][j][k] + m_biases[i + 1][k]);
                     }
                 }
             }
@@ -57,14 +57,14 @@ namespace gya {
         }
 
         [[nodiscard]] auto evaluate_const(std::span<T> inp) const {
-            layer_array < T, sizes...> m_values;
-            std::span<T> input{m_values.front()}, output{m_values.back()};
+            layer_array < T, sizes...> values;
+            std::span<T> input{values.front()}, output{values.back()};
             std::copy(inp.begin(), inp.end(), input.begin());
 
-            for (u64 i = 0; i + 1 < m_values.size(); ++i) {
-                for (u64 j = 0; j < m_values[i].size(); ++j) {
-                    for (u64 k = 0; k < m_values[i + 1].size(); ++k) {
-                        m_values[i + 1][k] += activation_function(m_values[i][j] * m_weights[i][j][k] + m_biases[i + 1][k]);
+            for (u64 i = 0; i + 1 < values.size(); ++i) {
+                for (u64 j = 0; j < values[i].size(); ++j) {
+                    for (u64 k = 0; k < values[i + 1].size(); ++k) {
+                        values[i + 1][k] += activation_function(values[i][j] * m_weights[i][j][k] + m_biases[i + 1][k]);
                     }
                 }
             }

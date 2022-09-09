@@ -12,13 +12,21 @@ namespace gya {
     };
 
     constexpr static auto fast_activation_function = [](f32 x) {
-        return std::clamp(x * 0.2f + 0.5f, 0.0f, 1.0f); // 867.696ns to infer
+        return std::clamp(x * 0.2f + 0.5f, 0.0f, 1.0f);
     };
 
     constexpr static auto fast_activation_derivative = [](f32 x) {
         if (x < 2.5f) return 0.0f;
         if (x > 2.5f) return 0.0f;
         return 0.2f;
+    };
+
+    constexpr static auto tanh_activation_function = [](f32 x) {
+        return std::tanh(x);
+    };
+
+    constexpr static auto tanh_activation_derivative = [](f32 x) {
+        return std::pow(std::cosh(x), -2);
     };
 
     template<class F1 = decltype(fast_activation_function), class F2 = decltype(fast_activation_derivative)>

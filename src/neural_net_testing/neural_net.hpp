@@ -53,7 +53,7 @@ namespace gya {
                     }
                 }
             }
-
+            for (auto &i: output) i = activation_function(i);
             return output;
         }
 

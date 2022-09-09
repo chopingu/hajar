@@ -26,7 +26,7 @@ namespace gya {
 
         layer_array<T, sizes...> calculate_deltas(std::span<T> correct_output) const {
             std::span<T> input{m_values.front()}, output{m_values.back()};
-            layer_array < T, sizes...> deltas;
+            layer_array<T, sizes...> deltas;
             for (u64 i = 0; i < output.size(); ++i) {
                 deltas[i] = output[i] - correct_output[i];
             }
@@ -41,7 +41,7 @@ namespace gya {
 
         }
 
-        [[nodiscard]] auto evaluate_impl(std::span<T> inp, layer_array<T, sizes...>& values) const {
+        [[nodiscard]] auto evaluate_impl(std::span<T> inp, layer_array<T, sizes...> &values) const {
             std::span<T> input{values.front()}, output{values.back()};
             std::copy(inp.begin(), inp.end(), input.begin());
 
@@ -63,7 +63,7 @@ namespace gya {
 
         [[nodiscard]] auto evaluate_const(std::span<T> inp) const {
             layer_array < T, sizes...> values;
-            auto output = evaluate_impl(values);
+            auto output = evaluate_impl(inp, values);
             return std::array(output.begin(), output.end());
         }
 

@@ -5,15 +5,15 @@
 #include "defines.hpp"
 
 namespace gya {
-    template<class T, u64... sizes>
+    template<class T, class F1, class F2, u64... sizes>
     struct neural_net {
         layer_array<T, sizes...> m_values;
         layer_array<T, sizes...> m_biases;
         weight_array<T, sizes...> m_weights;
-        activation_func_t activation_function;
-        activation_func_t activation_derivative;
+        F1 activation_function;
+        F2 activation_derivative;
 
-        neural_net(activation_func_t f, activation_func_t derivative) : activation_function{f}, activation_derivative{derivative} {}
+        neural_net(F1 f, F2 derivative) : activation_function{f}, activation_derivative{derivative} {}
 
         void fill_randomly() {
             std::mt19937_64 rng{std::random_device{}()};

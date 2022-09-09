@@ -4,29 +4,31 @@
 #include <memory>
 
 namespace gya {
-    template<class T, u64... sizes>
+    template<class T, class F1, class F2, u64... sizes>
     struct neural_net_params {
-        using neural_net_t = neural_net<T, sizes...>;
+        using neural_net_t = neural_net<T, F1, F2, sizes...>;
         using layer_array_t = layer_array<T, sizes...>;
         using weight_array_t = weight_array<T, sizes...>;
     };
 
-    constexpr f32 fast_activation_function(f32 x) {
+    constexpr static auto fast_activation_function = [](f32 x) {
         return std::clamp(x * 0.2f + 0.5f, 0.0f, 1.0f); // 867.696ns to infer
-    }
+    };
 
-    constexpr f32 fast_activation_derivative(f32 x) {
+    constexpr static auto fast_activation_derivative = [](f32 x) {
         if (x < 2.5f) return 0.0f;
         if (x > 2.5f) return 0.0f;
         return 0.2f;
-    }
+    };
 
+    template<class F1 = decltype(fast_activation_function), class F2 = decltype(fast_activation_derivative)>
     struct neural_net_player {
-        using neural_net_params_t = neural_net_params<f32, 43, 35, 30, 25, 20, 15, 10, 7>;
+        using neural_net_params_t = neural_net_params<f32, F1, F2, 43, 35, 30, 25, 20, 15, 10, 7>;
         using neural_net_t = typename neural_net_params_t::neural_net_t;
         using layer_array_t = typename neural_net_params_t::layer_array_t;
 
-        neural_net_player(activation_func_t f = fast_activation_function, activation_func_t derivative = fast_activation_derivative) : net{f, derivative} {}
+        neural_net_player(F1 f = fast_activation_function, F2 derivative = fast_activation_derivative)
+                : net{f, derivative} {}
 
         neural_net_t net;
 
@@ -65,7 +67,8 @@ namespace gya {
             for (u8 i = 0; i < net_output.size(); ++i) {
                 if (b.data[res].height == 6 && b.data[indices[i]].height < 6) {
                     res = indices[i];
-                } else if (net_output[indices[i]] > net_output[res] && b.data[indices[i]].height < 6) {
+                } else if (net_output[indices[i]] > net_output[res] &&
+                           b.data[indices[i]].height < 6) {
                     res = indices[i];
                 }
             }

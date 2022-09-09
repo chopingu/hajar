@@ -303,5 +303,9 @@ requires function input to be formatted as such (same as provided by board::to_s
         constexpr bool operator==(board const &other) const {
             return size == other.size && winner == other.winner && data == other.data;
         }
+
+        constexpr i8 turn() const {
+            return size % 2 ? -1 : 1;
+        }
     };
 } // namespace gya

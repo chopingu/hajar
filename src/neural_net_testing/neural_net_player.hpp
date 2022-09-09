@@ -4,20 +4,30 @@
 #include <memory>
 
 namespace gya {
+    template<class T, u64... sizes>
+    struct neural_net_params {
+        using neural_net_t = neural_net<T, sizes...>;
+        using layer_array_t = layer_array<T, sizes...>;
+        using weight_array_t = weight_array<T, sizes...>;
+    };
+
     struct neural_net_player {
-//        using net_type = neural_net<f32, 43, 36, 30, 24, 18, 12, 7>;
-//        using net_type = neural_net<f32, 43, 7>;
-        using net_type = neural_net<f32, 43, 35, 30, 25, 20, 15, 10, 7>;
-//        using net_type = neural_net<f32, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7>;
+        using neural_net_params_t = neural_net_params<f32, 43, 35, 30, 25, 20, 15, 10, 7>;
+        using neural_net_t = neural_net_params_t::neural_net_t;
+        using layer_array_t = neural_net_params_t::layer_array_t;
 
-        net_type net;
+        neural_net_t net;
 
-        u64 size() {
+        u64 size() const {
             return net.m_weights.data.size() + net.m_biases.data.size();
         }
 
+        void train(std::span<f32> correct_output) {
+            layer_array_t deltas;
+        }
+
         [[nodiscard]] u8 operator()(gya::board const &b) {
-            if (std::all_of(b.data.begin(), b.data.end(), [](auto& x) { return x.height == 6; }))
+            if (std::all_of(b.data.begin(), b.data.end(), [](auto &x) { return x.height == 6; }))
                 throw std::runtime_error("board is full");
 
             std::array<f32, 43> input{};

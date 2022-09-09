@@ -30,7 +30,7 @@ namespace gya {
             return 1.0f / (1.0f + std::exp(-x)); // 454727ns to infer
         }
 
-        [[nodiscard]] std::vector<T> evaluate(std::span<T> inp) {
+        [[nodiscard]] auto evaluate(std::span<T> inp) {
             std::span<T> input{m_values.front()}, output{m_values.back()};
             std::copy(inp.begin(), inp.end(), input.begin());
 
@@ -42,10 +42,10 @@ namespace gya {
                 }
             }
 
-            return std::vector(output.begin(), output.end());
+            return output;
         }
 
-        [[nodiscard]] std::vector<T> evaluate_const(std::span<T> inp) const {
+        [[nodiscard]] auto evaluate_const(std::span<T> inp) const {
             layer_array<T, sizes...> m_values;
             std::span<T> input{m_values.front()}, output{m_values.back()};
             std::copy(inp.begin(), inp.end(), input.begin());
@@ -58,7 +58,7 @@ namespace gya {
                 }
             }
 
-            return std::vector(output.begin(), output.end());
+            return std::array(output.begin(), output.end());
         }
     };
 }

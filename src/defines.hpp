@@ -14,3 +14,5 @@ using u64 = std::uint64_t;
 
 using f32 = float;
 using f64 = double;
+
+using activation_func_t = f32(*)(f32);

@@ -11,10 +11,22 @@ namespace gya {
         using weight_array_t = weight_array<T, sizes...>;
     };
 
+    constexpr f32 fast_activation_function(f32 x) {
+        return std::clamp(x * 0.2f + 0.5f, 0.0f, 1.0f); // 867.696ns to infer
+    }
+
+    constexpr f32 fast_activation_derivative(f32 x) {
+        if (x < 2.5f) return 0.0f;
+        if (x > 2.5f) return 0.0f;
+        return 0.2f;
+    }
+
     struct neural_net_player {
         using neural_net_params_t = neural_net_params<f32, 43, 35, 30, 25, 20, 15, 10, 7>;
-        using neural_net_t = neural_net_params_t::neural_net_t;
-        using layer_array_t = neural_net_params_t::layer_array_t;
+        using neural_net_t = typename neural_net_params_t::neural_net_t;
+        using layer_array_t = typename neural_net_params_t::layer_array_t;
+
+        neural_net_player(activation_func_t f = fast_activation_function, activation_func_t derivative = fast_activation_derivative) : net{f, derivative} {}
 
         neural_net_t net;
 
@@ -23,7 +35,7 @@ namespace gya {
         }
 
         void train(std::span<f32> correct_output) {
-            layer_array_t deltas;
+
         }
 
         [[nodiscard]] u8 operator()(gya::board const &b) {

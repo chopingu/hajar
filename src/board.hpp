@@ -40,7 +40,7 @@ namespace gya {
         std::array<i8, 6> data{};
         i8 height{};
 
-        constexpr auto &push(i8 value) {
+        constexpr decltype(auto) push(i8 value) {
             if (height == 6) {
                 std::cout << std::flush;
                 std::cerr << "invalid column to push into (column full)" << std::endl;
@@ -49,11 +49,11 @@ namespace gya {
             return data.at(height++) = value;
         }
 
-        constexpr auto &operator[](u64 idx) {
+        constexpr decltype(auto) operator[](u64 idx) {
             return data[idx];
         }
 
-        constexpr auto &operator[](u64 idx) const {
+        constexpr decltype(auto) operator[](u64 idx) const {
             return data[idx];
         }
 

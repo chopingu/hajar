@@ -1,7 +1,7 @@
 # Gymnasiearbete
 
 ```
-Connect four
+Connect Four
 
 MinMax
 Alpha-Beta Pruning

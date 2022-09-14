@@ -28,7 +28,7 @@ namespace gya {
         }
 
         void fill_randomly() {
-            std::mt19937_64 rng{std::random_device{}()};
+            thread_local std::mt19937_64 rng{std::random_device{}()};
             std::uniform_real_distribution<T> dist{-0.1f, 0.1f};
             for (auto &v: m_weights.data)
                 v = dist(rng);
@@ -37,7 +37,7 @@ namespace gya {
         }
 
         void update_randomly(T amount = 0.1) {
-            std::mt19937_64 rng{std::random_device{}()};
+            thread_local std::mt19937_64 rng{std::random_device{}()};
             std::uniform_real_distribution<T> dist{-amount, amount};
             for (auto &v: m_weights.data)
                 v += dist(rng);
@@ -130,8 +130,12 @@ namespace gya {
             return sizeof...(sizes);
         }
 
-        auto operator!=(neural_net const& other) {
+        bool operator!=(neural_net const& other) const {
             return m_weights.data != other.m_weights.data || m_biases.data != other.m_biases.data;
+        }
+
+        bool operator==(neural_net const& other) const {
+            return !(*this == other);
         }
 
         std::string to_string() const {

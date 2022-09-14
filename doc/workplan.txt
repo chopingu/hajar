@@ -26,7 +26,7 @@ Since all of us are interested in programming and the topic, we constantly work 
 It is therefore neither fully necessary nor helpful to assign strict deadlines. 
 Bertil Lundberg, teacher in programming, checks on our progress every other week in order to keep our process going. 
 
-Authors: Adam Amanbaev, Jonathan Hallstrom, Romeo Patzer, Hugo Akerfeldt, Alvar Edvardsson
+Authors: Adam Amanbaev, Jonathan Hallström, Romeo Patzer, Hugo Åkerfeldt, Alvar Edvardsson
 
 [1] Sutton, R. S., Barto, A. G., Reinforcement Learning: An Introduction 
 [2] Introduction to Deep Learning: from Logical Calculus to Artificial Intelligence, Springer, London, 2018. 

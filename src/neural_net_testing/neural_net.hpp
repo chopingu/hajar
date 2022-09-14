@@ -24,32 +24,6 @@ namespace gya {
                 v = dist(rng);
         }
 
-        auto calculate_deltas(std::span<T> correct_output) const {
-            std::span output{m_values.back()};
-            assert(correct_output.size() == output.size());
-            layer_array < T, sizes...> desired_values;
-            desired_values.back() = correct_output;
-            layer_array < T, sizes...> bias_deltas;
-            weight_array < T, sizes...> weight_deltas;
-
-            for (u64 layer = size(); layer > 0; --layer) {
-
-            }
-
-            for (u64 layer = size(); layer > 0; --layer) {
-                for (u64 node = 0; node < m_values[layer]; ++node) {
-                    for (u64 prev_node = 0; prev_node < m_values[layer - 1]; ++prev_node) {
-                        const T prev_val = m_values[layer - 1][prev_node];
-                        const T curr_val = m_values[layer][node];
-                        const T corr_val = desired_values[layer][node];
-                        const T delta = prev_val * activation_derivative(curr_val) * 2 * (curr_val - corr_val);
-                        weight_deltas[layer][prev_node][node] = delta;
-                    }
-                }
-            }
-            return std::tuple{bias_deltas, weight_deltas};
-        }
-
         static auto compute_cost(std::span<T> output, std::span<T> correct_output) {
             assert(output.size() == correct_output.size());
             T sum = 0;
@@ -61,9 +35,42 @@ namespace gya {
 
         auto train(std::span<T> input, std::span<T> correct_output, T learning_rate = 0.01) {
             evaluate(input);
-            const T cost_before = compute_cost(m_values.back(), correct_output);
-            calculate_deltas(correct_output);
+            // const T cost_before = compute_cost(m_values.back(), correct_output);
+            layer_array<T, sizes...> bias_derivatives;
+            weight_array<T, sizes...> weight_derivatives;
+            std::span output{m_values.back()};
+            const u64 num_layers = size();
+            for (u64 node = 0; node < output.size(); ++node) {
+                bias_derivatives.back()[node] =
+                        (1 - output[node] * output[node]) * (output[node] - correct_output[node]);
+            }
+            for (u64 layer = num_layers - 2; layer > 0; --layer) {
+                for (u64 node = 0; node < m_values[layer].size(); ++node) {
+                    T sum = 0;
+                    for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
+                        const T weight_derivative = m_values[layer][node] * bias_derivatives[layer + 1][next_node];
+                        sum += weight_derivative;
+                        weight_derivatives[layer][node][next_node] = weight_derivative;
+                    }
+                    const T bias_derivative = (1 - m_values[layer][node] * m_values[layer][node]) * sum;
+                    bias_derivatives[layer][node] = bias_derivative;
+                }
+            }
+            for (u64 node = 0; node < m_values[0].size(); ++node) {
+                for (u64 next_node = 0; next_node < m_values[1].size(); ++next_node) {
+                    const T weight_derivative = m_values[0][node] * bias_derivatives[1][next_node];
+                    weight_derivatives[0][node][next_node] = weight_derivative;
+                }
+            }
 
+            for (u64 layer = 0; layer < num_layers; ++layer) {
+                for (u64 node = 0; node < m_values[layer].size(); ++node) {
+                    m_biases[layer][node] += bias_derivatives[layer][node] * learning_rate;
+                    for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
+                        m_weights[layer][node][next_node] += weight_derivatives[layer][node][next_node] * learning_rate;
+                    }
+                }
+            }
         }
 
         [[nodiscard]] auto evaluate_impl(std::span<T> input, layer_array<T, sizes...> &values) const {
@@ -86,7 +93,7 @@ namespace gya {
         }
 
         [[nodiscard]] auto evaluate_const(std::span<T> inp) const {
-            layer_array < T, sizes...> values;
+            layer_array<T, sizes...> values;
             auto output = evaluate_impl(inp, values);
             std::array<T, (sizes, ...)> out;
             std::copy(output.begin(), output.end(), out.begin());

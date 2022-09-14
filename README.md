@@ -10,5 +10,6 @@ Q-Learning
 Convolutional Neural Network
 ...
 
+(Losing instead of winning)
 (PopOut)
 ```

@@ -5,7 +5,7 @@
 #include <bits/stdc++.h>
 
 namespace gya {
-    void randomly_update_neural_net_player(gya::neural_net_player &p, f32 change_rate) {
+    void randomly_update_neural_net_player(gya::neural_net_player<> &p, f32 change_rate) {
         u64 num_changes = std::random_device{}() % (p.size() / 8);
         std::default_random_engine rng{std::random_device{}()};
         auto rand_f = [&](f32 low, f32 high) { return std::uniform_real_distribution<f32>{low, high}(rng); };
@@ -38,7 +38,7 @@ int main() {
 //    gya::two_move_solver untrained_player;
     gya::neural_net_player untrained_player;
 
-    std::vector<gya::neural_net_player> players(num_players);
+    std::vector<gya::neural_net_player<>> players(num_players);
 
     for (auto &player: players)
         player.net.fill_randomly();
@@ -115,7 +115,7 @@ int main() {
 
                     std::function<void(i32, i32)> recursive_swap = [&](i32 a, i32 b) {
                         if (a != b) {
-                            std::swap(players[a], players[b]);
+                            std::swap(players[a].net, players[b].net);
                             recursive_swap(a, num_wins[b].second);
                         }
                     };

@@ -6,4 +6,5 @@ set(CMAKE_EXE_LINKER_FLAGS "-static")
 
 include_directories(src)
 
+# add_executable(gya_connect_four src/neural_net_testing/test.cpp)
 add_executable(gya_connect_four src/main.cpp)

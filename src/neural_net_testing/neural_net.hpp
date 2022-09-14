@@ -1,3 +1,5 @@
+#pragma once
+
 #include <random>
 #include "board.hpp"
 #include "layer_array.hpp"
@@ -14,6 +16,13 @@ namespace gya {
         F2 activation_derivative;
 
         neural_net(F1 f, F2 derivative) : activation_function{f}, activation_derivative{derivative} {}
+
+        auto& operator=(neural_net const& other) {
+            m_weights.data = other.m_weights.data;
+            m_values.data = other.m_values.data;
+            m_biases.data = other.m_biases.data;
+            return *this;
+        }
 
         void fill_randomly() {
             std::mt19937_64 rng{std::random_device{}()};
@@ -42,7 +51,7 @@ namespace gya {
             const u64 num_layers = size();
             for (u64 node = 0; node < output.size(); ++node) {
                 bias_derivatives.back()[node] =
-                        (1 - output[node] * output[node]) * (output[node] - correct_output[node]);
+                        activation_derivative(output[node]) * (output[node] - correct_output[node]);
             }
             for (u64 layer = num_layers - 2; layer > 0; --layer) {
                 for (u64 node = 0; node < m_values[layer].size(); ++node) {
@@ -52,7 +61,7 @@ namespace gya {
                         sum += weight_derivative;
                         weight_derivatives[layer][node][next_node] = weight_derivative;
                     }
-                    const T bias_derivative = (1 - m_values[layer][node] * m_values[layer][node]) * sum;
+                    const T bias_derivative = activation_derivative(m_values[layer][node]) * sum;
                     bias_derivatives[layer][node] = bias_derivative;
                 }
             }
@@ -100,8 +109,21 @@ namespace gya {
             return out;
         }
 
+        constexpr void swap(neural_net const& x) {
+            *this = x;
+        }
+
         constexpr u64 size() const {
             return sizeof...(sizes);
         }
     };
+}
+
+namespace std {
+    template<class T, class F1, class F2, u64... sizes>
+    void swap(gya::neural_net<T, F1, F2, sizes...>& t1, gya::neural_net<T, F1, F2, sizes...>& t2) {
+        auto temp = std::move(t1);
+        t1 = std::move(t2);
+        t2 = std::move(temp);
+    }
 }

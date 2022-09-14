@@ -26,7 +26,7 @@ namespace gya {
     };
 
     constexpr static auto tanh_activation_derivative = [](f32 x) {
-        return std::pow(std::cosh(x), -2);
+        return 1.0f - x * x;
     };
 
     template<class F1 = decltype(fast_activation_function), class F2 = decltype(fast_activation_derivative)>
@@ -35,8 +35,14 @@ namespace gya {
         using neural_net_t = typename neural_net_params_t::neural_net_t;
         using layer_array_t = typename neural_net_params_t::layer_array_t;
 
-        neural_net_player(F1 f = fast_activation_function, F2 derivative = fast_activation_derivative)
-                : net{f, derivative} {}
+        neural_net_player() : net{fast_activation_function, fast_activation_derivative} {}
+
+        neural_net_player(F1 f, F2 derivative) : net{f, derivative} {}
+
+        auto& operator=(neural_net_player const& other) {
+            net = other.net;
+            return *this;
+        }
 
         neural_net_t net;
 

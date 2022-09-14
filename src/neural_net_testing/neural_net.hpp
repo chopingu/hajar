@@ -1,6 +1,8 @@
 #pragma once
 
 #include <random>
+#include <sstream>
+#include <iomanip>
 #include <memory>
 #include "board.hpp"
 #include "layer_array.hpp"
@@ -32,6 +34,15 @@ namespace gya {
                 v = dist(rng);
             for (auto &v: m_biases.data)
                 v = dist(rng);
+        }
+
+        void update_randomly(T amount = 0.1) {
+            std::mt19937_64 rng{std::random_device{}()};
+            std::uniform_real_distribution<T> dist{-amount, amount};
+            for (auto &v: m_weights.data)
+                v += dist(rng);
+            for (auto &v: m_biases.data)
+                v += dist(rng);
         }
 
         static auto compute_cost(std::span<T> output, std::span<T> correct_output) {
@@ -117,6 +128,28 @@ namespace gya {
 
         constexpr u64 size() const {
             return sizeof...(sizes);
+        }
+
+        auto operator!=(neural_net const& other) {
+            return m_weights.data != other.m_weights.data || m_biases.data != other.m_biases.data;
+        }
+
+        std::string to_string() const {
+            std::ostringstream oss;
+            oss << std::setprecision(10000);
+            for (T i: m_weights.data)
+                oss << i << '\n';
+            for (T i: m_biases.data)
+                oss << i << '\n';
+            return oss.str();
+        }
+
+        void from_string(std::string_view s) {
+            std::istringstream iss((std::string(s)));
+            for (auto &i: m_weights.data)
+                iss >> i;
+            for (auto &i: m_biases.data)
+                iss >> i;
         }
     };
 }

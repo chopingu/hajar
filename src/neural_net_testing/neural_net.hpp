@@ -142,9 +142,9 @@ namespace gya {
             std::ostringstream oss;
             oss << std::setprecision(10000);
             for (T i: m_weights.data)
-                oss << i << '\n';
+                oss << i << ' ';
             for (T i: m_biases.data)
-                oss << i << '\n';
+                oss << i << ' ';
             return oss.str();
         }
 

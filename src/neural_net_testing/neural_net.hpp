@@ -32,12 +32,7 @@ namespace gya {
         }
 
         void fill_randomly() {
-            thread_local std::mt19937_64 rng{std::random_device{}()};
-            std::uniform_real_distribution<T> dist{-0.1f, 0.1f};
-            for (auto &v: m_weights.data)
-                v = dist(rng);
-            for (auto &v: m_biases.data)
-                v = dist(rng);
+            update_randomly(0.1);
         }
 
         void update_randomly(T amount = 0.1) {

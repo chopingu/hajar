@@ -15,6 +15,10 @@ namespace gya {
         layer_array<T, sizes...> m_values;
         layer_array<T, sizes...> m_biases;
         weight_array<T, sizes...> m_weights;
+
+        layer_array<T, sizes...> bias_derivatives; // TODO: make optional
+        weight_array<T, sizes...> weight_derivatives; // TODO: make optional
+
         F1 activation_function;
         F2 activation_derivative;
 
@@ -57,8 +61,6 @@ namespace gya {
         auto train(std::span<T> input, std::span<T> correct_output, T learning_rate = 0.01) {
             evaluate(input);
             // const T cost_before = compute_cost(m_values.back(), correct_output);
-            layer_array<T, sizes...> bias_derivatives;
-            thread_local auto weight_derivatives = std::make_unique<weight_array<T, sizes...>>();
             std::span output{m_values.back()};
             const u64 num_layers = size();
             for (u64 node = 0; node < output.size(); ++node) {
@@ -71,7 +73,7 @@ namespace gya {
                     for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
                         const T weight_derivative = m_values[layer][node] * bias_derivatives[layer + 1][next_node];
                         sum += weight_derivative;
-                        (*weight_derivatives)[layer][node][next_node] = weight_derivative;
+                        weight_derivatives[layer][node][next_node] = weight_derivative;
                     }
                     const T bias_derivative = activation_derivative(m_values[layer][node]) * sum;
                     bias_derivatives[layer][node] = bias_derivative;
@@ -80,7 +82,7 @@ namespace gya {
             for (u64 node = 0; node < m_values[0].size(); ++node) {
                 for (u64 next_node = 0; next_node < m_values[1].size(); ++next_node) {
                     const T weight_derivative = m_values[0][node] * bias_derivatives[1][next_node];
-                    (*weight_derivatives)[0][node][next_node] = weight_derivative;
+                    weight_derivatives[0][node][next_node] = weight_derivative;
                 }
             }
 
@@ -89,7 +91,7 @@ namespace gya {
                     m_biases[layer][node] += bias_derivatives[layer][node] * -learning_rate;
                     for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
                         m_weights[layer][node][next_node] +=
-                                (*weight_derivatives)[layer][node][next_node] * -learning_rate;
+                                weight_derivatives[layer][node][next_node] * -learning_rate;
                     }
                 }
             }

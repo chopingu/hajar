@@ -24,7 +24,7 @@ Different algorithms and neural networks will be assigned throughout the group d
 
 Since all of us are interested in programming and the topic, we constantly work on the project. 
 It is therefore neither fully necessary nor helpful to assign strict deadlines. 
-Bertil Lundberg, teacher in programming, checks on our progress every other week in order to keep our process going. 
+Bertil Lundell, teacher in programming, checks on our progress every other week in order to keep our process going. 
 
 Authors: Adam Amanbaev, Jonathan Hallström, Romeo Patzer, Hugo Åkerfeldt, Alvar Edvardsson
 

@@ -13,6 +13,14 @@ They will further on be put up against eachother and themselves which will allow
 Different combinations of these networks and methods of learning will be compared to eachother and provide insights in their impact
 on efficiency of learning, decision making and quality of learning. 
 
+Topics of interest: 
+1. How effective is Q-Learning by itself
+2. How effective is a genetic algorithm by itself?
+3. How effective are convolutional neural networks by themselves?
+4. How does the order of training (against heuristical algorithms, themselves, other neural networks) affect performance?
+5. How well do the neural networks perform against eachother and heuristical algorithms?
+6. How effective are different combinations of learning-methods?
+
 This work is limited to the game connect four, possibly a variation of it and a few neural networks with varying architectures. 
 
 In order to collect data to be analyzed, we will implement everything in the programming language C++ and conduct several experiments. 
@@ -30,7 +38,7 @@ We intend to be finished with 2 to 3 different neural networks until the 2nd Dec
 Preliminary work distribution:
 
 Jonathan Hallström: Q-Learning 
-Adam Amanbaev: Convolutional Neural Network (1)
+Adam Amanbaev: Convolutional Neural Network (1) / Heuristic Algorithms
 Hugo Åkerfeldt: Convolutional Neural Network (2)
 Romeo Patzer: Heuristic Algorithms 
 Alvar Edvardsson: Q-Learning

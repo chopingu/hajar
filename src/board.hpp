@@ -212,6 +212,7 @@ requires function input to be formatted as such (same as provided by board::to_s
         }
 
         [[nodiscard]] constexpr game_result has_won_test() const {
+            if (size < 7) return game_result{0};
             /*
             X
             X

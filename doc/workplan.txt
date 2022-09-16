@@ -24,9 +24,16 @@ Different algorithms and neural networks will be assigned throughout the group d
 
 Since all of us are interested in programming and the topic, we constantly work on the project. 
 It is therefore neither fully necessary nor helpful to assign strict deadlines. 
-Bertil Lundberg, teacher in programming, checks on our progress every other week in order to keep our process going. 
+Bertil Lundell, teacher in programming, checks on our progress every other week in order to keep our process going. 
+We intend to be finished with 2 to 3 different neural networks until the 2nd December when 50% of the work should be submitted.
 
-Authors: Adam Amanbaev, Jonathan Hallström, Romeo Patzer, Hugo Åkerfeldt, Alvar Edvardsson
+Preliminary work distribution:
+
+Jonathan Hallström: Q-Learning 
+Adam Amanbaev: Convolutional Neural Network (1)
+Hugo Åkerfeldt: Convolutional Neural Network (2)
+Romeo Patzer: Heuristic Algorithms 
+Alvar Edvardsson: Q-Learning
 
 [1] Sutton, R. S., Barto, A. G., Reinforcement Learning: An Introduction 
 [2] Introduction to Deep Learning: from Logical Calculus to Artificial Intelligence, Springer, London, 2018. 

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "layer_array.hpp"
+#include "weight_array.hpp"
+#include "../defines.hpp"
 #include <type_traits>
 
 namespace gya {
@@ -49,7 +51,6 @@ namespace gya {
             static_assert(used);
             return m_layer_array.back();
         }
-
     };
 
     template<bool used, class T, u64... sizes>

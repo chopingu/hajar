@@ -8,16 +8,23 @@
 #include "layer_array.hpp"
 #include "weight_array.hpp"
 #include "defines.hpp"
+#include "optional_structures.hpp"
 
 namespace gya {
-    template<class T, class F1, class F2, u64... sizes>
+    template<bool USE_BACKPROP, bool LABELED_DATA, class T, class F1, class F2, u64... sizes>
     struct neural_net {
         layer_array<T, sizes...> m_values;
         layer_array<T, sizes...> m_biases;
         weight_array<T, sizes...> m_weights;
 
-        layer_array<T, sizes...> bias_derivatives; // TODO: make optional
-        weight_array<T, sizes...> weight_derivatives; // TODO: make optional
+        optional_layer_array<USE_BACKPROP, T, sizes...> m_bias_derivatives_acc;
+        optional_weight_array<USE_BACKPROP, T, sizes...> m_weight_derivatives_acc;
+
+        optional_layer_array<USE_BACKPROP, T, sizes...> m_bias_derivatives_win;
+        optional_weight_array<USE_BACKPROP, T, sizes...> m_weight_derivatives_win;
+
+        optional_layer_array<USE_BACKPROP && !LABELED_DATA, T, sizes...> m_bias_derivatives_loss;
+        optional_weight_array<USE_BACKPROP && !LABELED_DATA, T, sizes...> m_weight_derivatives_loss;
 
         F1 activation_function;
         F2 activation_derivative;
@@ -54,29 +61,83 @@ namespace gya {
             return sum;
         }
 
-        auto compute_derivatives(std::span<T> correct_output) {
+        auto compute_derivatives_unlabeled(std::span<T> choice) {
+            thread_local layer_array<T, sizes...> local_bias_derivatives_win;
+            thread_local weight_array<T, sizes...> local_weight_derivatives_win;
+            thread_local layer_array<T, sizes...> local_bias_derivatives_loss;
+            thread_local weight_array<T, sizes...> local_weight_derivatives_loss;
+
             std::span output{m_values.back()};
             const u64 num_layers = size();
             for (u64 node = 0; node < output.size(); ++node) {
-                bias_derivatives.back()[node] =
+                local_bias_derivatives_win.back()[node] =
+                        activation_derivative(output[node]) * (output[node] - choice[node]);
+                local_bias_derivatives_loss.back()[node] =
+                        activation_derivative(output[node]) * (output[node] + choice[node]);
+            }
+            for (u64 layer = num_layers - 2; layer > 0; --layer) {
+                for (u64 node = 0; node < m_values[layer].size(); ++node) {
+                    T sum_win = 0;
+                    T sum_loss = 0;
+                    for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
+                        const T weight_derivative_win =
+                                m_values[layer][node] * local_bias_derivatives_win[layer + 1][next_node];
+                        sum_win += weight_derivative_win;
+                        local_weight_derivatives_win[layer][node][next_node] = weight_derivative_win;
+                        const T weight_derivative_loss =
+                                m_values[layer][node] * local_bias_derivatives_loss[layer + 1][next_node];
+                        sum_loss += weight_derivative_loss;
+                        local_weight_derivatives_loss[layer][node][next_node] = weight_derivative_loss;
+                    }
+                    const T bias_derivative_win = activation_derivative(m_values[layer][node]) * sum_win;
+                    local_bias_derivatives_win[layer][node] = bias_derivative_win;
+                    const T bias_derivative_loss = activation_derivative(m_values[layer][node]) * sum_loss;
+                    local_bias_derivatives_loss[layer][node] = bias_derivative_loss;
+                }
+            }
+            for (u64 node = 0; node < m_values[0].size(); ++node) {
+                for (u64 next_node = 0; next_node < m_values[1].size(); ++next_node) {
+                    const T weight_derivative_win = m_values[0][node] * local_bias_derivatives_win[1][next_node];
+                    local_weight_derivatives_win[0][node][next_node] = weight_derivative_win;
+                    const T weight_derivative_loss = m_values[0][node] * local_bias_derivatives_loss[1][next_node];
+                    local_weight_derivatives_loss[0][node][next_node] = weight_derivative_loss;
+                }
+            }
+            for (u64 i = 0; i < m_bias_derivatives_win.data.size(); ++i)
+                m_bias_derivatives_win.data[i] += local_bias_derivatives_win.data[i];
+            for (u64 i = 0; i < m_bias_derivatives_loss.data.size(); ++i)
+                m_bias_derivatives_loss.data[i] += local_bias_derivatives_loss.data[i];
+            for (u64 i = 0; i < m_weight_derivatives_win.data.size(); ++i)
+                m_weight_derivatives_win.data[i] += local_weight_derivatives_win.data[i];
+            for (u64 i = 0; i < m_weight_derivatives_loss.data.size(); ++i)
+                m_weight_derivatives_loss.data[i] += local_weight_derivatives_loss.data[i];
+        }
+
+
+        auto compute_derivatives_labeled(std::span<T> correct_output) {
+            std::span output{m_values.back()};
+            const u64 num_layers = size();
+            for (u64 node = 0; node < output.size(); ++node) {
+                m_bias_derivatives_win.back()[node] =
                         activation_derivative(output[node]) * (output[node] - correct_output[node]);
             }
             for (u64 layer = num_layers - 2; layer > 0; --layer) {
                 for (u64 node = 0; node < m_values[layer].size(); ++node) {
                     T sum = 0;
                     for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
-                        const T weight_derivative = m_values[layer][node] * bias_derivatives[layer + 1][next_node];
+                        const T weight_derivative =
+                                m_values[layer][node] * m_bias_derivatives_win[layer + 1][next_node];
                         sum += weight_derivative;
-                        weight_derivatives[layer][node][next_node] += weight_derivative;
+                        m_weight_derivatives_win[layer][node][next_node] = weight_derivative;
                     }
                     const T bias_derivative = activation_derivative(m_values[layer][node]) * sum;
-                    bias_derivatives[layer][node] += bias_derivative;
+                    m_bias_derivatives_win[layer][node] = bias_derivative;
                 }
             }
             for (u64 node = 0; node < m_values[0].size(); ++node) {
                 for (u64 next_node = 0; next_node < m_values[1].size(); ++next_node) {
-                    const T weight_derivative = m_values[0][node] * bias_derivatives[1][next_node];
-                    weight_derivatives[0][node][next_node] += weight_derivative;
+                    const T weight_derivative = m_values[0][node] * m_bias_derivatives_win[1][next_node];
+                    m_weight_derivatives_win[0][node][next_node] = weight_derivative;
                 }
             }
         }
@@ -86,10 +147,10 @@ namespace gya {
             const u64 num_layers = size();
             for (u64 layer = 0; layer < num_layers; ++layer) {
                 for (u64 node = 0; node < m_values[layer].size(); ++node) {
-                    m_biases[layer][node] += bias_derivatives[layer][node] * -learning_rate;
+                    m_biases[layer][node] += m_bias_derivatives_acc[layer][node] * -learning_rate;
                     for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
                         m_weights[layer][node][next_node] +=
-                                weight_derivatives[layer][node][next_node] * -learning_rate;
+                                m_weight_derivatives_acc[layer][node][next_node] * -learning_rate;
                     }
                 }
             }
@@ -97,7 +158,7 @@ namespace gya {
 
         auto train(std::span<T> input, std::span<T> correct_output, T learning_rate = 0.01) {
             evaluate(input);
-            compute_derivatives(correct_output);
+            compute_derivatives_labeled(correct_output);
             apply_derivatives(learning_rate);
         }
 
@@ -121,7 +182,7 @@ namespace gya {
         }
 
         [[nodiscard]] auto evaluate_const(std::span<T> inp) const {
-            layer_array < T, sizes...> values;
+            layer_array<T, sizes...> values;
             auto output = evaluate_impl(inp, values);
             std::array<T, (sizes, ...)> out;
             std::copy(output.begin(), output.end(), out.begin());
@@ -165,8 +226,8 @@ namespace gya {
 }
 
 namespace std {
-    template<class T, class F1, class F2, u64... sizes>
-    void swap(gya::neural_net<T, F1, F2, sizes...> &t1, gya::neural_net<T, F1, F2, sizes...> &t2) {
+    template<bool b1, bool b2, class T, class F1, class F2, u64... sizes>
+    void swap(gya::neural_net<b1, b2, T, F1, F2, sizes...> &t1, gya::neural_net<b1, b2, T, F1, F2, sizes...> &t2) {
         auto temp = std::move(t1);
         t1 = std::move(t2);
         t2 = std::move(temp);

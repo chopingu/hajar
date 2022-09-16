@@ -48,4 +48,25 @@ public:
     constexpr matrix_ref<T const> const operator[](u64 idx) const {
         return matrix_ref<T const>{data.data() + indices[idx], layer_sizes[idx + 1]};
     }
+
+    constexpr std::size_t size() const {
+        return sizeof...(sizes);
+    }
+
+    constexpr auto front() {
+        return operator[](0);
+    }
+
+    constexpr auto front() const {
+        return operator[](0);
+    }
+
+    constexpr auto back() {
+        return operator[](size() - 1);
+    }
+
+    constexpr auto back() const {
+        return operator[](size() - 1);
+    }
+
 };

@@ -32,6 +32,7 @@ namespace gya {
         }
 
         void fill_randomly() {
+            *this = {};
             update_randomly(0.1);
         }
 

@@ -96,6 +96,14 @@ requires function input to be formatted as such (same as provided by board::to_s
             return b;
         }
 
+        constexpr decltype(auto) operator[](u64 idx) {
+            return data[idx];
+        }
+
+        constexpr decltype(auto) operator[](u64 idx) const {
+            return data[idx];
+        }
+
         constexpr i8 &play(u8 column, i8 value) {
             if (value != 1 && value != -1) {
                 std::cout << std::flush;

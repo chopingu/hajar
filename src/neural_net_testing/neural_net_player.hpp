@@ -6,7 +6,7 @@
 namespace gya {
     template<class T, class F1, class F2, u64... sizes>
     struct neural_net_params {
-        using neural_net_t = neural_net<true, false, T, F1, F2, sizes...>;
+        using neural_net_t = neural_net<false, false, T, F1, F2, sizes...>;
         using layer_array_t = layer_array<T, sizes...>;
         using weight_array_t = weight_array<T, sizes...>;
     };
@@ -65,9 +65,9 @@ namespace gya {
                 }
             }
             input.back() = b.size % 2 ? 1 : -1;
-            auto net_output = net.evaluate(input);
+            auto net_output = net.evaluate_const(input);
 
-            std::array<u8, 7> indices;
+            std::array<u8, 7> indices{};
             u8 num_valid_indices = 0;
             for (u8 i = 0; i < 7; ++i)
                 if (b.data[i].height < 6)

@@ -10,7 +10,6 @@ namespace gya {
     struct optional_layer_array {
     private:
         struct empty_struct {
-            empty_struct() = delete;
         };
 
     public:
@@ -57,7 +56,6 @@ namespace gya {
     struct optional_weight_array {
     private:
         struct empty_struct {
-            empty_struct() = delete;
         };
 
     public:

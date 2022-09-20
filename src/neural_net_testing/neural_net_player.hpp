@@ -6,7 +6,7 @@
 namespace gya {
     template<class T, class F1, class F2, u64... sizes>
     struct neural_net_params {
-        using neural_net_t = neural_net<false, false, T, F1, F2, sizes...>;
+        using neural_net_t = neural_net<true, false, T, F1, F2, sizes...>;
         using layer_array_t = layer_array<T, sizes...>;
         using weight_array_t = weight_array<T, sizes...>;
     };

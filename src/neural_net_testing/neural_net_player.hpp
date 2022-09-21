@@ -65,9 +65,9 @@ namespace gya {
                 }
             }
             input.back() = b.size % 2 ? 1 : -1;
-            auto net_output = net.evaluate(input);
+            auto net_output = net.evaluate_const(input);
 
-            std::array<u8, 7> indices;
+            std::array<u8, 7> indices{};
             u8 num_valid_indices = 0;
             for (u8 i = 0; i < 7; ++i)
                 if (b.data[i].height < 6)

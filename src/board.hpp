@@ -40,7 +40,7 @@ namespace gya {
         std::array<i8, 6> data{};
         i8 height{};
 
-        constexpr decltype(auto) push(i8 value) {
+        constexpr i8 &push(i8 value) {
             if (height == 6) {
                 std::cout << std::flush;
                 std::cerr << "invalid column to push into (column full)" << std::endl;
@@ -49,11 +49,11 @@ namespace gya {
             return data.at(height++) = value;
         }
 
-        constexpr decltype(auto) operator[](u64 idx) {
+        constexpr i8 &operator[](u64 idx) {
             return data[idx];
         }
 
-        constexpr decltype(auto) operator[](u64 idx) const {
+        constexpr i8 const &operator[](u64 idx) const {
             return data[idx];
         }
 
@@ -96,11 +96,11 @@ requires function input to be formatted as such (same as provided by board::to_s
             return b;
         }
 
-        constexpr decltype(auto) operator[](u64 idx) {
+        constexpr board_column& operator[](u64 idx) {
             return data[idx];
         }
 
-        constexpr decltype(auto) operator[](u64 idx) const {
+        constexpr board_column const& operator[](u64 idx) const {
             return data[idx];
         }
 

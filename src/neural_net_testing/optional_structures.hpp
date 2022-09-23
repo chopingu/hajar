@@ -50,6 +50,10 @@ namespace gya {
             static_assert(used);
             return m_layer_array.back();
         }
+
+        constexpr bool active() const {
+            return used;
+        }
     };
 
     template<bool used, class T, u64... sizes>
@@ -95,6 +99,10 @@ namespace gya {
         constexpr auto back() const {
             static_assert(used);
             return m_weight_array.back();
+        }
+
+        constexpr bool active() const {
+            return used;
         }
     };
 }

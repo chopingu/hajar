@@ -39,7 +39,7 @@ struct neural_net {
     }
 
     void fill_randomly() {
-        *this = {};
+        *this = {activation_function, activation_derivative};
         update_randomly(0.1);
     }
 

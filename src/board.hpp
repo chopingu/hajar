@@ -104,7 +104,9 @@ requires function input to be formatted as such (same as provided by board::to_s
         return data[idx];
     }
 
-    constexpr i8 &play(u8 column, i8 value) {
+    constexpr i8 &play(u8 column, i8 value = 10) {
+        if (value == 10)
+            value = turn();
         if (value != 1 && value != -1) {
             std::cout << std::flush;
             std::cerr << "invalid player value\n";

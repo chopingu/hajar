@@ -70,6 +70,9 @@ struct neural_net {
         thread_local weight_array<T, sizes...> local_weight_derivatives_loss;
 
         std::span output{m_values.back()};
+
+        assert(choice.size() == output.size());
+
         const u64 num_layers = size();
         for (u64 node = 0; node < output.size(); ++node) {
             local_bias_derivatives_win.back()[node] =
@@ -105,14 +108,14 @@ struct neural_net {
                 local_weight_derivatives_loss[0][node][next_node] = weight_derivative_loss;
             }
         }
-        for (u64 i = 0; i < m_bias_derivatives_win.data.size(); ++i)
-            m_bias_derivatives_win.data[i] += local_bias_derivatives_win.data[i];
-        for (u64 i = 0; i < m_bias_derivatives_loss.data.size(); ++i)
-            m_bias_derivatives_loss.data[i] += local_bias_derivatives_loss.data[i];
-        for (u64 i = 0; i < m_weight_derivatives_win.data.size(); ++i)
-            m_weight_derivatives_win.data[i] += local_weight_derivatives_win.data[i];
-        for (u64 i = 0; i < m_weight_derivatives_loss.data.size(); ++i)
-            m_weight_derivatives_loss.data[i] += local_weight_derivatives_loss.data[i];
+        for (u64 i = 0; i < m_bias_derivatives_win.m_layer_array.data.size(); ++i)
+            m_bias_derivatives_win.m_layer_array.data[i] += local_bias_derivatives_win.data[i];
+        for (u64 i = 0; i < m_bias_derivatives_loss.m_layer_array.data.size(); ++i)
+            m_bias_derivatives_loss.m_layer_array.data[i] += local_bias_derivatives_loss.data[i];
+        for (u64 i = 0; i < m_weight_derivatives_win.m_weight_array.data.size(); ++i)
+            m_weight_derivatives_win.m_weight_array.data[i] += local_weight_derivatives_win.data[i];
+        for (u64 i = 0; i < m_weight_derivatives_loss.m_weight_array.data.size(); ++i)
+            m_weight_derivatives_loss.m_weight_array.data[i] += local_weight_derivatives_loss.data[i];
     }
 
     void compute_derivatives_based_on_result(bool won) {
@@ -120,11 +123,11 @@ struct neural_net {
         static_assert(!LABELED_DATA);
         auto &weights_derivatives = won ? m_weight_derivatives_win : m_weight_derivatives_loss;
         auto &bias_derivatives = won ? m_bias_derivatives_win : m_bias_derivatives_loss;
-        for (u64 i = 0; i < weights_derivatives.data.size(); ++i) {
-            m_weight_derivatives_acc.data[i] += weights_derivatives.data[i];
+        for (u64 i = 0; i < weights_derivatives.m_weight_array.data.size(); ++i) {
+            m_weight_derivatives_acc.m_weight_array.data[i] += weights_derivatives.m_weight_array.data[i];
         }
-        for (u64 i = 0; i < bias_derivatives.data.size(); ++i) {
-            m_bias_derivatives_acc.data[i] += bias_derivatives.data[i];
+        for (u64 i = 0; i < bias_derivatives.m_layer_array.data.size(); ++i) {
+            m_bias_derivatives_acc.m_layer_array.data[i] += bias_derivatives.m_layer_array.data[i];
         }
         m_weight_derivatives_win.fill(0);
         m_weight_derivatives_loss.fill(0);

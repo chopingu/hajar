@@ -184,6 +184,7 @@ struct neural_net {
         for (u64 layer = 0; layer < num_layers; ++layer) {
             for (u64 node = 0; node < m_values[layer].size(); ++node) {
                 m_biases[layer][node] += m_bias_derivatives_acc[layer][node] * -learning_rate;
+                m_bias_derivatives_acc[layer][node] = 0;
                 for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
                     m_weights[layer][node][next_node] +=
                             m_weight_derivatives_acc[layer][node][next_node] * -learning_rate;

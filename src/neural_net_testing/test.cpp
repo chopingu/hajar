@@ -5,29 +5,29 @@
 #include <bits/stdc++.h>
 
 namespace gya {
-    void randomly_update_neural_net_player(gya::neural_net_player<> &p, f32 change_rate) {
-        u64 num_changes = std::random_device{}() % (p.size() / 8);
-        std::default_random_engine rng{std::random_device{}()};
-        auto rand_f = [&](f32 low, f32 high) { return std::uniform_real_distribution<f32>{low, high}(rng); };
-        auto rand_i = [&](u64 low, u64 high) { return std::uniform_int_distribution<u64>{low, high}(rng); };
-        for (u64 i = 0; i < num_changes; ++i) {
-            if (rand_f(0, 1) < 0.5f) {
-                auto &item = p.net.m_weights.data[rand_i(0, p.net.m_weights.data.size() - 1)];
-                item = std::clamp(item + rand_f(-change_rate, change_rate), -1.0f, 1.0f);
-            } else {
-                auto &item = p.net.m_biases.data[rand_i(0, p.net.m_biases.data.size() - 1)];
-                item = std::clamp(item + rand_f(-change_rate, change_rate), -1.0f, 1.0f);
-            }
+void randomly_update_neural_net_player(gya::neural_net_player<> &p, f32 change_rate) {
+    u64 num_changes = std::random_device{}() % (p.size() / 8);
+    std::default_random_engine rng{std::random_device{}()};
+    auto rand_f = [&](f32 low, f32 high) { return std::uniform_real_distribution<f32>{low, high}(rng); };
+    auto rand_i = [&](u64 low, u64 high) { return std::uniform_int_distribution<u64>{low, high}(rng); };
+    for (u64 i = 0; i < num_changes; ++i) {
+        if (rand_f(0, 1) < 0.5f) {
+            auto &item = p.net.m_weights.data[rand_i(0, p.net.m_weights.data.size() - 1)];
+            item = std::clamp(item + rand_f(-change_rate, change_rate), -1.0f, 1.0f);
+        } else {
+            auto &item = p.net.m_biases.data[rand_i(0, p.net.m_biases.data.size() - 1)];
+            item = std::clamp(item + rand_f(-change_rate, change_rate), -1.0f, 1.0f);
         }
     }
+}
 
-    gya::board get_starting_pos(i32 num_random_moves) {
-        gya::board starting_pos;
-        gya::random_player p;
-        for (i32 i = 0; i < num_random_moves; ++i)
-            starting_pos.play(p(starting_pos), i % 2 == 0 ? 1 : -1);
-        return starting_pos;
-    }
+gya::board get_starting_pos(i32 num_random_moves) {
+    gya::board starting_pos;
+    gya::random_player p;
+    for (i32 i = 0; i < num_random_moves; ++i)
+        starting_pos.play(p(starting_pos), i % 2 == 0 ? 1 : -1);
+    return starting_pos;
+}
 }
 
 int main() {
@@ -95,7 +95,7 @@ int main() {
                             i32 local_wins = 0;
                             for (u64 k = 0; k < num_players; ++k) {
                                 auto &p1 = players[j];
-                                 auto &p2 = last_gen[k];
+                                auto &p2 = last_gen[k];
                                 const auto board = gya::get_starting_pos(rand() % 5 * 2);
                                 const auto result_1 = gya::test_game(p1, p2, board).has_won();
                                 const auto result_2 = gya::test_game(p2, p1, board).has_won();

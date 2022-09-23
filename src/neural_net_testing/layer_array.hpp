@@ -48,7 +48,7 @@ public:
         return operator[](size() - 1);
     }
 
-    constexpr auto fill(T const& value) {
+    constexpr auto fill(T const &value) {
         data.fill(value);
     }
 };

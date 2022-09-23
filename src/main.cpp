@@ -7,8 +7,10 @@
 #include "heuristic_solutions/two_move_solver.hpp"
 
 int main() {
-    tests: {
-        logic_testing: {
+    tests:
+    {
+        logic_testing:
+        {
             // test logic
             auto a = gya::board::from_string(
                     "| | | | | | | |\n"
@@ -58,7 +60,8 @@ int main() {
             std::cout << "game logic is ok" << std::endl;
         }
 
-        randomness_testing: {
+        randomness_testing:
+        {
             // test randomness
             gya::random_player p;
             std::unordered_map<u64, u64> prev_vals;
@@ -71,7 +74,8 @@ int main() {
             std::cout << "randomness is ok" << std::endl;
         }
 
-        random_player_perf: {
+        random_player_perf:
+        {
             // test performance
             gya::random_player p1, p2;
             auto t1 = std::chrono::high_resolution_clock::now();
@@ -85,7 +89,8 @@ int main() {
 
         }
 
-        neural_net_perf: {
+        neural_net_perf:
+        {
             // test neural net runtime  performance
             gya::random_player p1;
             gya::neural_net_player p2;
@@ -117,7 +122,8 @@ int main() {
             std::cout << "max: " << (max).count() << "ns" << std::endl;
         }
 
-        heuristic_solver_testing: {
+        heuristic_solver_testing:
+        {
             // test heuristic solvers
             {
 

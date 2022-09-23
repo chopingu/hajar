@@ -135,6 +135,15 @@ struct neural_net {
         m_bias_derivatives_loss.fill(0);
     }
 
+    void clear_derivatives() {
+        m_weight_derivatives_win.fill(0);
+        m_weight_derivatives_loss.fill(0);
+        m_weight_derivatives_acc.fill(0);
+        m_bias_derivatives_win.fill(0);
+        m_bias_derivatives_loss.fill(0);
+        m_bias_derivatives_acc.fill(0);
+    }
+
     auto compute_derivatives_labeled(std::span<T> correct_output) {
         static_assert(USE_BACKPROP);
         static_assert(LABELED_DATA);

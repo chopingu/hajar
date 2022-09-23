@@ -45,7 +45,7 @@ public:
         return matrix_ref<T>{data.data() + indices[idx], layer_sizes[idx + 1]};
     }
 
-    constexpr matrix_ref<T const> const operator[](u64 idx) const {
+    constexpr matrix_ref<T const> operator[](u64 idx) const {
         return matrix_ref<T const>{data.data() + indices[idx], layer_sizes[idx + 1]};
     }
 

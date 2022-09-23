@@ -47,4 +47,8 @@ public:
     constexpr std::span<T const> back() const {
         return operator[](size() - 1);
     }
+
+    constexpr auto fill(T const& value) {
+        data.fill(value);
+    }
 };

@@ -62,6 +62,8 @@ namespace gya {
         }
 
         auto compute_derivatives_unlabeled(std::span<T> choice) {
+            static_assert(USE_BACKPROP);
+            static_assert(!LABELED_DATA);
             thread_local layer_array<T, sizes...> local_bias_derivatives_win;
             thread_local weight_array<T, sizes...> local_weight_derivatives_win;
             thread_local layer_array<T, sizes...> local_bias_derivatives_loss;
@@ -113,8 +115,26 @@ namespace gya {
                 m_weight_derivatives_loss.data[i] += local_weight_derivatives_loss.data[i];
         }
 
+        void compute_derivatives_based_on_result(bool won) {
+            static_assert(USE_BACKPROP);
+            static_assert(!LABELED_DATA);
+            auto &weights_derivatives = won ? m_weight_derivatives_win : m_weight_derivatives_loss;
+            auto &bias_derivatives = won ? m_bias_derivatives_win : m_bias_derivatives_loss;
+            for (u64 i = 0; i < weights_derivatives.data.size(); ++i) {
+                m_weight_derivatives_acc.data[i] += weights_derivatives.data[i];
+            }
+            for (u64 i = 0; i < bias_derivatives.data.size(); ++i) {
+                m_bias_derivatives_acc.data[i] += bias_derivatives.data[i];
+            }
+            m_weight_derivatives_win.fill(0);
+            m_weight_derivatives_loss.fill(0);
+            m_bias_derivatives_win.fill(0);
+            m_bias_derivatives_loss.fill(0);
+        }
 
         auto compute_derivatives_labeled(std::span<T> correct_output) {
+            static_assert(USE_BACKPROP);
+            static_assert(LABELED_DATA);
             std::span output{m_values.back()};
             const u64 num_layers = size();
             for (u64 node = 0; node < output.size(); ++node) {
@@ -140,10 +160,14 @@ namespace gya {
                     m_weight_derivatives_win[0][node][next_node] = weight_derivative;
                 }
             }
+            for (u64 i = 0; i < m_bias_derivatives_acc.data.size(); ++i)
+                m_bias_derivatives_acc.data[i] += m_weight_derivatives_win.data[i];
+            for (u64 i = 0; i < m_weight_derivatives_acc.data.size(); ++i)
+                m_weight_derivatives_acc.data[i] += m_weight_derivatives_win.data[i];
         }
 
         auto apply_derivatives(T learning_rate = 0.01) {
-            std::span output{m_values.back()};
+            static_assert(USE_BACKPROP);
             const u64 num_layers = size();
             for (u64 layer = 0; layer < num_layers; ++layer) {
                 for (u64 node = 0; node < m_values[layer].size(); ++node) {
@@ -151,12 +175,15 @@ namespace gya {
                     for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
                         m_weights[layer][node][next_node] +=
                                 m_weight_derivatives_acc[layer][node][next_node] * -learning_rate;
+                        m_weight_derivatives_acc[layer][node][next_node] = 0;
                     }
                 }
             }
         }
 
         auto train(std::span<T> input, std::span<T> correct_output, T learning_rate = 0.01) {
+            static_assert(USE_BACKPROP);
+            static_assert(LABELED_DATA);
             evaluate(input);
             compute_derivatives_labeled(correct_output);
             apply_derivatives(learning_rate);
@@ -216,7 +243,7 @@ namespace gya {
         }
 
         void from_string(std::string_view s) {
-            std::istringstream iss((std::string(s)));
+            std::istringstream iss{std::string(s)};
             for (auto &i: m_weights.data)
                 iss >> i;
             for (auto &i: m_biases.data)

@@ -2,31 +2,33 @@
 
 #include <cmath>
 #include <string>
-#include <../defines.hpp>
+#include "../defines.hpp"
 
 namespace gya {
 
 namespace cnn 
 {
 
+template<class T>
+
 namespace mse 
 {
 std::string name="mse";
-f32 error(f32 output, f32 target) { return 0.5f * (output - target) * (output - target); }
-f32 pd_error(f32 output, f32 target) { return out - target; }
+T error(T output, T target) { return 0.5 * (output - target) * (output - target); }
+T pd_error(T output, T target) { return out - target; }
 }
 
 namespace bce
 {
 std::string name="bce";
-f32 error(f32 output, f32 target) { return (-target * std::log(output) - (1.0f - target) * std::log(1.0f - output)); }
-f32 pd_error(f32 output, f32 target) { return (output - target) / (output * (1.0f - output)); }
+T error(T output, T target) { return (-target * std::log(output) - (1.0 - target) * std::log(1.0 - output)); }
+T pd_error(T output, T target) { return (output - target) / (output * (1.0 - output)); }
 }
 
 struct error_function {
     std::string *name;
-    f32 (*error)(f32, f32);
-    f32 (*pd_error)(f32, f32);
+    T (*error)(T, T);
+    T (*pd_error)(T, T);
 }
 
 error_function* new_error_function(std::string new_function) {

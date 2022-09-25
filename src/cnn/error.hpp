@@ -2,7 +2,6 @@
 
 #include <cmath>
 #include <string>
-#include "../defines.hpp"
 
 /*
  * usage:

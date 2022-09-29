@@ -31,13 +31,18 @@ constexpr static auto tanh_activation_derivative = [](f32 x) {
 
 template<class F1 = decltype(fast_activation_function), class F2 = decltype(fast_activation_derivative)>
 struct neural_net_player {
-    using neural_net_params_t = neural_net_params<f32, F1, F2, 43, 35, 30, 25, 20, 15, 10, 7>;
+    using neural_net_params_t = neural_net_params<f32, F1, F2, 42, 128, 128, 7>;
     using neural_net_t = typename neural_net_params_t::neural_net_t;
     using layer_array_t = typename neural_net_params_t::layer_array_t;
 
-    neural_net_player() : net{fast_activation_function, fast_activation_derivative} {}
 
-    neural_net_player(F1 f, F2 derivative) : net{f, derivative} {}
+    neural_net_player() : net{F1{}, F2{}} {
+        net.update_randomly(0.5);
+    }
+
+    neural_net_player(F1 f, F2 derivative) : net{f, derivative} {
+        net.update_randomly(0.5);
+    }
 
     auto &operator=(neural_net_player const &other) {
         net = other.net;
@@ -50,43 +55,23 @@ struct neural_net_player {
         return net.m_weights.data.size() + net.m_biases.data.size();
     }
 
-    void train(std::span<f32> correct_output) {
-
-    }
-
     [[nodiscard]] u8 operator()(gya::board const &b) {
         if (std::all_of(b.data.begin(), b.data.end(), [](auto &x) { return x.height == 6; }))
             throw std::runtime_error("board is full");
 
-        std::array<f32, 43> input{};
+        std::array<f32, 42> input{};
         for (u64 i = 0; i < 6; ++i) {
             for (u64 j = 0; j < 7; ++j) {
-                input[i * 7 + j] = b.data[i][j];
+                input[i * 7 + j] = b.data[i][j] * b.turn();
             }
         }
-        input.back() = b.size % 2 ? 1 : -1;
-        auto net_output = net.evaluate_const(input);
-
-        std::array<u8, 7> indices{};
-        u8 num_valid_indices = 0;
+        const auto net_output = net.evaluate_const(input);
+        u8 ans = 0;
         for (u8 i = 0; i < 7; ++i)
-            if (b.data[i].height < 6)
-                indices[num_valid_indices++] = i;
-        std::default_random_engine rng;
-        static i32 m = 1;
-        rng.seed(clock() * m++);
-        u8 res = std::uniform_int_distribution<u8>{0, num_valid_indices}(rng);
+            if (b[i].height < 6 && (b[ans].height >= 6 || net_output[i] > net_output[ans]))
+                ans = i;
+        return ans;
 
-        std::shuffle(indices.begin(), indices.end(), rng);
-        for (u8 i = 0; i < net_output.size(); ++i) {
-            if (b.data[res].height == 6 && b.data[indices[i]].height < 6) {
-                res = indices[i];
-            } else if (net_output[indices[i]] > net_output[res] &&
-                       b.data[indices[i]].height < 6) {
-                res = indices[i];
-            }
-        }
-        return res;
     }
 };
 }

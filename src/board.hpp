@@ -41,7 +41,7 @@ struct board_column {
     i8 height{};
 
     constexpr i8 &push(i8 value) {
-        if (height == 6) {
+        if (height >= 6) {
             std::cout << std::flush;
             std::cerr << "invalid column to push into (column full)" << std::endl;
             exit(0);
@@ -111,6 +111,11 @@ requires function input to be formatted as such (same as provided by board::to_s
             std::cout << std::flush;
             std::cerr << "invalid player value\n";
             exit(-1);
+        }
+        if (data[column].height >= 6) {
+            std::cout << std::flush;
+            std::cerr << std::flush;
+            std::cerr << to_string() << std::endl;
         }
         auto &ret = data[column].push(value);
         ++size;

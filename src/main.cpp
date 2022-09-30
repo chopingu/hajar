@@ -50,7 +50,6 @@ int main() {
             gya::board c = gya::test_game(p1, p2);
             while (!c.has_won().is_tie()) {
                 c = gya::test_game(p1, p2);
-
             }
 
             if (!c.has_won_test().is_tie()) {

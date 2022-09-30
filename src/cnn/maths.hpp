@@ -6,8 +6,7 @@
 
 namespace gya {
 
-namespace cnn 
-{ 
+namespace cnn {
 
 template<class T>
 T dot(const T *v1, const T *v2, const u64 _size) { 
@@ -19,7 +18,7 @@ T dot(const T *v1, const T *v2, const u64 _size) {
 }
 
 template<class T> 
-T 2d_dot(const T *v1, const T *v2, const u64 _size, const u64 stride1, const u64 stride2) {
+T dot_2d(const T *v1, const T *v2, const u64 _size, const u64 stride1, const u64 stride2) {
     T sum = 0;
     for(u64 i = 0; i < _size; i++) 
         sum += dot(v1[stride1 * i], v2[stride2 * i], _size);
@@ -35,7 +34,5 @@ T dot_180(const T *v1, const T *v2, const u64 _size) {
 
     return sum;
 }
-
 }
-
 }

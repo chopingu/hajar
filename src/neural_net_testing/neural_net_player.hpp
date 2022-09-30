@@ -35,7 +35,6 @@ struct neural_net_player {
     using neural_net_t = typename neural_net_params_t::neural_net_t;
     using layer_array_t = typename neural_net_params_t::layer_array_t;
 
-
     neural_net_player() : net{F1{}, F2{}} {
         net.update_randomly(0.5);
     }
@@ -71,7 +70,6 @@ struct neural_net_player {
             if (b[i].height < 6 && (b[ans].height >= 6 || net_output[i] > net_output[ans]))
                 ans = i;
         return ans;
-
     }
 };
 }

@@ -13,25 +13,20 @@
 
 namespace gya {
 
-namespace cnn 
-{
+namespace cnn {
 
-template<class T>
-
-namespace mse 
-{
-std::string name="mse";
+namespace mse {
+constexpr auto name = "mse";
 
 template<class T>
 T cost(T output, T target) { return 0.5f * (output - target) * (output - target); }
 
 template<class T>
-T d_cost(T output, T target) { return out - target; }
+T d_cost(T output, T target) { return output - target; }
 }
 
-namespace bce
-{
-std::string name="bce";
+namespace bce {
+constexpr auto name = "bce";
 
 template<class T>
 T cost(T output, T target) { return (-target * std::log(output) - (1.0f - target) * std::log(1.0f - output)); }
@@ -42,31 +37,32 @@ T d_cost(T output, T target) { return (output - target) / (output * (1.0f - outp
 
 template<class T>
 struct cost_function {
-    std::string *name;
+    const char *name;
+
     T (*cost)(T, T);
+
     T (*d_cost)(T, T);
-}
+};
 
-cost_function* new_cost_function(std::string new_function) {
-    cost_function *nw = new cost_function;
+template<class T>
+cost_function<T> *new_cost_function(std::string_view new_function) {
+    cost_function<T> *nw = new cost_function<T>;
 
-    if(new_function==mse::name) { 
-        nw->cost=&mse::cost;
-        nw->d_cost=&mse::d_cost;
-        nw->name=mse::name;
+    if (new_function == mse::name) {
+        nw->cost = &mse::cost;
+        nw->d_cost = &mse::d_cost;
+        nw->name = mse::name;
         return nw;
     }
 
-    if(new_function==bce::name) {
-        nw->cost=&bce::cost;
-        nw->d_cost=&bce::d_cost;
-        nw->name=bce::name;
+    if (new_function == bce::name) {
+        nw->cost = &bce::cost;
+        nw->d_cost = &bce::d_cost;
+        nw->name = bce::name;
     }
 
     delete nw;
     return 0;
 }
-
 }
-
 }

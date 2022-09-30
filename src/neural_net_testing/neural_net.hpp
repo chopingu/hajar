@@ -129,19 +129,14 @@ struct neural_net {
         for (u64 i = 0; i < bias_derivatives.m_layer_array.data.size(); ++i) {
             m_bias_derivatives_acc.m_layer_array.data[i] += bias_derivatives.m_layer_array.data[i];
         }
-        m_weight_derivatives_win.fill(0);
-        m_weight_derivatives_loss.fill(0);
-        m_bias_derivatives_win.fill(0);
-        m_bias_derivatives_loss.fill(0);
+        clear_derivatives();
     }
 
     void clear_derivatives() {
         m_weight_derivatives_win.fill(0);
         m_weight_derivatives_loss.fill(0);
-        m_weight_derivatives_acc.fill(0);
         m_bias_derivatives_win.fill(0);
         m_bias_derivatives_loss.fill(0);
-        m_bias_derivatives_acc.fill(0);
     }
 
     auto compute_derivatives_labeled(std::span<T> correct_output) {
@@ -181,7 +176,7 @@ struct neural_net {
     auto apply_derivatives(T learning_rate = 0.01) {
         static_assert(USE_BACKPROP);
         const u64 num_layers = size();
-        for (u64 layer = 0; layer < num_layers; ++layer) {
+        for (u64 layer = num_layers; layer-- > 0;) {
             for (u64 node = 0; node < m_values[layer].size(); ++node) {
                 m_biases[layer][node] += m_bias_derivatives_acc[layer][node] * -learning_rate;
                 m_bias_derivatives_acc[layer][node] = 0;
@@ -192,6 +187,7 @@ struct neural_net {
                 }
             }
         }
+        clear_derivatives();
     }
 
     auto train(std::span<T> input, std::span<T> correct_output, T learning_rate = 0.01) {

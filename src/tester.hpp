@@ -22,9 +22,11 @@ gya::board test_game(player1_t &&player1, player2_t &&player2, gya::board b = {}
 struct random_player {
     u64 x = 123456789, y = 362436069, z = 521288629;
 
-    random_player() {
+    random_player(u64 seed = -1) {
         static u64 offs = 0;
         u64 t = ++offs * (std::chrono::system_clock::now().time_since_epoch().count() & 0xffffffff);
+        if (seed != -1)
+           t = seed;
         x ^= t;
         y ^= (t >> 32) ^ (t << 32);
         z ^= (t >> 16) ^ (t << 48);

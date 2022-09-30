@@ -21,17 +21,26 @@ template<class T>
 namespace mse 
 {
 std::string name="mse";
+
+template<class T>
 T cost(T output, T target) { return 0.5f * (output - target) * (output - target); }
+
+template<class T>
 T d_cost(T output, T target) { return out - target; }
 }
 
 namespace bce
 {
 std::string name="bce";
+
+template<class T>
 T cost(T output, T target) { return (-target * std::log(output) - (1.0f - target) * std::log(1.0f - output)); }
+
+template<class T>
 T d_cost(T output, T target) { return (output - target) / (output * (1.0f - output)); }
 }
 
+template<class T>
 struct cost_function {
     std::string *name;
     T (*cost)(T, T);

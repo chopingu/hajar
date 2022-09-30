@@ -10,12 +10,11 @@ namespace gya {
 namespace cnn 
 {
 
-template<class T> 
-
 namespace tan_h
 {
 std::string name = "tan_h"
 
+template<class T>
 void activation(std::span<T> input, std::span<const T> bias, const u64 _size) {
     for(u64 i = 0; i < _size; i++) {
         const T x = input[i] + bias[i];
@@ -25,6 +24,7 @@ void activation(std::span<T> input, std::span<const T> bias, const u64 _size) {
     }
 }
 
+template<class T>
 T d_activation(std::span<const T> input, const u64 index) { return (1.0f - input[index] * input[index]); } // input is already activated here
 }
 
@@ -32,11 +32,13 @@ namespace identity
 {
 std::string name = "identity";
 
+template<class T>
 void activation(std::span<T> input, std::span<const T> bias, const u64 _size) {
     for(u64 i = 0; i < _size; i++) 
         input[i] = input[i] + bias[i];
 }
 
+template<class T>
 T d_activation(std::span<const T> input, const u64 ind) { return 1.0f; }
 }
 
@@ -44,6 +46,7 @@ namespace elu
 {
 std::string name = "elu";
 
+template<class T>
 void activation(std::span<T> input, std::span<const T> bias, const u64 _size) { 
     for(u64 i = 0; i < _size; i++) {
         T x = input[i] + bias[i];
@@ -52,6 +55,7 @@ void activation(std::span<T> input, std::span<const T> bias, const u64 _size) {
     }
 }
 
+template<class T>
 T d_activation(std::span<const T> input, const u64 ind) { 
     if(input[i]>0) return 1.0f;
     else return 0.1f * std::exp(input[i]);
@@ -62,6 +66,7 @@ namespace relu
 {
 std::string name = "relu";
 
+template<class T>
 void activation(std::span<T> input, std::span<const T> bias, const u64 _size) { 
     for(u64 i = 0; i < _size; i++) {
         T x = input[i] + bias[i];
@@ -70,6 +75,7 @@ void activation(std::span<T> input, std::span<const T> bias, const u64 _size) {
     }
 }
 
+template<class T>
 T d_activation(std::span<const T> input, const u64 ind) { 
     if(input[i]>0) return 1.0f;
     else return 0.0f;
@@ -80,6 +86,7 @@ namespace lrelu
 {
 std::string name = "lrelu";
 
+template<class T>
 void activation(std::span<T> input, std::span<const T> bias, const u64 _size) { 
     for(u64 i = 0; i < _size; i++) {
         T x = input[i] + bias[i];
@@ -88,6 +95,7 @@ void activation(std::span<T> input, std::span<const T> bias, const u64 _size) {
     }
 }
 
+template<class T>
 T d_activation(std::span<const T> input, const u64 ind) { 
     if(input[i]>0) return 1.0f;
     else return 0.01f;
@@ -98,6 +106,7 @@ namespace vlrelu
 {
 std::string name = "vlrelu";
 
+template<class T>
 void activation(std::span<T> input, std::span<const T> bias, const u64 _size) { 
     for(u64 i = 0; i < _size; i++) {
         T x = input[i] + bias[i];
@@ -106,6 +115,7 @@ void activation(std::span<T> input, std::span<const T> bias, const u64 _size) {
     }
 }
 
+template<class T>
 T d_activation(std::span<const T> input, const u64 ind) { 
     if(input[i]>0) return 1.0f;
     else return 0.2f;
@@ -116,6 +126,7 @@ namespace sigmoid
 {
 std::string name = "sigmoid";
 
+template<class T>
 void activation(std::span<T> input, std::span<const T> bias, const u64 _size) { 
     for(u64 i = 0; i < _size; i++) {
         T x = input[i] + bias[i];
@@ -123,6 +134,7 @@ void activation(std::span<T> input, std::span<const T> bias, const u64 _size) {
     }
 }
 
+template<class T>
 T d_activation(std::span<const T> input, const u64 ind) { return input[i] * (1.0f - input[i]); } // input[i] is already activated
 }
 
@@ -130,10 +142,12 @@ namespace none
 {
 std::string name = "none";
 
+template<class T>
 void activation(std::span<T> input, std::span<const T> bias, const u64 _size) { return; }
 T d_activation(std::span<const T> input, const u64 ind) { return; } 
 }
 
+template<class T>
 struct activation_function {
     std::string *name;
     void (*activation)(std::span<T>, std::span<const T>, const u64);

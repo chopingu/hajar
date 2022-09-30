@@ -10,15 +10,32 @@ namespace cnn
 { 
 
 template<class T>
-
-T v_dot(std::span<const T> v1, std::span<const T> v2, const u64 _size, const u64 _start) { 
+T dot(const T *v1, const T *v2, const u64 _size) { 
     T sum = 0;
     for(u64 i = 0; i < _size; i++) 
-        sum += v1[_start + i] * v2[_start + i];
+        sum += v1[i] * v2[i];
+
+    return sum;
+}
+
+template<class T> 
+T 2d_dot(const T *v1, const T *v2, const u64 _size, const u64 stride1, const u64 stride2) {
+    T sum = 0;
+    for(u64 i = 0; i < _size; i++) 
+        sum += dot(v1[stride1 * i], v2[stride2 * i], _size);
+
+    return sum;
+}
+
+template<class T> 
+T dot_180(const T *v1, const T *v2, const u64 _size) { 
+    T sum = 0;
+    for(u64 i = 0; i < _size; i++) 
+        sum += v1[i] * v2[_size - 1 - i];
+
     return sum;
 }
 
 }
 
 }
-

@@ -1,0 +1,60 @@
+\ProvidesPackage{preamble}
+
+% math
+\usepackage{ebgaramond-maths}
+\usepackage[T1]{fontenc}
+\usepackage[Symbol]{upgreek}
+\usepackage{nicefrac, amsmath, amsthm}
+
+% clickable references
+\usepackage{hyperref}
+
+% nomenclature
+\usepackage{nomencl}
+\makenomenclature
+\renewcommand\nomname{}
+
+% chapters and sections
+\usepackage{titlesec}
+\usepackage[rightlabels]{titletoc}
+\renewcommand\thesection{\S\arabic{section}}
+\titleformat{\section}{\huge \centering\scshape}{\thesection.}{1ex}{}
+\titleformat{\subsection}{\scshape}{\thesubsection}{1ex}{}
+\titleformat{\subsubsection}{\small \scshape}{\thesubsubsection}{1ex}{}
+
+% keywords
+\providecommand{\keywords}[1] {
+    \centerline{
+        \small
+        \textbf{\scshape{Keywords ---}} #1
+    }
+}
+
+% date
+\date{}
+
+% abstract
+\renewcommand\abstractname{\scshape{abstract} \vskip 0.15cm \rule{2cm}{0.2mm}}
+
+% epigraph
+\newcommand{\attr}[1]{ \begin{flushright} \scriptsize \rule[0.5mm]{3mm}{0.1mm}\hspace{1.5mm}#1 \end{flushright}}
+\newcommand{\epigraph}[1]{\begin{quote} \footnotesize #1 \end{quote} }
+
+% contents 
+\renewcommand\contentsname{\Huge \textbf{\scshape{Contents}} \bigskip}
+
+% references
+\renewcommand\refname{\normalsize \textbf{\scshape{References}}}
+
+% figures
+\usepackage[labelfont={sc}]{caption}
+
+% hyphen
+\usepackage{hyphenat}
+
+% draw stuff
+\usepackage{graphicx}
+
+% argmin function
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}

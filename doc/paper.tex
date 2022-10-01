@@ -1,10 +1,6 @@
 \documentclass[titlepage]{article}
-\input{preamble.tex}
 
-\providecommand{\keywords}[1] {
-    \small
-    \textbf{\textit{Keywords ---}} #1
-}
+\usepackage{preamble}
 
 \title{
     \textbf{ANALYSIS OF \\
@@ -13,17 +9,11 @@
 }
 
 \author{
-    \rule{8cm}{0.3mm} \\[0.5in] 
-    \textit{Adam Amanbaev, Jonathan Hallström, Alvar Edvardsson} \\ 
-    \textit{Hugo Åkerfeldt, Romeo Patzer} \\\\
-    \small \textit{Supervisor: Ulf Backlund}
+    \rule{8cm}{0.3mm} \\[1.3cm] 
+    \small \scshape{Adam Amanbaev, Jonathan Hallström, Alvar Edvardsson} \\ 
+    \small \scshape{Hugo Åkerfeldt, Romeo Patzer} \\[1cm]
+    \small \scshape{Supervisor: Ulf Backlund}
 }
-
-\date{}
-
-\renewcommand\abstractname{\textbf{Abstract \\[0.1in] \rule{3cm}{0.2mm}}}
-
-\renewcommand\contentsname{\Huge Contents \\}
 
 \begin{document}
 
@@ -31,42 +21,56 @@
 
 \newpage
 
-% abstract page
 \begin{abstract}
-    In late 2017 DeepMind announced a groundbreaking system in a preprint \cite{alphazero} and the results were astonishing. The system was called AlphaZero and utilized \emph{artificial neural networks} in combination with \emph{heuristic algorithms} in order to teach itself the game chess without any proprietary knowledge. After approximately 9 hours it was able to beat the strongest hand-crafted engines, such as Stockfish and it had learned centuries of human knowledge of chess. In this paper we aim to study the effectiveness of different \emph{neural networks} and \emph{heuristic algorithms} such as the one used in AlphaZero. More precisely, we intend to analyze the efficiency of those networks and algorithms in combination with varying \emph{optimizations, parameters, hyperparameters} and \emph {architectures} applied to the classic games \emph{Connect Four} and \emph{Othello}. \\[0.5in]
-\centerline{\keywords{Machine Learning, Supervised Learning, Reinforcement Learning, Neural Network, Deep Learning}}
-\end{abstract}
+In late 2017 DeepMind announced a groundbreaking system in a preprint \cite{alphazero} and the results were astonishing. The system was called AlphaZero and utilized \emph{artificial neural networks} in combination with \emph{heuristic algorithms} in order to teach itself the game chess without any proprietary knowledge. After approximately 9 hours it was able to beat the strongest hand-crafted engines, such as Stockfish and it had learned centuries of human knowledge of chess. In this paper we aim to study the effectiveness of different \emph{neural networks} and \emph{heuristic algorithms} such as the one used in AlphaZero. More precisely, we intend to analyze the efficiency of those networks and algorithms in combination with varying \emph{optimizations, parameters, hyperparameters} and \emph {architectures} applied to the classic games \emph{Connect Four} and \emph{Othello}. 
+
+\vskip 0.8cm
+
+\keywords{Machine Learning, Supervised Learning, Reinforcement Learning, Neural Network, Deep Learning} 
+
+\end{abstract} 
+
+\pagenumbering{roman}
 
 \tableofcontents
 
-\newpage
+\newpage 
 
-\section{Motivation}
+\section*{\huge Summary of Notation}
+\addcontentsline{toc}{section}{Summary of Notation}
+
+\vskip 0.5cm
+
+\epigraph{
+I am a forest, and a night of dark trees: but he who is not afraid of my darkness, will find banks full of roses under my cypresses.
+\attr{Friedrich Nietzsche, Thus Spoke Zarathustra}
+}
+
+\vskip -1cm
+
+\nomenclature{$\upepsilon$}{probability of taking a random action in an $\upepsilon$\hyp greedy policy}
+\nomenclature{$\argmin_x f(x)$}{\{$x \mid f(x) = \min_{x'} f(x')$\}}
+\nomenclature{$\argmax_x f(x)$}{\{$x \mid f(x) = \max_{x'} f(x')$\}}
+\nomenclature{$\leftarrow$}{assignment}
+\nomenclature{$\upgamma$}{discount-rate parameter}
+
+\nomenclature{$\textnormal{s, s'}$}{states}
+
+\printnomenclature[3cm]
+
+\clearpage
+\pagenumbering{arabic}
 
 \newpage
 
 \section{Introduction}
 
-\subsection{What is Reinforcement Learning}
-\subsection{What is Deep Learning}
-\subsubsection{Artificial Neural Networks}
-\subsubsection{Deep Reinforcement Learning}
+\subsection{Background}
+\subsection{Analysis}
 
 \newpage
 
-\section{Notation and Definitions}
-\subsection{Sigma Function}
-\subsection{Vector}
-\subsection{Matrix}
-\subsection{Derivative}
-\subsection{Gradient}
-
-\newpage
-
-\begin{thebibliography}{100}
-\bibitem{alphazero}
-Silver, David; Hubert, Thomas; Schrittwieser, Julian; Antonoglou, Ioannis; Lai, Matthew; Guez, Arthur; Lanctot, Marc; Sifre, Laurent; Kumaran, Dharshan; Graepel, Thore; Lillicrap, Timothy; Simonyan, Karen; Hassabis, Demis (December 5, 2017). "Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm".
-
-\end{thebibliography}
+\bibliographystyle{plain}
+\bibliography{refs}
 
 \end{document}

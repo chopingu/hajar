@@ -1,7 +1,7 @@
 #include "defines.hpp"
 #include "neural_net_player.hpp"
-#include "heuristic_solutions/one_move_solver.hpp"
-#include "heuristic_solutions/two_move_solver.hpp"
+#include "heuristic/one_move_solver.hpp"
+#include "heuristic/two_move_solver.hpp"
 #include <bits/stdc++.h>
 
 namespace gya {

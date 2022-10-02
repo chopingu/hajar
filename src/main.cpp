@@ -1,8 +1,12 @@
+#include "cnn/activation.hpp"
+#include "cnn/cost.hpp"
+#include "cnn/maths.hpp"
 #include "defines.hpp"
 #include "board.hpp"
 #include "tester.hpp"
 #include <iostream>
 #include "neural_net_testing/neural_net_player.hpp"
+#include "heuristic/mcts.hpp"
 #include "heuristic/one_move_solver.hpp"
 #include "heuristic/two_move_solver.hpp"
 

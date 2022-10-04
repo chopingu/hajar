@@ -104,9 +104,7 @@ requires function input to be formatted as such (same as provided by board::to_s
         return data[idx];
     }
 
-    constexpr i8 &play(u8 column, i8 value = 10) {
-        if (value == 10)
-            value = turn();
+    constexpr i8 &play(u8 column, i8 value) {
         if (value != 1 && value != -1) {
             std::cout << std::flush;
             std::cerr << "invalid player value\n";
@@ -210,6 +208,10 @@ requires function input to be formatted as such (same as provided by board::to_s
         }
 
         return ret;
+    }
+
+    constexpr i8 &play(u8 column) {
+        return play(column, turn());
     }
 
     std::vector<u8> get_actions() {

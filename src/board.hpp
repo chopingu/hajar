@@ -212,6 +212,14 @@ requires function input to be formatted as such (same as provided by board::to_s
         return ret;
     }
 
+    std::vector<u8> get_actions() {
+        std::vector<u8> res;
+        for (u8 i = 0; i < 7; ++i)
+            if (data[i].height < 6)
+                res.push_back(i);
+        return res;
+    }
+
     [[nodiscard]] constexpr game_result has_won() const {
         return winner != 0 ?
                winner == 1 ? game_result{1} : game_result{2} :

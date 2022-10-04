@@ -4,10 +4,7 @@
 #include <array>
 #include "../defines.hpp"
 
-namespace gya {
-
 namespace cnn {
-
 template<class T>
 T dot(const T *v1, const T *v2, const u64 _size) { 
     T sum = 0;
@@ -33,6 +30,5 @@ T dot_180(const T *v1, const T *v2, const u64 _size) {
         sum += v1[i] * v2[_size - 1 - i];
 
     return sum;
-}
 }
 }

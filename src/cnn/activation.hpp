@@ -6,8 +6,6 @@
 #include <array>
 #include "../defines.hpp"
 
-namespace gya {
-
 namespace cnn {
 
 namespace tan_h {
@@ -203,6 +201,5 @@ activation_function<T> *new_activation_function(std::string_view new_function) {
 
     delete nw;
     return 0;
-}
 }
 }

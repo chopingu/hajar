@@ -10,9 +10,6 @@
  * the derivative of the partial derivative of the cost function
  * and a string that contains the name of the function
 */
-
-namespace gya {
-
 namespace cnn {
 
 namespace mse {
@@ -38,10 +35,9 @@ T d_cost(T output, T target) { return (output - target) / (output * (1.0f - outp
 template<class T>
 struct cost_function {
     const char *name;
+    using function_ptr = T(*)(T, T);
 
-    T (*cost)(T, T);
-
-    T (*d_cost)(T, T);
+    function_ptr cost, d_cost;
 };
 
 template<class T>
@@ -62,7 +58,6 @@ cost_function<T> *new_cost_function(std::string_view new_function) {
     }
 
     delete nw;
-    return 0;
-}
+    return nullptr;
 }
 }

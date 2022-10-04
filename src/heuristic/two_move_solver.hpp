@@ -2,7 +2,7 @@
 #include "../board.hpp"
 #include "../tester.hpp"
 
-namespace gya {
+namespace heuristic {
 
 struct two_move_solver {
     gya::random_player rp{};

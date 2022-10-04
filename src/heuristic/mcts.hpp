@@ -8,8 +8,7 @@
 #include "../defines.hpp"
 #include "../utilities.hpp"
 
-namespace gya::mcts {
-
+namespace mcts {
 template<class T>
 class Node {
 public:
@@ -23,5 +22,4 @@ public:
     Node(std::weak_ptr<Node> parent, std::shared_ptr<gya::board> state)
             : visits{1}, value{}, state{std::move(state)}, children{}, parent{parent} {}
 };
-
 } // namespace mcts

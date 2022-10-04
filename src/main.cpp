@@ -143,7 +143,7 @@ int main() {
                           << std::endl;
             }
             {
-                gya::one_move_solver s;
+                heuristic::one_move_solver s;
                 gya::board board_1 = gya::board::from_string(
                         "| | | | | | | |\n"
                         "| | | | | | | |\n"

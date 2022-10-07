@@ -129,8 +129,7 @@ int main() {
         {
             // test heuristic solvers
             {
-
-                gya::two_move_solver s;
+                heuristic::two_move_solver s;
                 gya::random_player p;
                 int iters = 10000;
                 double games = iters * 2;

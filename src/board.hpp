@@ -141,7 +141,7 @@ requires function input to be formatted as such (same as provided by board::to_s
             }
         }
         if (hor >= 4) {
-            winner = value;
+            winner = value == -1 ? 2 : 1;
             return ret;
         }
         int ver = 1;
@@ -155,7 +155,7 @@ requires function input to be formatted as such (same as provided by board::to_s
             }
         }
         if (ver >= 4) {
-            winner = value;
+            winner = value == -1 ? 2 : 1;
             return ret;
         }
 
@@ -179,7 +179,7 @@ requires function input to be formatted as such (same as provided by board::to_s
             }
         }
         if (diag_tl >= 4) {
-            winner = value;
+            winner = value == -1 ? 2 : 1;
             return ret;
         }
 
@@ -203,8 +203,12 @@ requires function input to be formatted as such (same as provided by board::to_s
             }
         }
         if (diag_tr >= 4) {
-            winner = value;
+            winner = value == -1 ? 2 : 1;
             return ret;
+        }
+
+        if (size == 42) {
+            winner = -1;
         }
 
         return ret;
@@ -223,9 +227,7 @@ requires function input to be formatted as such (same as provided by board::to_s
     }
 
     [[nodiscard]] constexpr game_result has_won() const {
-        return winner != 0 ?
-               winner == 1 ? game_result{1} : game_result{2} :
-               size == 42 ? game_result{-1} : game_result{0};
+        return game_result{winner};
     }
 
     [[nodiscard]] constexpr game_result has_won_test() const {

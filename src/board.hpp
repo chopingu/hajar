@@ -105,15 +105,15 @@ requires function input to be formatted as such (same as provided by board::to_s
     }
 
     constexpr i8 &play(u8 column, i8 value) {
-        if (value != 1 && value != -1) {
-            std::cout << std::flush;
-            std::cerr << "invalid player value\n";
-            exit(-1);
-        }
+        if (size == 42)
+            throw std::runtime_error("cant play if board is full (possible tie)");
+        if (value != 1 && value != -1)
+            throw std::runtime_error("invalid player");
         if (data[column].height >= 6) {
             std::cout << std::flush;
             std::cerr << std::flush;
             std::cerr << to_string() << std::endl;
+            std::cerr << "column: " << (int) column << std::endl;
         }
         auto &ret = data[column].push(value);
         ++size;
@@ -218,7 +218,19 @@ requires function input to be formatted as such (same as provided by board::to_s
         return play(column, turn());
     }
 
-    std::vector<u8> get_actions() {
+    /**
+     * @param column
+     * @return board state after playing the given move
+     */
+    constexpr gya::board play_copy(u8 column) const {
+        gya::board result = *this;
+        result.play(column);
+        return result;
+    }
+
+    std::vector<u8> get_actions() const {
+        if (size == 42)
+            throw std::runtime_error("no actions if board is full (possible tie)");
         std::vector<u8> res;
         for (u8 i = 0; i < 7; ++i)
             if (data[i].height < 6)

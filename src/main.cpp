@@ -9,8 +9,93 @@
 #include "heuristic/mcts.hpp"
 #include "heuristic/one_move_solver.hpp"
 #include "heuristic/two_move_solver.hpp"
+#include "heuristic/n_move_solver.hpp"
+
+#include <thread>
 
 int main() {
+//    gya::board board_1 = gya::board::from_string(
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "|O|X| | | | | |\n"
+//            "|O|O|X| | | | |\n"
+//            "|X|O|O|X|X| | |\n"
+//            "|1|2|3|4|5|6|7|\n"
+//    );
+//    std::cout << (int) heuristic::n_move_solver{}.evaluate_board(board_1, 5) << '\n';
+//    board_1 = gya::board::from_string(
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "| | |X|X|X| | |\n"
+//            "| |X|O|O|O|X|O|\n"
+//            "|1|2|3|4|5|6|7|\n"
+//    );
+//    std::cout << (int) heuristic::n_move_solver{}.evaluate_board(board_1, 5) << '\n';
+//    board_1 = gya::board::from_string(
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "| | | |X|X|X| |\n"
+//            "| | | |O|X|O|X|\n"
+//            "| | | |X|O|O|O|\n"
+//            "|1|2|3|4|5|6|7|\n"
+//    );
+//    std::cout << (int) heuristic::n_move_solver{}.evaluate_board(board_1, 5) << '\n';
+//    board_1 = gya::board::from_string(
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "| | | | |X|O| |\n"
+//            "| | |O|O|X|X| |\n"
+//            "| | |O|X|X|O| |\n"
+//            "|1|2|3|4|5|6|7|\n"
+//    );
+//    std::cout << (int) heuristic::n_move_solver{}.evaluate_board(board_1, 5) << '\n';
+//    board_1 = gya::board::from_string(
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "| | | | | | | |\n"
+//            "| | | | |X|O| |\n"
+//            "| | |O|O|X|X| |\n"
+//            "| | |O|X|X|O| |\n"
+//            "|1|2|3|4|5|6|7|\n"
+//    );
+//    std::cout << (int) heuristic::n_move_solver{}.evaluate_board(board_1, 5) << '\n';
+//    auto print_with_color = [](std::string_view s) {
+//        for (auto c: s) {
+//            if (c == 'X') {
+//                fflush(nullptr);
+//                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+//                fputc(c, stderr);
+//                fflush(nullptr);
+//                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+//            } else {
+//                fputc(c, stdout);
+//            }
+//        }
+//    };
+//    while (true) {
+//        gya::board b;
+//        int turn = 1;
+//        while (!b.has_won().is_game_over()) {
+//            if (turn ^= 1) {
+//                print_with_color(b.to_string());
+//                std::cout << (int) heuristic::n_move_solver{}.evaluate_board(b, 5) * b.turn() << '\n';
+//                b.play(heuristic::n_move_solver{}(b));
+//            } else {
+//                print_with_color(b.to_string());
+//                std::cout << (int) heuristic::n_move_solver{}.evaluate_board(b, 5) * b.turn() << '\n';
+//                int move;
+//                std::cin >> move;
+//                b.play(move - 1);
+//            }
+//        }
+//        print_with_color(b.to_string());
+//    }
+
     tests:
     {
         logic_testing:
@@ -129,9 +214,9 @@ int main() {
         {
             // test heuristic solvers
             {
-                heuristic::two_move_solver s;
+                heuristic::n_move_solver s;
                 gya::random_player p;
-                int iters = 10000;
+                int iters = 1000;
                 double games = iters * 2;
                 int wins = 0;
                 for (int i = 0; i < iters; ++i) {

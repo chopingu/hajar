@@ -33,7 +33,6 @@ struct n_move_solver {
         f32 best_score = -1e9;
         u8 best_move = 0;
         auto actions = b.get_actions();
-//        std::random_shuffle(actions.begin(), actions.end());
         std::shuffle(actions.begin(), actions.end(), std::default_random_engine{static_cast<u32>(std::chrono::high_resolution_clock::now().time_since_epoch().count())});
         for (u8 move: actions) {
             f32 temp = evaluate_board(b.play_copy(move), 5) * b.turn();
@@ -43,7 +42,6 @@ struct n_move_solver {
             }
         }
         return best_move;
-        return gya::random_player{}(b);
     }
 };
 }

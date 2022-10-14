@@ -34,6 +34,9 @@ struct neural_net_player {
     using neural_net_params_t = neural_net_params<f32, F1, F2, 42, 128, 128, 7>;
     using neural_net_t = typename neural_net_params_t::neural_net_t;
     using layer_array_t = typename neural_net_params_t::layer_array_t;
+    using weight_array_t = typename neural_net_params_t::weight_array_t;
+
+    neural_net_t net;
 
     neural_net_player() : net{F1{}, F2{}} {
         net.update_randomly(0.5);
@@ -47,8 +50,6 @@ struct neural_net_player {
         net = other.net;
         return *this;
     }
-
-    neural_net_t net;
 
     u64 size() const {
         return net.m_weights.data.size() + net.m_biases.data.size();

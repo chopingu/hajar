@@ -9,6 +9,8 @@
 
 #include "defines.hpp"
 
+#include "../lib/lmj/src/lmj_containers/lmj_static_vector.hpp"
+
 namespace gya {
 struct game_result {
     i8 state{};
@@ -228,10 +230,10 @@ requires function input to be formatted as such (same as provided by board::to_s
         return result;
     }
 
-    std::vector<u8> get_actions() const {
+    [[nodiscard]] lmj::static_vector<u8, 7> get_actions() const {
         if (size == 42)
             throw std::runtime_error("no actions if board is full (possible tie)");
-        std::vector<u8> res;
+        lmj::static_vector<u8, 7> res;
         for (u8 i = 0; i < 7; ++i)
             if (data[i].height < 6)
                 res.push_back(i);

@@ -13,7 +13,7 @@ namespace util { // with external bias
 std::mt19937 gen(std::chrono::steady_clock::now().time_since_epoch().count());
 
 template<class T>
-void dirichlet_noise(std::span<T> input, std::span<const T> span, const T alpha, const T eps) {
+void dirichlet_noise(std::span<T> input, std::span<const T> bias, const T alpha = 0.03f, const T eps = 0.25f) {
     std::gamma_distribution<T> gamma(alpha, 1);
     std::vector<T> noise;
 

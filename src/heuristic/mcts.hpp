@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <cmath> 
+#include <random>
 
 #include "../board.hpp"
 #include "../defines.hpp"
@@ -95,6 +96,7 @@ public:
     }
 };
 
+// dummy_model until network is finished
 template<class T>
 std::pair<std::vector<T>, T> dummy_model(gya::board state) {
     std::vector<T> probs(state.data.size());

@@ -350,4 +350,58 @@ requires function input to be formatted as such (same as provided by board::to_s
         return size % 2 ? -1 : 1;
     }
 };
+
+
+struct compressed_column {
+private:
+    u8 data{};
+public:
+    static constexpr gya::board_column decompress(gya::compressed_column c) {
+        gya::board_column res{};
+        if (!c.data)
+            return res;
+
+        for (res.height = 6; res.height >= 1; --res.height)
+            if (c.data & (1 << (res.height - 1)))
+                break;
+
+        i8 highest_player = (c.data >> 7) ? 1 : -1;
+        i8 other_player = (c.data >> 7) ? -1 : 1;
+
+        for (u8 i = 0; i < res.height; ++i) {
+            res[i] = (c.data & (1 << i)) ? highest_player : other_player;
+        }
+
+        return res;
+    }
+
+    static constexpr gya::compressed_column compress(gya::board_column const &b) {
+        gya::compressed_column res{};
+        if (!b.height)
+            return res;
+        i8 highest_player = b[b.height - 1];
+        res.data |= (highest_player == 1) << 7;
+        for (u8 i = 0; i < b.height; ++i) {
+            res.data |= (b[i] == highest_player) << i;
+        }
+        return res;
+    }
+
+
+};
+
+static_assert([] { // loop through all possible columns and verify they are compressed and decompressed properly
+    for (int num_moves = 0; num_moves <= 6; ++num_moves) {
+        for (int i = 0; i < (1 << num_moves); ++i) {
+            gya::board_column c;
+            for (int j = 0; j < num_moves; ++j) {
+                c.push((i & (1 << j)) ? 1 : -1);
+            }
+            if (c != gya::compressed_column::decompress(gya::compressed_column::compress(c))) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}());
 } // namespace gya

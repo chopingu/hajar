@@ -9,18 +9,18 @@
 
 namespace lmj::lagrange {
 namespace detail {
-template<std::size_t length, class...T>
-constexpr auto format_helper(static_vector<point, length> &arr, long double a, long double b, T &&...pack) {
+template<std::size_t length, class...Args>
+constexpr auto format_helper(static_vector<point, length> &arr, long double a, long double b, Args &&...pack) {
     arr.push_back(point{a, b});
     if constexpr (sizeof...(pack)) {
-        format_helper(arr, pack...);
+        format_helper(arr, std::forward<Args>(pack)...);
     }
 }
 
-template<class... T>
-constexpr auto data_format(T &&...pack) {
-    static_assert(sizeof...(T) % 2 == 0, "even number of arguments required, interpreted as pairs of (x, y)");
-    constexpr auto num_pairs = sizeof...(T) / 2;
+template<class... Args>
+constexpr auto data_format(Args &&...pack) {
+    static_assert(sizeof...(Args) % 2 == 0, "even number of arguments required, interpreted as pairs of (x, y)");
+    constexpr auto num_pairs = sizeof...(Args) / 2;
     static_vector<point, num_pairs> v;
     format_helper(v, pack...);
     std::array<point, num_pairs> res{};

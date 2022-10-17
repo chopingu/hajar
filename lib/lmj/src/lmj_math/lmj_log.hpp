@@ -5,7 +5,8 @@
 #include "lmj_newton_raphson.hpp"
 
 namespace lmj {
-constexpr auto ln_cp_impl(long double n) {
+namespace detail {
+constexpr auto log_impl(long double n) {
     constexpr long double ln_1001 = 0.000999500333083; // ln(1.001)
 
     struct approximation {
@@ -41,6 +42,7 @@ constexpr auto ln_cp_impl(long double n) {
     auto const approx = (high.exponent - (high.exponent - low.exponent) * t); // approximately ln(n) / ln(1.001)
     return approx * ln_1001;
 }
+}
 
 constexpr long double log(long double x) {
     if (x < 0) // if x < 0 ln(x) is undefined
@@ -48,9 +50,9 @@ constexpr long double log(long double x) {
     else if (x == 0) // if x == 0 ln(x) is -infinity
         return -std::numeric_limits<long double>::infinity();
     else if (x < 1.0) // can only find natural log of numbers greater than 1 and ln(x) = -ln(1 / x)
-        return -ln_cp_impl(1.0l / x);
+        return -detail::log_impl(1.0l / x);
     else // normal case
-        return ln_cp_impl(x);
+        return detail::log_impl(x);
 }
 
 constexpr long double log_n(long double x, long double n) {

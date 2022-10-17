@@ -7,6 +7,6 @@ struct point {
     constexpr point() = default;
 
     template<class T, class G>
-    constexpr point(T &&_x, G &&_y) : x(_x), y(_y) {}
+    constexpr point(T &&x, G &&y) : x(x), y(y) {}
 };
 }

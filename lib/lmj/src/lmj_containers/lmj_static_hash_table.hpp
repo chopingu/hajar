@@ -34,10 +34,10 @@ public:
     using bool_type = std::uint8_t;
     using iterator = static_hash_table_iterator<key_type, value_type, _capacity, hash_type>;
     using const_iterator = static_hash_table_const_iterator<key_type, value_type, _capacity, hash_type>;
-    pair_type _table[_capacity]{};
-    bool_type _is_set[_capacity]{};
-    size_type _elem_count{};
-    hash_type _hasher{};
+    pair_type m_table[_capacity]{};
+    bool_type m_is_set[_capacity]{};
+    size_type m_elem_count{};
+    hash_type m_hasher{};
 
     constexpr static_hash_table() = default;
 
@@ -47,7 +47,7 @@ public:
 
     constexpr static_hash_table(static_hash_table const &other) { *this = other; }
 
-    constexpr explicit static_hash_table(hash_type _hasher) : _hasher{_hasher} {}
+    constexpr explicit static_hash_table(hash_type hasher) : m_hasher{hasher} {}
 
     ~static_hash_table() = default;
 
@@ -61,9 +61,9 @@ public:
         if (other.size() != this->size())
             return false;
         for (size_type i = 0; i < _capacity; ++i) {
-            if (_is_set[i] == ACTIVE &&
-                other.contains(_table[i].first) &&
-                other.at(_table[i].first) != _table[i].second) {
+            if (m_is_set[i] == ACTIVE &&
+                other.contains(m_table[i].first) &&
+                other.at(m_table[i].first) != m_table[i].second) {
                 return false;
             }
         }
@@ -71,58 +71,58 @@ public:
     }
 
     /**
-     * @return reference to value associated with _key or default constructs value if it doesn't exist
+     * @return reference to value associated with key or default constructs value if it doesn't exist
      */
-    constexpr value_type &operator[](key_type const &_key) {
-        return get(_key);
+    constexpr value_type &operator[](key_type const &key) {
+        return get(key);
     }
 
     /**
-     * @return value at _key or fails
+     * @return value at key or fails
      */
-    constexpr value_type const &at(key_type const &_key) const {
-        size_type _idx = _get_index_read(_key);
-        assert(_is_set[_idx] == ACTIVE && _table[_idx].first == _key && "key not found");
-        return _table[_idx].second;
+    [[nodiscard]] constexpr value_type const &at(key_type const &key) const {
+        const size_type idx = _get_index_read(key);
+        assert(m_is_set[idx] == ACTIVE && m_table[idx].first == key && "key not found");
+        return m_table[idx].second;
     }
 
     /**
-     * @brief gets value at _key or creates new value at _key with default value
-     * @return reference to value associated with _key
+     * @brief gets value at key or creates new value at key with default value
+     * @return reference to value associated with key
      */
-    constexpr value_type &get(key_type const &_key) {
-        if (!_elem_count)
-            return emplace(_key, value_type{});
-        size_type _idx = _get_index_read(_key);
-        return (_is_set[_idx] == ACTIVE && _table[_idx].first == _key) ?
-               _table[_idx].second : emplace(_key, value_type{});
+    constexpr value_type &get(key_type const &key) {
+        if (!m_elem_count)
+            return emplace(key, value_type{});
+        const size_type idx = _get_index_read(key);
+        return (m_is_set[idx] == ACTIVE && m_table[idx].first == key) ?
+               m_table[idx].second : emplace(key, value_type{});
     }
 
     /**
-     * @return whether _key is in table
+     * @return whether key is in table
      */
-    constexpr bool contains(key_type const &_key) const {
-        size_type _idx = _get_index_read(_key);
-        return _is_set[_idx] == ACTIVE && _table[_idx].first == _key;
+    constexpr bool contains(key_type const &key) const {
+        const size_type idx = _get_index_read(key);
+        return m_is_set[idx] == ACTIVE && m_table[idx].first == key;
     }
 
     /**
-     * @param _key key which is removed from table
+     * @param key key which is removed from table
      */
-    constexpr void erase(key_type const &_key) {
-        remove(_key);
+    constexpr void erase(key_type const &key) {
+        remove(key);
     }
 
     /**
-     * @param _key key which is removed from table
+     * @param key key which is removed from table
      */
-    constexpr void remove(key_type const &_key) {
-        size_type _idx = _get_index_read(_key);
-        if (_is_set[_idx] == ACTIVE && _table[_idx].first == _key) {
-            --_elem_count;
-            _table[_idx].first = key_type{};
-            _table[_idx].second = value_type{};
-            _is_set[_idx] = TOMBSTONE;
+    constexpr void remove(key_type const &key) {
+        const size_type idx = _get_index_read(key);
+        if (m_is_set[idx] == ACTIVE && m_table[idx].first == key) {
+            --m_elem_count;
+            m_table[idx].first = key_type{};
+            m_table[idx].second = value_type{};
+            m_is_set[idx] = TOMBSTONE;
         }
     }
 
@@ -150,35 +150,35 @@ public:
         return const_iterator(this, _get_end_index());
     }
 
-    constexpr value_type &insert(pair_type const &_pair) {
-        return emplace(_pair);
+    constexpr value_type &insert(pair_type const &pair) {
+        return emplace(pair);
     }
 
     /**
-     * @param _pack arguments for constructing element
+     * @param pack arguments for constructing element
      * @return  reference to newly constructed value
      */
-    template<class... T>
-    constexpr value_type &emplace(T &&... _pack) {
-        static_assert(sizeof...(_pack));
-        assert(_elem_count < _capacity);
-        auto _p = pair_type{std::forward<T>(_pack)...};
-        const size_type _hash = _get_hash(_p.first);
-        size_type _idx = _get_index_read(_p.first, _hash);
-        if (_is_set[_idx] == ACTIVE && _table[_idx].first == _p.first)
-            return _table[_idx].second;
-        _idx = _get_writable_index(_p.first, _hash);
-        ++_elem_count;
-        _is_set[_idx] = ACTIVE;
-        _table[_idx] = std::move(_p);
-        return _table[_idx].second;
+    template<class... Args>
+    constexpr value_type &emplace(Args &&... pack) {
+        static_assert(sizeof...(pack));
+        assert(m_elem_count < _capacity);
+        auto p = pair_type{std::forward<Args>(pack)...};
+        const size_type hash = _get_hash(p.first);
+        size_type idx = _get_index_read(p.first, hash);
+        if (m_is_set[idx] == ACTIVE && m_table[idx].first == p.first)
+            return m_table[idx].second;
+        idx = _get_writable_index(p.first, hash);
+        ++m_elem_count;
+        m_is_set[idx] = ACTIVE;
+        m_table[idx] = std::move(p);
+        return m_table[idx].second;
     }
 
     /**
      * @return number of elements
      */
     [[nodiscard]] constexpr size_type size() const {
-        return _elem_count;
+        return m_elem_count;
     }
 
     /**
@@ -193,29 +193,29 @@ public:
      */
     constexpr void clear() {
         for (size_type i = 0; i < _capacity; ++i) {
-            if (_is_set[i] == ACTIVE) {
-                _table[i].~pair_type();
+            if (m_is_set[i] == ACTIVE) {
+                m_table[i].~pair_type();
             }
-            _is_set[i] = INACTIVE;
+            m_is_set[i] = INACTIVE;
         }
-        _elem_count = 0;
+        m_elem_count = 0;
     }
 
-    [[nodiscard]] constexpr const_iterator find(key_type const &_key) const {
-        if (!_elem_count)
+    [[nodiscard]] constexpr const_iterator find(key_type const &key) const {
+        if (!m_elem_count)
             return end();
-        size_type _idx = _get_index_read(_key);
-        if (_is_set[_idx] == ACTIVE && _table[_idx].first == _key)
-            return const_iterator(this, _idx);
+        const size_type idx = _get_index_read(key);
+        if (m_is_set[idx] == ACTIVE && m_table[idx].first == key)
+            return const_iterator(this, idx);
         return end();
     }
 
 private:
     [[nodiscard]] constexpr size_type _get_start_index() const {
-        if (!_elem_count)
+        if (!m_elem_count)
             return 0;
         for (size_type i = 0; i < _capacity; ++i)
-            if (_is_set[i] == ACTIVE)
+            if (m_is_set[i] == ACTIVE)
                 return i;
         return 0; // should be unreachable;
     }
@@ -226,66 +226,66 @@ private:
 
     constexpr void _copy(static_hash_table const &other) {
         for (size_type i = 0; i < other.capacity(); ++i) {
-            if (other._is_set[i] == ACTIVE) {
-                _table[i].first = other._table[i].first;
-                _table[i].second = other._table[i].second;
+            if (other.m_is_set[i] == ACTIVE) {
+                m_table[i].first = other.m_table[i].first;
+                m_table[i].second = other.m_table[i].second;
             }
-            _is_set[i] = other._is_set[i];
+            m_is_set[i] = other.m_is_set[i];
         }
-        _elem_count = other._elem_count;
+        m_elem_count = other.m_elem_count;
         if constexpr (std::is_copy_assignable_v<hash_type>)
-            _hasher = other._hasher;
+            m_hasher = other.m_hasher;
     }
 
-    [[nodiscard]] constexpr size_type _clamp_size(size_type _idx) const {
+    [[nodiscard]] constexpr size_type _clamp_size(size_type idx) const {
         if constexpr (_capacity & (_capacity - 1))
-            return _idx % _capacity;
+            return idx % _capacity;
         else
-            return _idx & (_capacity - 1);
+            return idx & (_capacity - 1);
     }
 
-    [[nodiscard]] constexpr size_type _get_hash(key_type const &_key) const {
-        const size_type _hash = _hasher(_key);
-        return _clamp_size(_hash ^ (~_hash >> 16) ^ (_hash << 24));
+    [[nodiscard]] constexpr size_type _get_hash(key_type const &key) const {
+        const size_type hash = m_hasher(key);
+        return _clamp_size(hash ^ (~hash >> 16) ^ (hash << 24));
 
     }
 
-    [[nodiscard]] constexpr size_type _new_idx(size_type const _idx) const {
-        return _clamp_size(_idx + 1);
+    [[nodiscard]] constexpr size_type _new_idx(size_type const idx) const {
+        return _clamp_size(idx + 1);
     }
 
-    [[nodiscard]] constexpr size_type _get_index_read(key_type const &_key) const {
-        return _get_index_read_impl(_key, _get_hash(_key));
+    [[nodiscard]] constexpr size_type _get_index_read(key_type const &key) const {
+        return _get_index_read_impl(key, _get_hash(key));
     }
 
-    [[nodiscard]] constexpr size_type _get_index_read(key_type const &_key, size_type _idx) const {
-        return _get_index_read_impl(_key, _idx);
+    [[nodiscard]] constexpr size_type _get_index_read(key_type const &key, size_type const idx) const {
+        return _get_index_read_impl(key, idx);
     }
 
-    [[nodiscard]] constexpr size_type _get_index_read_impl(key_type const &_key, size_type _idx) const {
+    [[nodiscard]] constexpr size_type _get_index_read_impl(key_type const &key, size_type idx) const {
         std::size_t _iterations = 0;
-        while ((_is_set[_idx] == TOMBSTONE || (_is_set[_idx] == ACTIVE && _table[_idx].first != _key)) &&
+        while ((m_is_set[idx] == TOMBSTONE || (m_is_set[idx] == ACTIVE && m_table[idx].first != key)) &&
                _iterations++ < _capacity) {
-            _idx = _new_idx(_idx);
+            idx = _new_idx(idx);
         }
-        return _idx;
+        return idx;
     }
 
-    [[nodiscard]] constexpr size_type _get_writable_index(key_type const &_key) const {
-        return _get_writable_index_impl(_key, _get_hash(_key));
+    [[nodiscard]] constexpr size_type _get_writable_index(key_type const &key) const {
+        return _get_writable_index_impl(key, _get_hash(key));
     }
 
-    [[nodiscard]] constexpr size_type _get_writable_index(key_type const &_key, size_type _idx) const {
-        return _get_writable_index_impl(_key, _idx);
+    [[nodiscard]] constexpr size_type _get_writable_index(key_type const &key, size_type idx) const {
+        return _get_writable_index_impl(key, idx);
     }
 
-    [[nodiscard]] constexpr size_type _get_writable_index_impl(key_type const &_key, size_type _idx) const {
-        std::size_t _iterations = 0;
-        while (_is_set[_idx] == ACTIVE && _table[_idx].first != _key) {
-            assert(_iterations++ < _capacity && "empty slot not found");
-            _idx = _new_idx(_idx);
+    [[nodiscard]] constexpr size_type _get_writable_index_impl(key_type const &key, size_type idx) const {
+        std::size_t iterations = 0;
+        while (m_is_set[idx] == ACTIVE && m_table[idx].first != key) {
+            assert(iterations++ < _capacity && "empty slot not found");
+            idx = _new_idx(idx);
         }
-        return _idx;
+        return idx;
     }
 };
 
@@ -306,39 +306,40 @@ public:
     using pointer = pair_type *;
     using reference = pair_type &;
 
-    static_hash_table<key_t, value_t, _table_capacity, hash_t> *const _table_ptr;
-    size_type _index;
+    static_hash_table<key_t, value_t, _table_capacity, hash_t> *const m_table_ptr;
+    size_type m_index;
 
-    constexpr static_hash_table_iterator(static_hash_table<key_t, value_t, _table_capacity, hash_t> *_ptr,
-                                         size_type _idx) : _table_ptr{_ptr}, _index{_idx} {}
+    constexpr static_hash_table_iterator(static_hash_table<key_t, value_t, _table_capacity, hash_t> *ptr,
+                                         size_type idx) : m_table_ptr{ptr}, m_index{idx} {}
 
     constexpr auto &operator++() {
-        ++_index;
-        while (_index < _table_ptr->capacity() && _table_ptr->_is_set[_index] != ACTIVE) ++_index;
+        ++m_index;
+        while (m_index < m_table_ptr->capacity() && m_table_ptr->m_is_set[m_index] != ACTIVE) ++m_index;
         return *this;
     }
 
     constexpr auto &operator--() {
-        --_index;
-        while (_index > 0 && _table_ptr->_is_set[_index] != ACTIVE) --_index;
+        --m_index;
+        while (m_index > 0 && m_table_ptr->m_is_set[m_index] != ACTIVE) --m_index;
         return *this;
     }
 
     constexpr reference operator*() const {
-        return _table_ptr->_table[_index];
+        return m_table_ptr->m_table[m_index];
     }
 
     constexpr auto operator->() const {
-        return &_table_ptr->_table[_index];
-    }
-
-    constexpr bool operator!=(static_hash_table_iterator const &other) const {
-        return _index != other._index || _table_ptr != other._table_ptr;
+        return &m_table_ptr->m_table[m_index];
     }
 
     template<class T>
-    constexpr bool operator==(T const &other) const {
-        return !(*this != other);
+    constexpr bool operator!=(T const &other) const {
+        return m_index != other.m_index || m_table_ptr != other.m_table_ptr;
+    }
+
+    template<class T>
+    constexpr bool operator==(T other) const {
+        return m_index == other.m_index || m_table_ptr == other.m_table_ptr;
     }
 };
 
@@ -359,40 +360,43 @@ public:
     using pointer = pair_type const *;
     using reference = pair_type const &;
 
-    static_hash_table<key_t, value_t, _table_capacity, hash_t> const *const _table_ptr;
-    size_type _index;
+    static_hash_table<key_t, value_t, _table_capacity, hash_t> const *const m_table_ptr;
+    size_type m_index;
 
     constexpr static_hash_table_const_iterator(
-            static_hash_table<key_t, value_t, _table_capacity, hash_t> const *_ptr,
-            size_type _idx) : _table_ptr{_ptr}, _index{_idx} {}
+            static_hash_table<key_t, value_t, _table_capacity, hash_t> const *ptr,
+            size_type idx) : m_table_ptr{ptr}, m_index{idx} {}
 
     constexpr auto &operator++() {
-        ++_index;
-        while (_index < _table_ptr->capacity() && _table_ptr->_is_set[_index] != ACTIVE) ++_index;
+        ++m_index;
+        while (m_index < m_table_ptr->capacity() && m_table_ptr->m_is_set[m_index] != ACTIVE)
+            ++m_index;
         return *this;
     }
 
     constexpr auto &operator--() {
-        --_index;
-        while (_index > 0 && _table_ptr->_is_set[_index] != ACTIVE) --_index;
+        --m_index;
+        while (m_index > 0 && m_table_ptr->m_is_set[m_index] != ACTIVE)
+            --m_index;
         return *this;
     }
 
     constexpr reference operator*() const {
-        return _table_ptr->_table[_index];
+        return m_table_ptr->m_table[m_index];
     }
 
     constexpr auto operator->() const {
-        return &_table_ptr->_table[_index];
-    }
-
-    constexpr bool operator!=(static_hash_table_const_iterator const &other) const {
-        return _index != other._index || _table_ptr != other._table_ptr;
+        return &m_table_ptr->m_table[m_index];
     }
 
     template<class T>
-    constexpr bool operator==(T const &other) const {
-        return !(*this != other);
+    constexpr bool operator!=(T const &other) const {
+        return m_index != other.m_index || m_table_ptr != other.m_table_ptr;
+    }
+
+    template<class T>
+    constexpr bool operator==(T other) const {
+        return m_index == other.m_index || m_table_ptr == other.m_table_ptr;
     }
 };
 

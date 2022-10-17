@@ -29,20 +29,20 @@ class static_vector {
 public:
     using size_type = decltype(detail::needed_uint<_capacity>());
 
-    T _data[_capacity]{};
-    size_type _size{};
+    T m_data[_capacity]{};
+    size_type m_size{};
 
     constexpr static_vector() = default;
 
-    constexpr explicit static_vector(size_type _n) {
-        assert(_n <= _capacity);
-        _size = _n;
+    constexpr explicit static_vector(size_type n) {
+        assert(n <= _capacity);
+        m_size = n;
     }
 
-    constexpr explicit static_vector(size_type _n, T const &_value) {
-        _size = _n;
-        for (size_type i = 0; i < _size; ++i)
-            _data[i] = _value;
+    constexpr explicit static_vector(size_type n, T const &value) {
+        m_size = n;
+        for (size_type i = 0; i < m_size; ++i)
+            m_data[i] = value;
     }
 
     template<class Iter>
@@ -59,43 +59,43 @@ public:
     constexpr static_vector(static_vector &&) noexcept = default;
 
 
-    template<std::size_t _other_capacity>
-    constexpr auto &operator=(static_vector<T, _other_capacity> const &_other) {
-        assert(_other._size <= _capacity);
-        _size = _other._size;
-        for (size_type i = 0; i < _size; ++i)
-            _data[i] = _other._data[i];
+    template<std::size_t other_capacity>
+    constexpr auto &operator=(static_vector<T, other_capacity> const &other) {
+        assert(other.m_size <= _capacity);
+        m_size = other.m_size;
+        for (size_type i = 0; i < m_size; ++i)
+            m_data[i] = other.m_data[i];
         return *this;
     }
 
-    template<std::size_t _other_capacity>
-    constexpr auto &operator=(static_vector<T, _other_capacity> &&_other) {
-        assert(_other._size <= _capacity);
-        _size = _other._size;
-        for (size_type i = 0; i < _size; ++i)
-            _data[i] = std::move(_other._data[i]);
+    template<std::size_t other_capacity>
+    constexpr auto &operator=(static_vector<T, other_capacity> &&other) {
+        assert(other.m_size <= _capacity);
+        m_size = other.m_size;
+        for (size_type i = 0; i < m_size; ++i)
+            m_data[i] = std::move(other.m_data[i]);
         return *this;
     }
 
-    template<std::size_t _other_capacity>
-    constexpr explicit static_vector(static_vector<T, _other_capacity> const &_other) {
-        *this = _other;
+    template<std::size_t other_capacity>
+    constexpr explicit static_vector(static_vector<T, other_capacity> const &other) {
+        *this = other;
     }
 
-    template<std::size_t _other_capacity>
-    constexpr explicit static_vector(static_vector<T, _other_capacity> &&_other) noexcept {
-        *this = std::move(_other);
+    template<std::size_t other_capacity>
+    constexpr explicit static_vector(static_vector<T, other_capacity> &&other) noexcept {
+        *this = std::move(other);
     }
 
-    constexpr static_vector(std::initializer_list<T> _il) {
-        assert(_il.size() <= _capacity);
-        _size = _il.size();
-        for (size_type i = 0; i < _size; ++i)
-            _data[i] = _il.begin()[i];
+    constexpr static_vector(std::initializer_list<T> il) {
+        assert(il.size() <= _capacity);
+        m_size = il.size();
+        for (size_type i = 0; i < m_size; ++i)
+            m_data[i] = il.begin()[i];
     }
 
     [[nodiscard]] constexpr std::size_t size() const {
-        return _size;
+        return m_size;
     }
 
     [[nodiscard]] constexpr std::size_t capacity() const {
@@ -103,83 +103,83 @@ public:
     }
 
     template<class G>
-    constexpr auto &push_back(G &&_elem) {
-        return emplace_back(std::forward<G>(_elem));
+    constexpr auto &push_back(G &&elem) {
+        return emplace_back(std::forward<G>(elem));
     }
 
     template<class...Args>
-    constexpr auto &emplace_back(Args &&... _args) {
-        assert(_size < _capacity && "out of space in static_vector");
-        _data[_size++] = T(std::forward<Args &&...>(_args...));
-        return _data[_size - 1];
+    constexpr auto &emplace_back(Args &&... args) {
+        assert(m_size < _capacity && "out of space in static_vector");
+        m_data[m_size++] = T(std::forward<Args>(args)...);
+        return m_data[m_size - 1];
     }
 
-    [[nodiscard]] constexpr auto &operator[](size_type _idx) {
-        return _data[_idx];
+    [[nodiscard]] constexpr auto &operator[](size_type idx) {
+        return m_data[idx];
     }
 
-    constexpr auto const &operator[](size_type _idx) const {
-        assert(_idx < _size && "no element to return");
-        return _data[_idx];
+    constexpr auto const &operator[](size_type idx) const {
+        assert(idx < m_size && "no element to return");
+        return m_data[idx];
     }
 
     [[nodiscard]] constexpr auto &front() {
-        assert(_size && "no element to return");
-        return _data[0];
+        assert(m_size && "no element to return");
+        return m_data[0];
     }
 
     [[nodiscard]] constexpr auto const &front() const {
-        assert(_size && "no element to return");
-        return _data[0];
+        assert(m_size && "no element to return");
+        return m_data[0];
     }
 
     [[nodiscard]] constexpr auto &back() {
-        assert(_size && "no element to return");
-        return _data[_size - 1];
+        assert(m_size && "no element to return");
+        return m_data[m_size - 1];
     }
 
     [[nodiscard]] constexpr auto const &back() const {
-        assert(_size && "no element to return");
-        return _data[_size - 1];
+        assert(m_size && "no element to return");
+        return m_data[m_size - 1];
     }
 
     constexpr void pop_back() {
-        assert(_size && "no element to pop");
-        _data[--_size].~T();
+        assert(m_size && "no element to pop");
+        m_data[--m_size].~T();
     }
 
     constexpr void clear() {
-        for (size_type i = 0; i < _size; ++i)
-            _data[i].~T();
-        _size = 0;
+        for (size_type i = 0; i < m_size; ++i)
+            m_data[i].~T();
+        m_size = 0;
     }
 
     [[nodiscard]] constexpr bool empty() {
-        return !_size;
+        return !m_size;
     }
 
     [[nodiscard]] constexpr auto begin() const {
-        return _data;
+        return m_data;
     }
 
     [[nodiscard]] constexpr auto end() const {
-        return _data + _size;
+        return m_data + m_size;
     }
 
     [[nodiscard]] constexpr auto begin() {
-        return _data;
+        return m_data;
     }
 
     [[nodiscard]] constexpr auto end() {
-        return _data + _size;
+        return m_data + m_size;
     }
 
     [[nodiscard]] constexpr auto cbegin() const {
-        return _data;
+        return m_data;
     }
 
     [[nodiscard]] constexpr auto cend() const {
-        return _data + _size;
+        return m_data + m_size;
     }
 
     [[nodiscard]] constexpr auto rbegin() const {
@@ -206,12 +206,12 @@ public:
         return std::reverse_iterator{begin()};
     }
 
-    template<std::size_t _other_capacity>
-    constexpr auto operator==(static_vector<T, _other_capacity> const &_other) const {
-        if (_size != _other._size)
+    template<std::size_t other_capacity>
+    constexpr auto operator==(static_vector<T, other_capacity> const &other) const {
+        if (m_size != other.m_size)
             return false;
-        for (size_type i = 0; i < _size; ++i)
-            if (_data[i] != _other._data[i])
+        for (size_type i = 0; i < m_size; ++i)
+            if (m_data[i] != other.m_data[i])
                 return false;
         return true;
     }

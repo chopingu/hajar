@@ -15,7 +15,7 @@ constexpr auto derivative(Func &&f, T h = 1e-5l) {
 
 template<class Func, class T = long double>
 requires number<T>
-constexpr T newtons_method(Func &&f, T x = 2.0l, T epsilon = 1e-5l) {
+constexpr T newtons_method(Func &&f, T x = 2.0l, T epsilon = 1e-3l) {
     const auto f_prim = derivative(f);
     long double dx;
     do {

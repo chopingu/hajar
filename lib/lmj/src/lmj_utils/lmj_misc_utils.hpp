@@ -66,8 +66,8 @@ auto rand() -> std::enable_if_t<std::is_integral_v<T>, T> {
 }
 
 constexpr auto random_shuffle(auto &random_access_container) {
-    using T = decltype(random_access_container.size());
-    const T n = random_access_container.size();
+    const auto n = random_access_container.size();
+    using T = std::remove_cvref_t<decltype(n)>;
     for (T i = 0; i < n; ++i) {
         std::swap(random_access_container[i], random_access_container[rand<T>() % n]);
     }

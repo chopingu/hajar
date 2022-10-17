@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <chrono>
+#include <type_traits>
 
 #include "defines.hpp"
 
@@ -36,6 +38,8 @@ struct game_result {
     constexpr bool is_game_over() const { return player_1_won() || player_2_won() || is_tie(); }
 
     constexpr bool is_tie() const { return state == -1; }
+
+    constexpr bool operator==(gya::game_result other) const { return state == other.state; }
 };
 
 struct board_column {
@@ -66,7 +70,7 @@ struct board_column {
 
 struct board {
     std::array<board_column, 7> data{};
-    i8 winner = 0;
+    gya::game_result winner{0};
     i8 size = 0;
 
     /*
@@ -143,7 +147,7 @@ requires function input to be formatted as such (same as provided by board::to_s
             }
         }
         if (hor >= 4) {
-            winner = value == -1 ? 2 : 1;
+            winner.state = value == -1 ? 2 : 1;
             return ret;
         }
         int ver = 1;
@@ -157,7 +161,7 @@ requires function input to be formatted as such (same as provided by board::to_s
             }
         }
         if (ver >= 4) {
-            winner = value == -1 ? 2 : 1;
+            winner.state = value == -1 ? 2 : 1;
             return ret;
         }
 
@@ -181,7 +185,7 @@ requires function input to be formatted as such (same as provided by board::to_s
             }
         }
         if (diag_tl >= 4) {
-            winner = value == -1 ? 2 : 1;
+            winner.state = value == -1 ? 2 : 1;
             return ret;
         }
 
@@ -205,12 +209,12 @@ requires function input to be formatted as such (same as provided by board::to_s
             }
         }
         if (diag_tr >= 4) {
-            winner = value == -1 ? 2 : 1;
+            winner.state = value == -1 ? 2 : 1;
             return ret;
         }
 
         if (size == 42) {
-            winner = -1;
+            winner.state = -1;
         }
 
         return ret;
@@ -351,6 +355,63 @@ requires function input to be formatted as such (same as provided by board::to_s
     }
 };
 
+struct random_player {
+    u64 x = 123456789, y = 362436069, z = 521288629;
+
+    constexpr random_player(u64 seed = -1) {
+        if (std::is_constant_evaluated()) {
+            set_seed(1);
+        } else {
+            construct(seed);
+        }
+    }
+
+    void construct(u64 seed) {
+        static u64 offs = 0;
+        if (seed == -1)
+            seed = ++offs * (std::chrono::system_clock::now().time_since_epoch().count() & 0xffffffff);
+        set_seed(seed);
+    }
+
+    constexpr void set_seed(u64 seed) {
+        u64 t = seed;
+        x ^= t;
+        y ^= (t >> 32) ^ (t << 32);
+        z ^= (t >> 16) ^ (t << 48);
+
+        for (int i = 0; i < 128; ++i)
+            get_num();
+    }
+
+    constexpr u64 get_num() { // based on George Marsaglia's xorshift
+        x ^= x << 16;
+        x ^= x >> 5;
+        x ^= x << 1;
+
+        u64 t = x;
+        x = y;
+        y = z;
+        z = t ^ x ^ y;
+
+        return z;
+    }
+
+    [[nodiscard]] constexpr u8 operator()(gya::board const &b) {
+        u8 idx = get_num() % 7;
+        int iters = 0;
+        while (b.data[idx].height == 6 && iters++ < 100) {
+            idx = get_num() % 7;
+        }
+        if (b.data[idx].height == 6) {
+            for (idx = 0; idx < 7; ++idx) {
+                if (b.data[idx].height < 6)
+                    break;
+            }
+            return -1;
+        }
+        return idx;
+    }
+};
 
 struct compressed_column {
 private:
@@ -398,10 +459,54 @@ static_assert([] { // loop through all possible columns and verify they are comp
                 c.push((i & (1 << j)) ? 1 : -1);
             }
             if (c != gya::compressed_column::decompress(gya::compressed_column::compress(c))) {
-                return 0;
+                return false;
             }
         }
     }
-    return 1;
+    return true;
+}());
+
+struct compressed_board {
+private:
+    std::array<compressed_column, 7> data;
+public:
+    static constexpr gya::board decompress(gya::compressed_board c) {
+        gya::board res;
+        for (u8 i = 0; i < 7; ++i) {
+            res.data[i] = gya::compressed_column::decompress(c.data[i]);
+            res.size += res.data[i].height;
+        }
+        res.winner = res.has_won_test();
+        return res;
+    }
+
+    static constexpr gya::compressed_board compress(gya::board const &b) {
+        gya::compressed_board res;
+        for (u8 i = 0; i < 7; ++i) {
+            res.data[i] = gya::compressed_column::compress(b.data[i]);
+        }
+        return res;
+    }
+};
+
+static_assert([]() {
+    for (int i = 0; i < 100; ++i) {
+        gya::random_player p1(i), p2(i + 10);
+        gya::board b;
+        b.play(p1(b));
+        b.play(p2(b));
+
+        b.play(p1(b));
+        b.play(p2(b));
+
+        b.play(p1(b));
+        b.play(p2(b));
+
+        b.play(p1(b));
+
+        if (b != gya::compressed_board::decompress(gya::compressed_board::compress(b)))
+            return false;
+    }
+    return true;
 }());
 } // namespace gya

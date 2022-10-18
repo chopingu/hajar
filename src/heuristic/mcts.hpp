@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include <cmath> 
+#include <cmath>
 #include <random>
 
 #include "../board.hpp"
@@ -21,47 +21,47 @@ public:
     i8 player = 0;
     i8 action = -1;
     u64 visits = 0;
-    T value_sum = 0; 
+    T value_sum = 0;
     T prior = 0;
 
     gya::board state;
     std::default_random_engine gen;
     std::vector<std::unique_ptr<Node>> children;
-  
-    Node(i8 player, i8 action, T prior) 
-        : player(player), action(action), prior(prior) {}
+
+    Node(i8 player, i8 action, T prior)
+            : player(player), action(action), prior(prior) {}
 
     T ucb_score(Node *child) {
         u64 sum = 0; // maybe change for performance reasons
-        for(auto ptr: child->children) {
+        for (auto ptr: child->children) {
             auto child = ptr.get();
             sum += child->visits;
         }
         const T c_puct = std::log((child->visits + c_puct_base + 1) / c_puct_base) + c_puct_init;
         const T U = c_puct * child->prior * std::sqrt(sum) / (child->visits + 1);
-        const T Q = (child->visits) ? -child->value_sum / child->visits : 0.f; 
-        
-        return Q + U; 
+        const T Q = (child->visits) ? -child->value_sum / child->visits : 0.f;
+
+        return Q + U;
     }
-             
+
     void expand(const gya::board &state, const std::vector<T> &priors, i8 player) {
-        for(u64 i = 0; i < priors.size(); i++) {
+        for (u64 i = 0; i < priors.size(); i++) {
             const T prior_prob = priors[i];
-            if(prior_prob != 0.0f) { 
+            if (prior_prob != 0.0f) {
                 auto child = std::make_unique<Node>(prior_prob, -player, i);
                 children.push_back(std::move(child));
-            } 
+            }
         }
     }
 
-    Node* select_child() {
+    Node *select_child() {
         T mx = std::numeric_limits<T>::min();
         Node *argmax = children.front().get();
-        
-        for(auto &ptr: children) {
+
+        for (auto &ptr: children) {
             auto child = ptr.get();
             T score = ucb_score(child);
-            if(score > mx) { 
+            if (score > mx) {
                 mx = score;
                 argmax = child;
             }
@@ -73,23 +73,22 @@ public:
     u8 select_action(T temperature) {
         std::vector<u8> actions;
         std::vector<u64> visit_counts;
-        
+
         u8 argmax = 0, mx = 0;
-        for(u64 i = 0; i < children.size(); i++) {
+        for (u64 i = 0; i < children.size(); i++) {
             Node *child = children[i].get();
             actions.push_back(child->action);
             visit_counts.push_back(child->visits);
 
-            if(child->visits > mx) {
+            if (child->visits > mx) {
                 argmax = i;
                 mx = child->visits;
             }
         }
 
-        if(!temperature) {
+        if (!temperature) {
             return actions[argmax];
-        }
-        else {
+        } else {
             std::discrete_distribution<u64> distr(visit_counts.begin(), visit_counts.end());
             return actions[distr(gen)];
         }
@@ -100,7 +99,7 @@ public:
 template<class T>
 std::pair<std::vector<T>, T> dummy_model(gya::board state) {
     std::vector<T> probs(state.data.size());
-    for(auto i: state.get_actions()) 
+    for (auto i: state.get_actions())
         probs[i] = 0.5;
 
     return {probs, 0};

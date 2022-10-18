@@ -52,7 +52,9 @@ struct board_column {
             std::cerr << "invalid column to push into (column full)" << std::endl;
             exit(0);
         }
-        return data.at(height++) = value;
+        data[height] = value;
+        ++height;
+        return data[height - 1];
     }
 
     constexpr i8 &operator[](u64 idx) {
@@ -228,7 +230,7 @@ requires function input to be formatted as such (same as provided by board::to_s
      * @param column
      * @return board state after playing the given move
      */
-    constexpr gya::board play_copy(u8 column) const {
+    [[nodiscard]] constexpr gya::board play_copy(u8 column) const {
         gya::board result = *this;
         result.play(column);
         return result;
@@ -350,7 +352,7 @@ requires function input to be formatted as such (same as provided by board::to_s
         return size == other.size && winner == other.winner && data == other.data;
     }
 
-    constexpr i8 turn() const {
+    [[nodiscard]] constexpr i8 turn() const {
         return size % 2 ? -1 : 1;
     }
 };
@@ -436,7 +438,7 @@ public:
         return res;
     }
 
-    static constexpr gya::compressed_column compress(gya::board_column const &b) {
+    static constexpr gya::compressed_column compress(gya::board_column b) {
         gya::compressed_column res{};
         if (!b.height)
             return res;
@@ -447,8 +449,6 @@ public:
         }
         return res;
     }
-
-
 };
 
 static_assert([] { // loop through all possible columns and verify they are compressed and decompressed properly
@@ -489,7 +489,7 @@ public:
     }
 };
 
-static_assert([]() {
+static_assert([] {
     for (int i = 0; i < 100; ++i) {
         gya::random_player p1(i), p2(i + 10);
         gya::board b;

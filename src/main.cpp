@@ -1,5 +1,5 @@
-#include "cnn/activation.hpp"
 #include "cnn/cost.hpp"
+#include "cnn/activation.hpp"
 #include "cnn/maths.hpp"
 #include "defines.hpp"
 #include "board.hpp"
@@ -14,87 +14,43 @@
 #include <thread>
 
 int main() {
-//    gya::board board_1 = gya::board::from_string(
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "|O|X| | | | | |\n"
-//            "|O|O|X| | | | |\n"
-//            "|X|O|O|X|X| | |\n"
-//            "|1|2|3|4|5|6|7|\n"
-//    );
-//    std::cout << (int) heuristic::n_move_solver{}.evaluate_board(board_1, 5) << '\n';
-//    board_1 = gya::board::from_string(
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "| | |X|X|X| | |\n"
-//            "| |X|O|O|O|X|O|\n"
-//            "|1|2|3|4|5|6|7|\n"
-//    );
-//    std::cout << (int) heuristic::n_move_solver{}.evaluate_board(board_1, 5) << '\n';
-//    board_1 = gya::board::from_string(
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "| | | |X|X|X| |\n"
-//            "| | | |O|X|O|X|\n"
-//            "| | | |X|O|O|O|\n"
-//            "|1|2|3|4|5|6|7|\n"
-//    );
-//    std::cout << (int) heuristic::n_move_solver{}.evaluate_board(board_1, 5) << '\n';
-//    board_1 = gya::board::from_string(
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "| | | | |X|O| |\n"
-//            "| | |O|O|X|X| |\n"
-//            "| | |O|X|X|O| |\n"
-//            "|1|2|3|4|5|6|7|\n"
-//    );
-//    std::cout << (int) heuristic::n_move_solver{}.evaluate_board(board_1, 5) << '\n';
-//    board_1 = gya::board::from_string(
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "| | | | | | | |\n"
-//            "| | | | |X|O| |\n"
-//            "| | |O|O|X|X| |\n"
-//            "| | |O|X|X|O| |\n"
-//            "|1|2|3|4|5|6|7|\n"
-//    );
-//    std::cout << (int) heuristic::n_move_solver{}.evaluate_board(board_1, 5) << '\n';
-//    auto print_with_color = [](std::string_view s) {
-//        for (auto c: s) {
-//            if (c == 'X') {
-//                fflush(nullptr);
-//                std::this_thread::sleep_for(std::chrono::milliseconds(50));
-//                fputc(c, stderr);
-//                fflush(nullptr);
-//                std::this_thread::sleep_for(std::chrono::milliseconds(50));
-//            } else {
-//                fputc(c, stdout);
-//            }
-//        }
-//    };
-//    while (true) {
-//        gya::board b;
-//        int turn = 1;
-//        while (!b.has_won().is_game_over()) {
-//            if (turn ^= 1) {
-//                print_with_color(b.to_string());
+    auto print = [](std::string_view s) {
+        for (auto c: s) {
+            putchar(c);
+        }
+    };
+    while (true) {
+        gya::board b;
+        int turn = 1;
+        heuristic::n_move_solver s{9};
+        while (!b.has_won().is_game_over()) {
+            if (turn ^= 1) {
+                print(b.to_string());
 //                std::cout << (int) heuristic::n_move_solver{}.evaluate_board(b, 5) * b.turn() << '\n';
-//                b.play(heuristic::n_move_solver{}(b));
-//            } else {
-//                print_with_color(b.to_string());
+                u8 move;
+                {
+                    lmj::timer t{false};
+                    move = s(b);
+                    printf("%f\n", t.elapsed());
+                }
+                b.play(move);
+            } else {
+                print(b.to_string());
 //                std::cout << (int) heuristic::n_move_solver{}.evaluate_board(b, 5) * b.turn() << '\n';
-//                int move;
-//                std::cin >> move;
-//                b.play(move - 1);
-//            }
-//        }
-//        print_with_color(b.to_string());
-//    }
+                int move;
+                std::cin >> move;
+                b.play(move - 1);
+            }
+        }
+        print(b.to_string());
+        if (b.has_won().is_tie()) {
+            std::puts("tie!");
+        } else if (b.has_won().player_1_won()) {
+            std::puts("you won!");
+        } else {
+            std::puts("you lost!");
+        }
+    }
 
     tests:
     {
@@ -214,7 +170,7 @@ int main() {
         {
             // test heuristic solvers
             {
-                heuristic::n_move_solver s;
+                heuristic::n_move_solver s{4};
                 gya::random_player p;
                 int iters = 1000;
                 double games = iters * 2;
@@ -223,7 +179,33 @@ int main() {
                     wins += gya::test_game(s, p).has_won_test().player_1_won();
                     wins += gya::test_game(p, s).has_won_test().player_2_won();
                 }
-                std::cout << "two move solver winrate against random player: " << wins / games * 1e2 << "%"
+                std::cout << "4 move solver winrate against random player: " << wins / games * 1e2 << "%"
+                          << std::endl;
+            }
+            {
+                heuristic::n_move_solver s{4};
+                heuristic::n_move_solver p{2};
+                int iters = 1000;
+                double games = iters * 2;
+                int wins = 0;
+                for (int i = 0; i < iters; ++i) {
+                    wins += gya::test_game(s, p).has_won_test().player_1_won();
+                    wins += gya::test_game(p, s).has_won_test().player_2_won();
+                }
+                std::cout << "4 move solver winrate against 2 move solver: " << wins / games * 1e2 << "%"
+                          << std::endl;
+            }
+            {
+                heuristic::n_move_solver s{4};
+                heuristic::two_move_solver p;
+                int iters = 100;
+                double games = iters * 2;
+                int wins = 0;
+                for (int i = 0; i < iters; ++i) {
+                    wins += gya::test_game(s, p).has_won_test().player_1_won();
+                    wins += gya::test_game(p, s).has_won_test().player_2_won();
+                }
+                std::cout << "4 move solver winrate against two_move_solver: " << wins / games * 1e2 << "%"
                           << std::endl;
             }
             {
@@ -252,9 +234,45 @@ int main() {
                 board_1.play(s(board_1), 1);
                 assert(board_1.has_won_test().player_1_won());
             }
+            {
+                heuristic::one_move_solver p1, p2;
+                auto t1 = std::chrono::high_resolution_clock::now();
+                for (int j = 0; j < (1 << 10); ++j)
+                    volatile gya::board c = gya::test_game(p1, p2);
+                auto t2 = std::chrono::high_resolution_clock::now();
+                auto time =
+                        (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 10);
+                using std::chrono_literals::operator ""ns;
+                std::cout << "one_move_solver:\n";
+                std::cout << "avg: " << time.count() / 1e3 << "us" << std::endl;
+            }
+            {
+                heuristic::two_move_solver p1, p2;
+                auto t1 = std::chrono::high_resolution_clock::now();
+                for (int j = 0; j < (1 << 10); ++j)
+                    volatile gya::board c = gya::test_game(p1, p2);
+                auto t2 = std::chrono::high_resolution_clock::now();
+                auto time =
+                        (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 10);
+                using std::chrono_literals::operator ""ns;
+                std::cout << "two_move_solver:\n";
+                std::cout << "avg: " << time.count() / 1e3 << "us" << std::endl;
+            }
+            {
+                heuristic::n_move_solver p1{5}, p2{5};
+                auto t1 = std::chrono::high_resolution_clock::now();
+                for (int j = 0; j < (1 << 10); ++j)
+                    volatile gya::board c = gya::test_game(p1, p2);
+                auto t2 = std::chrono::high_resolution_clock::now();
+                auto time =
+                        (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 10);
+                using std::chrono_literals::operator ""ns;
+                std::cout << "n_move_solver (5 moves):\n";
+                std::cout << "avg: " << time.count() / 1e3 << "us" << std::endl;
+            }
         }
 
         std::cout << "tests passed" << std::endl;
-        std::cin.get();
+//        std::cin.get();
     }
 }

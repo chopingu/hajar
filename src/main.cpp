@@ -1,6 +1,3 @@
-#include "cnn/cost.hpp"
-#include "cnn/activation.hpp"
-#include "cnn/maths.hpp"
 #include "defines.hpp"
 #include "board.hpp"
 #include "tester.hpp"

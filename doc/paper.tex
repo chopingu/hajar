@@ -24,7 +24,7 @@
 \begin{abstract}
 In late 2017 DeepMind announced a groundbreaking system in a preprint \cite{alphazero} and the results were astonishing. The system was called AlphaZero and utilized \emph{artificial neural networks} in combination with \emph{heuristic algorithms} in order to teach itself the game chess without any proprietary knowledge. After approximately 9 hours it was able to beat the strongest hand-crafted engines, such as Stockfish and it had learned centuries of human knowledge of chess. In this paper we aim to study the effectiveness of different \emph{neural networks} and \emph{heuristic algorithms} such as the one used in AlphaZero. More precisely, we intend to analyze the efficiency of those networks and algorithms in combination with varying \emph{optimizations, parameters, hyperparameters} and \emph {architectures} applied to the classic games \emph{Connect Four} and \emph{Othello}. 
 
-\vskip 0.8cm
+\vskip 1cm
 
 \keywords{Machine Learning, Supervised Learning, Reinforcement Learning, Neural Network, Deep Learning} 
 
@@ -35,6 +35,11 @@ In late 2017 DeepMind announced a groundbreaking system in a preprint \cite{alph
 \tableofcontents
 
 \newpage 
+
+\section*{Preface}
+\addcontentsline{toc}{section}{Preface}
+
+\newpage
 
 \section*{\huge Summary of Notation}
 \addcontentsline{toc}{section}{Summary of Notation}
@@ -48,41 +53,14 @@ I am a forest, and a night of dark trees: but he who is not afraid of my darknes
 
 \vskip -1cm
 
-\nomenclature{$\upepsilon$}{probability of taking a random action in an $\upepsilon$\hyp greedy policy}
 \nomenclature{$\argmin_x f(x)$}{\{$x \mid f(x) = \min_{x'} f(x')$\}}
 \nomenclature{$\argmax_x f(x)$}{\{$x \mid f(x) = \max_{x'} f(x')$\}}
 \nomenclature{$\leftarrow$}{assignment}
-\nomenclature{$\upgamma$}{discount-rate parameter}
-\nomenclature{$\textnormal{s, s'}$}{states}
-\nomenclature{$\textnormal{S}$}{set of all nonterminal states}
+\nomenclature{$P(a \mid b)$}{probability of a given b}
 
 \printnomenclature[3cm]
 
 \newpage
-
-\section*{\huge Todo}
-\addcontentsline{toc}{section}{Todo}
-
-\noindent
-Regularization: Tikhonov \\
-Network Architecture: Depth-Breadth \\
-Ensamble methods: Dropout \\
-Vanishing/Exploding Gradient: ReLU, Sigmoid \\
-Convergence: \\ 
-Local Optima: Pretraining \\
-Prove nonlinearity's importance: identity function \\
-Parameter Reduction: Deeper networks \\
-ResNet: Skip Connections \\
-\bigskip
-Long Short-Term Memory: "forgetting" \\
-ConvNet: "forgetting", feature maps, pooling, ReLU \\
-RecurrentNet: sequence of moves \\
-Stochastic Gradient Descent: Mini-Batch, Point \\
-Learning Rate Decay: Exponential and Inverse Decay \\
-Momentum-Based Learning: Nesterov Momentum, AdaGrad, RMSProp, \\ AdaDelta, Adam \\
-Acceleration and Data Compression: GPU, SIMD ... \\
-Overfitting: Penalty Regularization, Ensamble Methods, \\ Early Stopping, Pretraining, Continuation Methods 
-Imitation Learning: Supervised 
 
 \clearpage
 \pagenumbering{arabic}

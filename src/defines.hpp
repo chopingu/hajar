@@ -14,3 +14,15 @@ using u64 = std::uint64_t;
 
 using f32 = float;
 using f64 = double;
+
+/*
+#define AVX
+#define SSE
+#define NORMAL
+
+#ifndef NORMAL
+
+#include <immintrin.h>
+
+#endif
+*/

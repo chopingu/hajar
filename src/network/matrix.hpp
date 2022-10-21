@@ -316,79 +316,109 @@ public:
 #ifdef AVX
     // += 
     matrix& operator+=(const matrix &mtx) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] += mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(_ptr + i, _mm256_add_ps(_mm256_load_ps(_ptr + i), _mm256_load_ps(mtx._ptr + i)));
+
         return *this;
     }
 
     // -= 
     matrix& operator-=(const matrix &mtx) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] -= mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(_ptr + i, _mm256_sub_ps(_mm256_load_ps(_ptr + i), _mm256_load_ps(mtx._ptr + i)));
+
         return *this;
     }
 
     // *=
     matrix& operator*=(const matrix &mtx) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] *= mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(_ptr + i, _mm256_mul_ps(_mm256_load_ps(_ptr + i), _mm256_load_ps(mtx._ptr + i)));
+
         return *this;
     }
    
     // += value
     matrix& operator+=(const f32 value) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] += value;
+        __m256 val = _mm256_set_ps(value, value, value, value, value, value, value, value);
+        for(u32 i = 0; i < _size; i += 8)
+            _mm256_store_ps(_ptr + i, _mm256_add_ps(_mm256_load_ps(_ptr + i), val));
+
         return *this;
     }
 
     // -= value
     matrix& operator-=(const f32 value) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] -= value;
+        __m256 val = _mm256_set_ps(value, value, value, value, value, value, value, value);
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(_ptr + i, _mm256_sub_ps(_mm256_load_ps(_ptr + i), val));
+
         return *this;
     }
 
     // *= value
     matrix& operator*=(const f32 value) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] *= value;
+        __m256 val = _mm256_set_ps(value, value, value, value, value, value, value, value);
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(_ptr + i, _mm256_mul_ps(_mm256_load_ps(_ptr + i), val));
+
         return *this;
     }
 
     // +
     matrix operator+(const matrix &mtx) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] + mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(nw._ptr, _mm256_add_ps(_mm256_load_ps(_ptr + i), _mm256_load_ps(mtx._ptr + i)));
+
         return nw;
     }
 
     // -
     matrix operator-(const matrix &mtx) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] - mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(nw._ptr, _mm256_sub_ps(_mm256_load_ps(_ptr + i), _mm256_load_ps(mtx._ptr + i)));
+            
         return nw;
     }
 
     // *
     matrix operator*(const matrix &mtx) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] * mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(nw._ptr, _mm256_mul_ps(_mm256_load_ps(_ptr + i), _mm256_load_ps(mtx._ptr + i)));
+
         return nw;
     }
    
     // + value
     matrix operator+(const f32 value) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] + value;
+        __m256 val = _mm256_set_ps(value, value, value, value, value, value, value, value);
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(nw._ptr + i, _mm256_add_ps(_mm256_load_ps(_ptr + i), val));
+
         return nw;
     }
 
     // - value
     matrix operator-(const f32 value) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] - value;
+        __m256 val = _mm256_set_ps(value, value, value, value, value, value, value, value);
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(nw._ptr + i, _mm256_sub_ps(_mm256_load_ps(_ptr + i), val));
+
         return nw;
     }
 
     // * value
     matrix operator*(const f32 value) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] * value;
+        __m256 val = _mm256_set_ps(value, value, value, value, value, value, value, value);
+        for(u32 i = 0; i < _size; i += 8) 
+            _mm256_store_ps(nw._ptr + i, _mm256_mul_ps(_mm256_load_ps(_ptr + i), val));
+
         return nw;
     }
 #endif
@@ -396,79 +426,109 @@ public:
 #ifdef SSE
     // += 
     matrix& operator+=(const matrix &mtx) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] += mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(_ptr + i, _mm_add_ps(_mm_load_ps(_ptr + i), _mm_load_ps(mtx._ptr + i)));
+
         return *this;
     }
 
     // -= 
     matrix& operator-=(const matrix &mtx) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] -= mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(_ptr + i, _mm_sub_ps(_mm_load_ps(_ptr + i), _mm_load_ps(mtx._ptr + i)));
+
         return *this;
     }
 
     // *=
     matrix& operator*=(const matrix &mtx) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] *= mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(_ptr + i, _mm_mul_ps(_mm_load_ps(_ptr + i), _mm_load_ps(mtx._ptr + i)));
+
         return *this;
     }
    
     // += value
     matrix& operator+=(const f32 value) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] += value;
+        __m128 val = _mm_set_ps(value, value, value, value);
+        for(u32 i = 0; i < _size; i += 4)
+            _mm_store_ps(_ptr + i, _mm_add_ps(_mm_load_ps(_ptr + i), val));
+
         return *this;
     }
 
     // -= value
     matrix& operator-=(const f32 value) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] -= value;
+        __m128 val = _mm_set_ps(value, value, value, value);
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(_ptr + i, _mm_sub_ps(_mm_load_ps(_ptr + i), val));
+
         return *this;
     }
 
     // *= value
     matrix& operator*=(const f32 value) {
-        for(u32 i = 0; i < _size; i++) _ptr[i] *= value;
+        __m128 val = _mm_set_ps(value, value, value, value);
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(_ptr + i, _mm_mul_ps(_mm_load_ps(_ptr + i), val));
+
         return *this;
     }
 
     // +
     matrix operator+(const matrix &mtx) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] + mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(nw._ptr, _mm_add_ps(_mm_load_ps(_ptr + i), _mm_load_ps(mtx._ptr + i)));
+
         return nw;
     }
 
     // -
     matrix operator-(const matrix &mtx) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] - mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(nw._ptr, _mm_sub_ps(_mm_load_ps(_ptr + i), _mm_load_ps(mtx._ptr + i)));
+            
         return nw;
     }
 
     // *
     matrix operator*(const matrix &mtx) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] * mtx._ptr[i];
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(nw._ptr, _mm_mul_ps(_mm_load_ps(_ptr + i), _mm_load_ps(mtx._ptr + i)));
+
         return nw;
     }
    
     // + value
     matrix operator+(const f32 value) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] + value;
+        __m128 val = _mm_set_ps(value, value, value, value);
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(nw._ptr + i, _mm_add_ps(_mm_load_ps(_ptr + i), val));
+
         return nw;
     }
 
     // - value
     matrix operator-(const f32 value) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] - value;
+        __m128 val = _mm_set_ps(value, value, value, value);
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(nw._ptr + i, _mm_sub_ps(_mm_load_ps(_ptr + i), val));
+
         return nw;
     }
 
     // * value
     matrix operator*(const f32 value) {
         matrix nw(rows, cols, channels);
-        for(u32 i = 0; i < _size; i++) nw._ptr[i] = _ptr[i] * value;
+        __m128 val = _mm_set_ps(value, value, value, value);
+        for(u32 i = 0; i < _size; i += 4) 
+            _mm_store_ps(nw._ptr + i, _mm_mul_ps(_mm_load_ps(_ptr + i), val));
+
         return nw;
     }
 #endif

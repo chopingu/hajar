@@ -1,4 +1,4 @@
-#include "defines.hpp"
+#include "../defines.hpp"
 #include "neural_net.hpp"
 #include "board.hpp"
 #include <memory>

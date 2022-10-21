@@ -145,30 +145,6 @@ public:
         return mtx;
     }
 
-    void clip(const f32 mn, const f32 mx) {
-        for(u32 i = 0; i < _size; i++) {
-            if(_ptr[i] < mn) _ptr[i] = mn;
-            if(_ptr[i] > mx) _ptr[i] = mx;
-        }
-    }
-
-    void min_max(f32 *mn, f32 *mx, f32 *mn_id = 0, f32 *mx_id = 0) {
-        const u32 area = rows * cols;
-        u32 mnid = 0, mxid = 0;
-        for(u32 i = 0; i < channels; i++) {
-            const u32 channel_id = i * channel_stride;
-            for(u32 j = channel_id; j < channel_id + area; j++) {
-                if(_ptr[j] < _ptr[mnid]) mnid = j;
-                if(_ptr[j] > _ptr[mxid]) mxid = j;
-            }
-        }
-
-        *mn = _ptr[mnid];
-        *mx = _ptr[mxid];
-        if(mn_id) *mn_id = mnid;
-        if(mx_id) *mx_id = mxid;
-    }
-
     f32 mean() {
         const u32 area = rows * cols;
         f32 average = 0;
@@ -205,15 +181,9 @@ public:
         for(u32 i = 0; i < _size; i++) _ptr[i] = value;
     }
 
-    void uniform_random_fill(const f32 low, const f32 high) {
+    void fill_random(const f32 low, const f32 high) {
         std::mt19937 seed(0);
         std::uniform_real_distribution<f32> generator(low, high);
-        for(u32 i = 0; i < _size; i++) _ptr[i] = generator(seed);
-    }
-
-    void normal_random_fill(const f32 high) {
-        std::mt19937 seed(0);
-        std::normal_distribution<f32> generator(0, high);
         for(u32 i = 0; i < _size; i++) _ptr[i] = generator(seed);
     }
 

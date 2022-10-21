@@ -119,7 +119,7 @@ public:
         return mtx;
     }
 
-    matrix shift(const u32 dy, const u32 dx, pingu::padding pad_type = pingu::zero) {
+    matrix shift(const i32 dy, const i32 dx, pingu::padding pad_type = pingu::zero) {
         matrix shifted = matrix_pad(abs(dy), abs(dx), pad_type);
         return shifted.crop(abs(dy) - dy, abs(dx) - dx, rows, cols);
     }
@@ -556,7 +556,3 @@ public:
 };
 
 } // namespace pingu
-
-int main() {
-
-}

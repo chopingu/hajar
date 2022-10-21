@@ -6,7 +6,7 @@
 #include "../defines.hpp"
 #include "../board.hpp"
 #include "../tester.hpp"
-#include "../lib/lmj/src/lmj_include_all.hpp"
+#include "../../lib/lmj/src/lmj_include_all.hpp"
 
 namespace heuristic {
 struct n_move_solver {

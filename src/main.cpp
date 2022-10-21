@@ -7,6 +7,7 @@
 #include "heuristic/one_move_solver.hpp"
 #include "heuristic/two_move_solver.hpp"
 #include "heuristic/n_move_solver.hpp"
+#include "network/matrix.hpp"
 
 #include <thread>
 

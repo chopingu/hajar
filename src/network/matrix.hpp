@@ -1,4 +1,4 @@
-//#pragma once
+#pragma once
 
 #include <random>
 #include <vector>
@@ -6,10 +6,7 @@
 #include <cstring>
 #include <cstdint>
 
-#define AVX
-
-using f32 = float;
-using u32 = uint32_t;
+#include "../defines.hpp"
 
 namespace pingu {
 

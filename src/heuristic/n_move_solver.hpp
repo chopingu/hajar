@@ -1,12 +1,6 @@
 #pragma once
 
-#include <algorithm>
-#include <random>
-#include <future>
-#include "../defines.hpp"
-#include "../board.hpp"
-#include "../tester.hpp"
-#include "../../lib/lmj/src/lmj_include_all.hpp"
+#include "../include.hpp"
 
 namespace heuristic {
 struct n_move_solver {
@@ -32,7 +26,7 @@ struct n_move_solver {
         std::array<f64, 7> scores{};
         lmj::static_vector<f64, 7> move_scores;
         const auto actions = b.get_actions();
-        const auto eval_move = [=, &scores, &biases, &move_scores](u8 move) {
+        const auto eval_move = [=, this, &scores, &biases, &move_scores](u8 move) {
             const auto evaluation = evaluate_board(b.play_copy(move), steps_left - 1, recursion_depth + 1)
                                     * 0.75 * b.turn() + biases[move];
             scores[move] = evaluation;

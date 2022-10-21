@@ -11,7 +11,7 @@
 
 #include "defines.hpp"
 
-#include "../lib/lmj/src/lmj_containers/lmj_static_vector.hpp"
+#include "../lib/lmj/src/containers/static_vector.hpp"
 
 namespace gya {
 struct game_result {

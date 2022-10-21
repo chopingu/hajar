@@ -137,6 +137,16 @@ public:
     }
 
     /**
+     * @return value at key or fails
+     */
+    value_type &at(key_type const &key) {
+        assert(m_capacity && "empty hash_table");
+        const size_type idx = _get_index_read(key);
+        assert(m_is_set[idx] == ACTIVE && m_table[idx].first == key && "key not found");
+        return m_table[idx].second;
+    }
+
+    /**
      * @brief gets value at key or creates new value at key with default value
      * @return reference to value associated with key
      */
@@ -334,6 +344,7 @@ private:
     }
 
     [[nodiscard]] size_type _get_hash(key_type const &key) const {
+        return _clamp_size(m_hasher(key));
         const size_type hash = m_hasher(key);
         return _clamp_size(hash ^ (~hash >> 16) ^ (hash << 24));
     }

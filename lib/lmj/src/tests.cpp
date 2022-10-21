@@ -1,6 +1,4 @@
-#include "lmj_include_all.hpp"
-
-#include <cmath>
+#include "include.hpp"
 
 int main() {
     {

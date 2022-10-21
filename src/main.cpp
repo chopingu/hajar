@@ -10,8 +10,16 @@
 #include "network/matrix.hpp"
 
 #include <thread>
+#include <omp.h>
 
 int main() {
+    #pragma omp parallel default(none) num_threads(100)
+    {
+        printf("%d\n", omp_get_thread_num());
+    }
+
+    return 0;
+
     auto print = [](std::string_view s) {
         for (auto c: s) {
             putchar(c);

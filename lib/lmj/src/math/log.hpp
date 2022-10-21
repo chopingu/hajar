@@ -1,8 +1,8 @@
 #pragma once
 
 #include <limits>
-#include "lmj_misc_math.hpp"
-#include "lmj_newton_raphson.hpp"
+#include "misc_math.hpp"
+#include "newton_raphson.hpp"
 
 namespace lmj {
 namespace detail {

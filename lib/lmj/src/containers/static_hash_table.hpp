@@ -4,7 +4,7 @@
 #include <functional>
 #include <cstdint>
 
-#include "lmj_container_helpers.hpp"
+#include "container_helpers.hpp"
 
 namespace lmj {
 template<class T>
@@ -81,6 +81,15 @@ public:
      * @return value at key or fails
      */
     [[nodiscard]] constexpr value_type const &at(key_type const &key) const {
+        const size_type idx = _get_index_read(key);
+        assert(m_is_set[idx] == ACTIVE && m_table[idx].first == key && "key not found");
+        return m_table[idx].second;
+    }
+
+    /**
+     * @return value at key or fails
+     */
+    [[nodiscard]] constexpr value_type &at(key_type const &key) {
         const size_type idx = _get_index_read(key);
         assert(m_is_set[idx] == ACTIVE && m_table[idx].first == key && "key not found");
         return m_table[idx].second;

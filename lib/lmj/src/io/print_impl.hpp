@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 
-#include "../lmj_utils/lmj_utils.hpp"
+#include "../utils/utils.hpp"
 
 namespace lmj {
 using std::operator ""s;
@@ -46,7 +46,7 @@ constexpr void print_impl_pretty(print_stream auto &out, T &&x) {
     auto first = true;
     for (auto &&i: x) {
         if (!first) {
-            if constexpr (iterable<decltype(i)>)
+            if constexpr (iterable<decltype(i)> || requires { i.second; i.first; })
                 out << ",\n";
             else
                 out << ", ";
@@ -76,7 +76,7 @@ constexpr void print_impl(print_stream auto &out, std::pair<T, G> const &p) {
 template<class T>
 requires iterable<T> && (!std::is_convertible_v<T, std::string>)
 constexpr void print_impl(print_stream auto &out, T &&x) {
-    auto first = true;
+    bool first = true;
     for (auto &&i: x) {
         if (!first)
             out << ' ';

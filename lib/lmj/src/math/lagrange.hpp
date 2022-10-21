@@ -4,8 +4,8 @@
 #include <utility>
 #include <array>
 
-#include "../lmj_utils/lmj_utils.hpp"
-#include "../lmj_containers/lmj_containers.hpp"
+#include "../utils/utils.hpp"
+#include "../containers/containers.hpp"
 
 namespace lmj::lagrange {
 namespace detail {
@@ -45,7 +45,8 @@ constexpr long double interpolate(long double x, std::array<point, length> const
 }
 
 /**
- * @brief get polynomial function which has values of (x, y) as specified in parameter points
+ * @brief get polynomial function takes on values of all pairs (x, y) specified in parameter points
+ * @note uses lagrange interpolation
  * @param points
  * @return
  */

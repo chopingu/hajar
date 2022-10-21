@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string_view>
-#include "../lmj_containers/lmj_containers.hpp"
+#include "../containers/containers.hpp"
 
 namespace lmj {
 constexpr unsigned long long seed_from_str(std::string_view v) {

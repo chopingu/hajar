@@ -282,7 +282,7 @@ public:
         hash_table other{new_capacity, m_hasher};
         for (size_type i = 0; i < m_capacity; ++i) {
             if (m_is_set[i] == ACTIVE)
-                other.emplace(m_table[i]);
+                other.emplace(std::move(m_table[i].first), std::move(m_table[i].second));
         }
         *this = std::move(other);
     }
@@ -322,7 +322,7 @@ public:
         for (size_type i = 0; i < m_capacity; ++i) {
             if (m_is_set[i] == ACTIVE) {
                 const size_type idx = other._get_writable_index(m_table[i].first);
-                new(&other.m_table[idx]) pair_type{m_table[i]};
+                new(&other.m_table[idx]) pair_type{std::move(m_table[i].first), std::move(m_table[i].second)};
                 other.m_is_set[idx] = ACTIVE;
             }
         }

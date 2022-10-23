@@ -4,15 +4,26 @@
 #include <functional>
 
 namespace lmj {
+
+#ifdef __GNUC__
 template<class T> concept integral = std::is_integral_v<std::remove_cvref_t<T>>
                                      || std::is_same_v<T, __uint128_t> || std::is_same_v<T, __int128_t>;
+#else
+template<class T> concept integral = std::is_integral_v<std::remove_cvref_t<T>>;
+#endif
+
 template<class T> concept unsigned_integral = integral<T> &&
                                               !std::is_signed_v<std::remove_cvref_t<T>>;
 template<class T> concept signed_integral = integral<T> &&
                                             std::is_signed_v<std::remove_cvref_t<T>>;
 
+#ifdef __GNUC__
 template<class T> concept floating_point = std::is_floating_point_v<std::remove_cvref_t<T>> ||
                                            std::is_same_v<T, __float128>;
+#else
+template<class T> concept floating_point = std::is_floating_point_v<std::remove_cvref_t<T>>;
+#endif
+
 
 template<class T>
 concept number = integral<T> ||

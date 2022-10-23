@@ -42,8 +42,28 @@ constexpr auto ipow(number auto base, std::uint64_t exp) {
  * @param x
  * @return |x|
  */
-constexpr auto abs(number auto x) {
-    return x > 0 ? x : -x;
+template<class T>
+requires number<T>
+constexpr T abs(T x) {
+    if ((std::is_constant_evaluated() && !std::is_floating_point_v<T>) ||
+        (std::is_same_v<T, long double> && sizeof(long double) == 16)) {
+        return x < 0 ? -x : x;
+    } else {
+        if constexpr (std::endian::native == std::endian::little) {
+            // clear sign bit
+            if (!std::is_constant_evaluated())
+                ((std::uint8_t *) &x)[sizeof(T) - 1] &= ~0x80;
+        } else if constexpr (std::endian::native == std::endian::big) {
+            // clear sign bit
+            if (!std::is_constant_evaluated())
+                ((std::uint8_t *) &x)[0] &= ~0x80;
+        } else {
+            // wtf is your architecture
+            static_assert(std::endian::native == std::endian::big ||
+                          std::endian::native == std::endian::little);
+        }
+        return x;
+    }
 }
 
 #ifdef __GNUC__

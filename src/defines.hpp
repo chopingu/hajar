@@ -22,5 +22,6 @@ using f64 = double;
 #ifndef NORMAL
 
 #include <immintrin.h>
+#include <xmmintrin.h>
 
 #endif

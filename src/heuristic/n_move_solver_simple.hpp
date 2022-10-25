@@ -3,9 +3,7 @@
 #include "../include.hpp"
 
 namespace heuristic {
-struct n_move_solver {
-    constexpr static auto MULTI_THREAD = true;
-
+struct n_move_solver_simple {
     int num_moves = 5;
 
     f64 evaluate_board(gya::board const &b, i32 steps_left, i32 recursion_depth = 0) const {

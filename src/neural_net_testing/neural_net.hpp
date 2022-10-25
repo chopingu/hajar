@@ -29,7 +29,10 @@ struct neural_net {
     F1 activation_function;
     F2 activation_derivative;
 
-    neural_net(F1 f, F2 derivative) : activation_function{f}, activation_derivative{derivative} {}
+    template<class F1_, class F2_>
+    neural_net(F1_ &&f, F2_ &&derivative) :
+            activation_function{std::forward<F1_>(f)},
+            activation_derivative{std::forward<F2_>(derivative)} {}
 
     auto &operator=(neural_net const &other) {
         m_weights.data = other.m_weights.data;
@@ -229,19 +232,19 @@ struct neural_net {
         *this = x;
     }
 
-    constexpr u64 size() const {
+    [[nodiscard]] constexpr u64 size() const {
         return sizeof...(sizes);
     }
 
-    bool operator!=(neural_net const &other) const {
+    [[nodiscard]] bool operator!=(neural_net const &other) const {
         return m_weights.data != other.m_weights.data || m_biases.data != other.m_biases.data;
     }
 
-    bool operator==(neural_net const &other) const {
-        return !(*this == other);
+    [[nodiscard]] bool operator==(neural_net const &other) const {
+        return m_weights.data == other.m_weights.data && m_biases.data == other.m_biases.data;
     }
 
-    std::string to_string() const {
+    [[nodiscard]] std::string to_string() const {
         std::ostringstream oss;
         oss << std::setprecision(10000);
         for (T i: m_weights.data)

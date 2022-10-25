@@ -360,7 +360,7 @@ requires function input to be formatted as such (same as provided by board::to_s
 struct random_player {
     u64 x = 123456789, y = 362436069, z = 521288629;
 
-    constexpr random_player(u64 seed = -1) {
+    constexpr explicit random_player(u64 seed = -1) {
         if (std::is_constant_evaluated()) {
             set_seed(1);
         } else {

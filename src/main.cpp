@@ -9,6 +9,7 @@
 #include "heuristic/n_move_solver.hpp"
 #include "heuristic/n_move_solver_simple.hpp"
 #include "pinguml/tensor.hpp"
+#include "pinguml/cost.hpp"
 
 #include <thread>
 #include <omp.h>

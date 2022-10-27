@@ -5,8 +5,9 @@
 namespace heuristic {
 struct n_move_solver_simple {
     int num_moves = 5;
+    static constexpr std::array bias = {0, 1, 2, 3, 2, 1, 0};
 
-    f64 evaluate_board(gya::board const &b, i32 steps_left, i32 recursion_depth = 0) const {
+    f64 evaluate_board(gya::board const &b, i32 steps_left) const {
         if (gya::game_result result = b.has_won(); result.is_game_over()) {
             if (result.is_tie()) {
                 return -1e5 * b.turn();
@@ -24,16 +25,16 @@ struct n_move_solver_simple {
         f64 best_eval = 0;
 
         for (auto move: actions) {
-            const auto evaluation = evaluate_board(b.play_copy(move), steps_left - 1) * b.turn();
+            const auto evaluation = evaluate_board(b.play_copy(move), steps_left - 1) * b.turn() + bias[move];
             if (evaluation > best_eval)
                 best_eval = evaluation;
         }
 
-        return best_eval;
+        return best_eval * b.turn();
     }
 
     u8 operator()(gya::board const &b) const {
-        f64 best_eval = -1e9;
+        f64 best_eval = -std::numeric_limits<f64>::max();
         u8 best_move = 0;
         auto actions = b.get_actions();
         lmj::random_shuffle(actions);

@@ -18,10 +18,16 @@ using f64 = double;
 #define AVX
 //#define SSE
 //#define NORMAL
+//#define OMP
 
 #ifndef NORMAL
 
 #include <immintrin.h>
-#include <xmmintrin.h>
+
+#endif
+
+#ifdef OMP
+
+#include <omp.h>
 
 #endif

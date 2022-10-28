@@ -1,8 +1,6 @@
 #pragma once
 
-#include "../defines.hpp"
-#include <array>
-#include <span>
+#include "../include.hpp"
 
 template<class T, u64... sizes>
 class layer_array {

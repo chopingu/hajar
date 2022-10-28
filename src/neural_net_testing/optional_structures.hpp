@@ -2,8 +2,7 @@
 
 #include "layer_array.hpp"
 #include "weight_array.hpp"
-#include "../defines.hpp"
-#include <type_traits>
+#include "../include.hpp"
 
 namespace gya {
 template<bool used, class T, u64... sizes>

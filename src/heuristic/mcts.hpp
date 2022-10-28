@@ -1,14 +1,6 @@
 #pragma once
 
-#include <vector>
-#include <memory>
-#include <string>
-#include <cmath>
-#include <random>
-
-#include "../board.hpp"
-#include "../defines.hpp"
-#include "../utilities.hpp"
+#include "../include.hpp"
 
 namespace mcts {
 

@@ -1,7 +1,6 @@
-#include "../defines.hpp"
+#include "../include.hpp"
 #include "neural_net.hpp"
 #include "../board.hpp"
-#include <memory>
 
 namespace gya {
 template<class T, class F1, class F2, u64... sizes>

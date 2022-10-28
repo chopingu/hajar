@@ -1,7 +1,8 @@
 #include "defines.hpp"
 #include "board.hpp"
 #include "tester.hpp"
-#include <iostream>
+#include "include.hpp"
+
 #include "neural_net_testing/neural_net_player.hpp"
 #include "heuristic/mcts.hpp"
 #include "heuristic/one_move_solver.hpp"
@@ -11,10 +12,8 @@
 #include "pinguml/tensor.hpp"
 #include "pinguml/cost.hpp"
 
-#include <thread>
-#include <omp.h>
-
 int main() {
+    /*
     auto print = [](std::string_view s) {
         for (auto c: s) {
             putchar(c);
@@ -52,6 +51,7 @@ int main() {
             std::puts("you lost!");
         }
     }
+    */
 
     tests:
     {
@@ -177,8 +177,8 @@ int main() {
                 double games = iters * 2;
                 int wins = 0;
                 for (int i = 0; i < iters; ++i) {
-                    wins += gya::test_game(s, p).has_won_test().player_1_won();
-                    wins += gya::test_game(p, s).has_won_test().player_2_won();
+                    wins += gya::test_game(s, p).has_won().player_1_won();
+                    wins += gya::test_game(p, s).has_won().player_2_won();
                 }
                 std::cout << "4 move solver winrate against random player: " << wins / games * 1e2 << "%"
                           << std::endl;
@@ -190,8 +190,8 @@ int main() {
                 double games = iters * 2;
                 int wins = 0;
                 for (int i = 0; i < iters; ++i) {
-                    wins += gya::test_game(s, p).has_won_test().player_1_won();
-                    wins += gya::test_game(p, s).has_won_test().player_2_won();
+                    wins += gya::test_game(s, p).has_won().player_1_won();
+                    wins += gya::test_game(p, s).has_won().player_2_won();
                 }
                 std::cout << "4 move solver winrate against 2 move solver: " << wins / games * 1e2 << "%"
                           << std::endl;
@@ -203,8 +203,8 @@ int main() {
                 double games = iters * 2;
                 int wins = 0;
                 for (int i = 0; i < iters; ++i) {
-                    wins += gya::test_game(s, p).has_won_test().player_1_won();
-                    wins += gya::test_game(p, s).has_won_test().player_2_won();
+                    wins += gya::test_game(s, p).has_won().player_1_won();
+                    wins += gya::test_game(p, s).has_won().player_2_won();
                 }
                 std::cout << "4 move solver winrate against two_move_solver: " << wins / games * 1e2 << "%"
                           << std::endl;

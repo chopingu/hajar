@@ -5,7 +5,7 @@
 namespace heuristic {
 struct n_move_solver_simple {
     int num_moves = 5;
-    static constexpr std::array bias = {0, 1, 2, 3, 2, 1, 0};
+    constexpr static std::array bias = {0, 1, 2, 3, 2, 1, 0};
 
     f64 evaluate_board(gya::board const &b, i32 steps_left) const {
         if (gya::game_result result = b.has_won(); result.is_game_over()) {

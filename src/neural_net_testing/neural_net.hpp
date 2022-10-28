@@ -1,13 +1,9 @@
 #pragma once
 
-#include <random>
-#include <sstream>
-#include <iomanip>
-#include <memory>
+#include "../include.hpp"
 #include "../board.hpp"
 #include "layer_array.hpp"
 #include "weight_array.hpp"
-#include "../defines.hpp"
 #include "optional_structures.hpp"
 
 namespace gya {

@@ -8,14 +8,16 @@ struct n_move_solver {
 
     int num_moves = 5;
 
-    f64 evaluate_board(gya::board const &b, i32 steps_left, i32 recursion_depth = 0) const {
+    using transpo_table_t = lmj::hash_table<gya::compressed_board, i8>;
+
+    i16 evaluate_board(gya::board const &b, i32 steps_left, i32 recursion_depth = 0) const {
         if (gya::game_result result = b.has_won(); result.is_game_over()) {
             if (result.is_tie()) {
-                return -1e5 * b.turn();
+                return static_cast<i16>(-127 * b.turn());
             } else if (result.player_1_won()) {
-                return 1e9;
+                return 32767;
             } else {
-                return -1e9;
+                return -32767;
             }
         }
 
@@ -23,12 +25,13 @@ struct n_move_solver {
         constexpr std::array<int, 7> biases = {0, 1, 2, 3, 2, 1, 0};
 //        constexpr std::array<int, 7> biases = {};
 
-        std::array<f64, 7> scores{};
-        lmj::static_vector<f64, 7> move_scores;
+        std::array<i16, 7> scores{};
+        lmj::static_vector<i16, 7> move_scores;
         const auto actions = b.get_actions();
         const auto eval_move = [=, this, &scores, &biases, &move_scores](u8 move) {
-            const auto evaluation = evaluate_board(b.play_copy(move), steps_left - 1, recursion_depth + 1)
-                                    * 0.75 * b.turn() + biases[move];
+            const auto evaluation = static_cast<i16>(
+                    (evaluate_board(b.play_copy(move), steps_left - 1, recursion_depth + 1)
+                     - 10) * b.turn() + biases[move]);
             scores[move] = evaluation;
             move_scores.push_back(evaluation);
         };
@@ -43,22 +46,12 @@ struct n_move_solver {
         } else {
             for (u8 move: actions) {
                 eval_move(move);
-                if (scores[move] >= 0.75 * 1e9) {
-                    return scores[move] * b.turn();
+                if (scores[move] >= 32757) {
+                    return static_cast<i16>(scores[move] * b.turn());
                 }
             }
         }
-        if (move_scores.size() >= 3) {
-            std::partial_sort(move_scores.begin(), move_scores.begin() + 3, move_scores.end(), std::greater{});
-            f64 score = move_scores[0];
-            score += 1e-8 * move_scores[1] + 1e-9 * move_scores[2];
-            return score * b.turn();
-        } else {
-            std::sort(move_scores.begin(), move_scores.end(), std::greater{});
-            f64 score = move_scores[0];
-            if (move_scores.size() == 2) score += move_scores[1] * 1e-8;
-            return score * b.turn();
-        }
+        return static_cast<i16>(*std::max_element(std::begin(move_scores), std::end(move_scores)) * b.turn());
     }
 
     u8 operator()(gya::board const &b) const {

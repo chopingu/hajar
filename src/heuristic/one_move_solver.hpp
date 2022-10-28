@@ -1,6 +1,4 @@
-#include "../defines.hpp"
-#include "../board.hpp"
-#include "../tester.hpp"
+#include "../include.hpp"
 
 namespace heuristic {
 struct one_move_solver {

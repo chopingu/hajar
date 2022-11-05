@@ -3,8 +3,8 @@
 #include "../include.hpp"
 
 namespace heuristic {
+template<bool MULTI_THREAD = false>
 struct n_move_solver {
-    constexpr static auto MULTI_THREAD = true;
 
     int num_moves = 5;
 

@@ -419,17 +419,23 @@ struct compressed_column {
 private:
     u8 data{};
 public:
+    [[nodiscard]] constexpr u8 height() const {
+        u8 res;
+        for (res = 6; res >= 1; --res)
+            if (data & (1 << (res - 1)))
+                break;
+        return res;
+    }
+
     static constexpr gya::board_column decompress(gya::compressed_column c) {
         gya::board_column res{};
         if (!c.data)
             return res;
 
-        for (res.height = 6; res.height >= 1; --res.height)
-            if (c.data & (1 << (res.height - 1)))
-                break;
+        res.height = c.height();
 
-        i8 highest_player = (c.data >> 7) ? 1 : -1;
-        i8 other_player = (c.data >> 7) ? -1 : 1;
+        const i8 highest_player = (c.data >> 7) ? 1 : -1;
+        const i8 other_player = (c.data >> 7) ? -1 : 1;
 
         for (u8 i = 0; i < res.height; ++i) {
             res[i] = (c.data & (1 << i)) ? highest_player : other_player;
@@ -448,6 +454,14 @@ public:
             res.data |= (b[i] == highest_player) << i;
         }
         return res;
+    }
+
+    constexpr bool operator==(gya::compressed_column c) const {
+        return data == c.data;
+    }
+
+    constexpr bool operator!=(gya::compressed_column c) const {
+        return data != c.data;
     }
 };
 
@@ -470,6 +484,16 @@ struct compressed_board {
 private:
     std::array<compressed_column, 7> data;
 public:
+    constexpr compressed_board() = default;
+
+    constexpr compressed_board(gya::compressed_board const &) = default;
+
+    constexpr compressed_board(gya::board const &b) : compressed_board{compress(b)} {}
+
+    constexpr operator gya::board() const {
+        return decompress(*this);
+    }
+
     static constexpr gya::board decompress(gya::compressed_board c) {
         gya::board res;
         for (u8 i = 0; i < 7; ++i) {
@@ -487,9 +511,17 @@ public:
         }
         return res;
     }
+
+    constexpr bool operator==(gya::compressed_board const &b) const {
+        return data == b.data;
+    }
+
+    constexpr bool operator!=(gya::compressed_board const &b) const {
+        return data != b.data;
+    }
 };
 
-static_assert([] {
+static_assert([] { // test some randomly generated games to make sure they are compressed and decompressed properly
     for (int i = 0; i < 100; ++i) {
         gya::random_player p1(i), p2(i + 10);
         gya::board b;

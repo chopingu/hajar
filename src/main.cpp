@@ -31,7 +31,7 @@ int main() {
                 {
                     lmj::timer t{false};
                     move = s(b);
-                    printf("%f\n", t.elapsed());
+                    printf("%fs\n", t.elapsed());
                 }
                 b.play(move);
             } else {
@@ -171,7 +171,7 @@ int main() {
         {
             // test heuristic solvers
             {
-                heuristic::n_move_solver s{4};
+                heuristic::n_move_solver<false> s{4};
                 gya::random_player p;
                 int iters = 1000;
                 double games = iters * 2;
@@ -184,8 +184,8 @@ int main() {
                           << std::endl;
             }
             {
-                heuristic::n_move_solver s{4};
-                heuristic::n_move_solver p{2};
+                heuristic::n_move_solver<false> s{5};
+                heuristic::n_move_solver<false> p{2};
                 int iters = 1000;
                 double games = iters * 2;
                 int wins = 0;
@@ -197,7 +197,7 @@ int main() {
                           << std::endl;
             }
             {
-                heuristic::n_move_solver s{4};
+                heuristic::n_move_solver<false> s{4};
                 heuristic::two_move_solver p;
                 int iters = 100;
                 double games = iters * 2;
@@ -260,7 +260,7 @@ int main() {
                 std::cout << "avg: " << time.count() / 1e3 << "us" << std::endl;
             }
             {
-                heuristic::n_move_solver p1{5}, p2{5};
+                heuristic::n_move_solver<false> p1{5}, p2{5};
                 auto t1 = std::chrono::high_resolution_clock::now();
                 for (int j = 0; j < (1 << 10); ++j)
                     volatile gya::board c = gya::test_game(p1, p2);

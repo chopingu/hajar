@@ -329,6 +329,10 @@ public:
         *this = std::move(other);
     }
 
+    [[nodiscard]] bool empty() const {
+        return m_elem_count == 0;
+    }
+
 private:
     [[nodiscard]] size_type _get_start_index() const {
         if (!m_capacity)
@@ -362,7 +366,7 @@ private:
     }
 
     [[nodiscard]] size_type _get_index_read_impl(key_type const &key, size_type idx) const {
-        std::size_t iterations = 0;
+        [[maybe_unused]] std::size_t iterations = 0;
         while ((m_is_set[idx] == TOMBSTONE ||
                 (m_is_set[idx] == ACTIVE && m_table[idx].first != key)) && iterations++ < m_capacity) {
             idx = _new_idx(idx);
@@ -379,7 +383,7 @@ private:
     }
 
     [[nodiscard]] size_type _get_writable_index_impl(key_type const &key, size_type idx) const {
-        std::size_t iterations = 0;
+        [[maybe_unused]] std::size_t iterations = 0;
         while (m_is_set[idx] == ACTIVE && m_table[idx].first != key) {
             assert(iterations++ < m_capacity && "element not found");
             idx = _new_idx(idx);

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../include.hpp"
 
 namespace heuristic {

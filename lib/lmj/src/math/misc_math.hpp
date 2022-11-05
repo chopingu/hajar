@@ -9,10 +9,16 @@
 
 namespace lmj {
 
-template<class T>
+#if defined(__GNUC__) || defined(__clang_major__) || defined (__clang_minor__)
+using biggest_float = __float128;
+#else
+using biggest_float = long double;
+#endif
+
+template<class T = long double>
 constexpr T e = 2.718281828459045235360287471352662497757247093699959574966967627724076630353547594571382178525166427427l;
 
-template<class T>
+template<class T = long double>
 constexpr T pi = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798l;
 
 /**
@@ -21,15 +27,16 @@ constexpr T pi = 3.1415926535897932384626433832795028841971693993751058209749445
  * @throws std::out_of_range if exp = base = 0
  * @return base ^ exp
  */
-constexpr auto ipow(number auto base, std::uint64_t exp) {
-    using T = std::remove_cvref_t<decltype(base)>;
+template<class T>
+requires number<T>
+constexpr auto ipow(T base, std::uint64_t exp) {
     if (exp == 1)
         return base;
     if (exp == 0 && base != 0)
         return T{1};
     if (exp == 0 && base == 0)
         throw std::out_of_range("0^0 is undefined");
-    decltype(base) result = 1;
+    T result = 1;
     while (exp) {
         result *= (exp & 1) ? base : T{1};
         exp >>= 1;
@@ -66,12 +73,6 @@ constexpr T abs(T x) {
     }
 }
 
-#ifdef __GNUC__
-using biggest_float = __float128;
-#else
-using biggest_float = long double;
-#endif
-
 constexpr biggest_float _exp_small(biggest_float x, int n = 32) {
     biggest_float sum = 1;
     while (--n)
@@ -90,13 +91,11 @@ constexpr long double exp(long double x) {
             return 1;
         if (x < 0)
             return 1.0l / lmj::exp(-x);
-        if (x > 1) {
-            const auto whole_part = static_cast<unsigned>(x);
-            const auto fractional_part = x - static_cast<long double>(whole_part);
-            return static_cast<long double>(ipow(e<biggest_float>, whole_part) * _exp_small(fractional_part));
-        }
-        // only if x >= 0 and x <= 1
-        return static_cast<long double>(_exp_small(x));
+        const auto whole_part = static_cast<unsigned>(x);
+        const auto fractional_part = x - whole_part;
+        return static_cast<long double>(
+                _exp_small(fractional_part) * ipow(e<biggest_float>, whole_part)
+        );
     } else {
         return std::exp(x);
     }

@@ -219,6 +219,10 @@ public:
         return end();
     }
 
+    [[nodiscard]] constexpr bool empty() const {
+        return m_elem_count == 0;
+    }
+
 private:
     [[nodiscard]] constexpr size_type _get_start_index() const {
         if (!m_elem_count)
@@ -289,7 +293,7 @@ private:
     }
 
     [[nodiscard]] constexpr size_type _get_writable_index_impl(key_type const &key, size_type idx) const {
-        std::size_t iterations = 0;
+        [[maybe_unused]] std::size_t iterations = 0;
         while (m_is_set[idx] == ACTIVE && m_table[idx].first != key) {
             assert(iterations++ < _capacity && "empty slot not found");
             idx = _new_idx(idx);

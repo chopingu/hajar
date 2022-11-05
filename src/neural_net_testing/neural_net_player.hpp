@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../include.hpp"
 #include "neural_net.hpp"
 #include "../board.hpp"

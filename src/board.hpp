@@ -17,20 +17,6 @@ namespace gya {
 struct game_result {
     i8 state{};
 
-    constexpr void set_player_1_won() noexcept {
-        state = 1;
-    }
-
-    constexpr void set_player_2_won() noexcept {
-        state = 2;
-    }
-
-    constexpr void set_tie() noexcept {
-        state = -1;
-    }
-
-    constexpr int winner() const noexcept { return state; }
-
     constexpr bool player_1_won() const { return state == 1; }
 
     constexpr bool player_2_won() const { return state == 2; }

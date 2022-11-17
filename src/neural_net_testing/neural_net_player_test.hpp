@@ -28,7 +28,7 @@ struct neural_net_player_test {
         return *this;
     }
 
-    [[nodiscard]] u64 size() const {
+    [[nodiscard]] usize size() const {
         return net.m_weights.data.size() + net.m_biases.data.size();
     }
 
@@ -38,8 +38,8 @@ struct neural_net_player_test {
 
 #define MATRIX(x) (*reinterpret_cast<std::array<std::array<f32, 7>, 6>*>(&x))
         std::array<f32, 42> input{};
-        for (u64 i = 0; i < 6; ++i) {
-            for (u64 j = 0; j < 7; ++j) {
+        for (usize i = 0; i < 6; ++i) {
+            for (usize j = 0; j < 7; ++j) {
                 // reinterpret casting to avoid copying
                 MATRIX(input)[i][j] = static_cast<f32>(b[i][j] * b.turn());
             }

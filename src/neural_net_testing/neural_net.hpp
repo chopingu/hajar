@@ -7,7 +7,7 @@
 #include "optional_structures.hpp"
 
 namespace gya {
-template<bool USE_BACKPROP, bool LABELED_DATA, class T, class F1, class F2, u64... sizes>
+template<bool USE_BACKPROP, bool LABELED_DATA, class T, class F1, class F2, usize... sizes>
 struct neural_net {
     layer_array<T, sizes...> m_values;
     layer_array<T, sizes...> m_biases;
@@ -54,7 +54,7 @@ struct neural_net {
     static auto compute_cost(std::span<T> output, std::span<T> correct_output) {
         assert(output.size() == correct_output.size());
         T sum = 0;
-        for (u64 i = 0; i < output.size(); ++i) {
+        for (usize i = 0; i < output.size(); ++i) {
             sum += (output[i] - correct_output[i]) * (output[i] - correct_output[i]);
         }
         return sum;
@@ -72,18 +72,18 @@ struct neural_net {
 
         assert(choice.size() == output.size());
 
-        const u64 num_layers = size();
-        for (u64 node = 0; node < output.size(); ++node) {
+        const usize num_layers = size();
+        for (usize node = 0; node < output.size(); ++node) {
             local_bias_derivatives_win.back()[node] =
                     m_activation_derivative(output[node]) * (output[node] - choice[node]);
             local_bias_derivatives_loss.back()[node] =
                     m_activation_derivative(output[node]) * (output[node] + choice[node]);
         }
-        for (u64 layer = num_layers - 2; layer > 0; --layer) {
-            for (u64 node = 0; node < m_values[layer].size(); ++node) {
+        for (usize layer = num_layers - 2; layer > 0; --layer) {
+            for (usize node = 0; node < m_values[layer].size(); ++node) {
                 T sum_win = 0;
                 T sum_loss = 0;
-                for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
+                for (usize next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
                     const T weight_derivative_win =
                             m_values[layer][node] * local_bias_derivatives_win[layer + 1][next_node];
                     sum_win += weight_derivative_win;
@@ -99,21 +99,21 @@ struct neural_net {
                 local_bias_derivatives_loss[layer][node] = bias_derivative_loss;
             }
         }
-        for (u64 node = 0; node < m_values[0].size(); ++node) {
-            for (u64 next_node = 0; next_node < m_values[1].size(); ++next_node) {
+        for (usize node = 0; node < m_values[0].size(); ++node) {
+            for (usize next_node = 0; next_node < m_values[1].size(); ++next_node) {
                 const T weight_derivative_win = m_values[0][node] * local_bias_derivatives_win[1][next_node];
                 local_weight_derivatives_win[0][node][next_node] = weight_derivative_win;
                 const T weight_derivative_loss = m_values[0][node] * local_bias_derivatives_loss[1][next_node];
                 local_weight_derivatives_loss[0][node][next_node] = weight_derivative_loss;
             }
         }
-        for (u64 i = 0; i < m_bias_derivatives_win.m_layer_array.data.size(); ++i)
+        for (usize i = 0; i < m_bias_derivatives_win.m_layer_array.data.size(); ++i)
             m_bias_derivatives_win.m_layer_array.data[i] += local_bias_derivatives_win.data[i];
-        for (u64 i = 0; i < m_bias_derivatives_loss.m_layer_array.data.size(); ++i)
+        for (usize i = 0; i < m_bias_derivatives_loss.m_layer_array.data.size(); ++i)
             m_bias_derivatives_loss.m_layer_array.data[i] += local_bias_derivatives_loss.data[i];
-        for (u64 i = 0; i < m_weight_derivatives_win.m_weight_array.data.size(); ++i)
+        for (usize i = 0; i < m_weight_derivatives_win.m_weight_array.data.size(); ++i)
             m_weight_derivatives_win.m_weight_array.data[i] += local_weight_derivatives_win.data[i];
-        for (u64 i = 0; i < m_weight_derivatives_loss.m_weight_array.data.size(); ++i)
+        for (usize i = 0; i < m_weight_derivatives_loss.m_weight_array.data.size(); ++i)
             m_weight_derivatives_loss.m_weight_array.data[i] += local_weight_derivatives_loss.data[i];
     }
 
@@ -122,10 +122,10 @@ struct neural_net {
         static_assert(!LABELED_DATA);
         auto &weights_derivatives = won ? m_weight_derivatives_win : m_weight_derivatives_loss;
         auto &bias_derivatives = won ? m_bias_derivatives_win : m_bias_derivatives_loss;
-        for (u64 i = 0; i < weights_derivatives.m_weight_array.data.size(); ++i) {
+        for (usize i = 0; i < weights_derivatives.m_weight_array.data.size(); ++i) {
             m_weight_derivatives_acc.m_weight_array.data[i] += weights_derivatives.m_weight_array.data[i];
         }
-        for (u64 i = 0; i < bias_derivatives.m_layer_array.data.size(); ++i) {
+        for (usize i = 0; i < bias_derivatives.m_layer_array.data.size(); ++i) {
             m_bias_derivatives_acc.m_layer_array.data[i] += bias_derivatives.m_layer_array.data[i];
         }
         clear_derivatives();
@@ -142,15 +142,15 @@ struct neural_net {
         static_assert(USE_BACKPROP);
         static_assert(LABELED_DATA);
         std::span output{m_values.back()};
-        const u64 num_layers = size();
-        for (u64 node = 0; node < output.size(); ++node) {
+        const usize num_layers = size();
+        for (usize node = 0; node < output.size(); ++node) {
             m_bias_derivatives_win.back()[node] =
                     m_activation_derivative(output[node]) * (output[node] - correct_output[node]);
         }
-        for (u64 layer = num_layers - 2; layer > 0; --layer) {
-            for (u64 node = 0; node < m_values[layer].size(); ++node) {
+        for (usize layer = num_layers - 2; layer > 0; --layer) {
+            for (usize node = 0; node < m_values[layer].size(); ++node) {
                 T sum = 0;
-                for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
+                for (usize next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
                     const T weight_derivative =
                             m_values[layer][node] * m_bias_derivatives_win[layer + 1][next_node];
                     sum += weight_derivative;
@@ -160,26 +160,26 @@ struct neural_net {
                 m_bias_derivatives_win[layer][node] = bias_derivative;
             }
         }
-        for (u64 node = 0; node < m_values[0].size(); ++node) {
-            for (u64 next_node = 0; next_node < m_values[1].size(); ++next_node) {
+        for (usize node = 0; node < m_values[0].size(); ++node) {
+            for (usize next_node = 0; next_node < m_values[1].size(); ++next_node) {
                 const T weight_derivative = m_values[0][node] * m_bias_derivatives_win[1][next_node];
                 m_weight_derivatives_win[0][node][next_node] = weight_derivative;
             }
         }
-        for (u64 i = 0; i < m_bias_derivatives_acc.data.size(); ++i)
+        for (usize i = 0; i < m_bias_derivatives_acc.data.size(); ++i)
             m_bias_derivatives_acc.data[i] += m_weight_derivatives_win.data[i];
-        for (u64 i = 0; i < m_weight_derivatives_acc.data.size(); ++i)
+        for (usize i = 0; i < m_weight_derivatives_acc.data.size(); ++i)
             m_weight_derivatives_acc.data[i] += m_weight_derivatives_win.data[i];
     }
 
     auto apply_derivatives(T learning_rate = 0.01) {
         static_assert(USE_BACKPROP);
-        const u64 num_layers = size();
-        for (u64 layer = num_layers; layer-- > 0;) {
-            for (u64 node = 0; node < m_values[layer].size(); ++node) {
+        const usize num_layers = size();
+        for (usize layer = num_layers; layer-- > 0;) {
+            for (usize node = 0; node < m_values[layer].size(); ++node) {
                 m_biases[layer][node] += m_bias_derivatives_acc[layer][node] * -learning_rate;
                 m_bias_derivatives_acc[layer][node] = 0;
-                for (u64 next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
+                for (usize next_node = 0; next_node < m_values[layer + 1].size(); ++next_node) {
                     m_weights[layer][node][next_node] +=
                             m_weight_derivatives_acc[layer][node][next_node] * -learning_rate;
                     m_weight_derivatives_acc[layer][node][next_node] = 0;
@@ -200,10 +200,10 @@ struct neural_net {
     [[nodiscard]] auto evaluate_impl(std::span<T> input, layer_array<T, sizes...> &values) const {
         std::span<T> input_layer{values.front()}, output_layer{values.back()};
         std::copy(input.begin(), input.end(), input_layer.begin());
-        for (u64 layer = 1; layer < values.size(); ++layer) {
-            for (u64 node = 0; node < values[layer].size(); ++node) {
+        for (usize layer = 1; layer < values.size(); ++layer) {
+            for (usize node = 0; node < values[layer].size(); ++node) {
                 T sum = m_biases[layer][node];
-                for (u64 prev_node = 0; prev_node < values[layer - 1].size(); ++prev_node) {
+                for (usize prev_node = 0; prev_node < values[layer - 1].size(); ++prev_node) {
                     sum += m_weights[layer - 1][prev_node][node] * values[layer - 1][prev_node];
                 }
                 values[layer][node] = m_activation_function(sum);
@@ -228,7 +228,7 @@ struct neural_net {
         *this = x;
     }
 
-    [[nodiscard]] constexpr u64 size() const {
+    [[nodiscard]] constexpr usize size() const {
         return sizeof...(sizes);
     }
 
@@ -261,7 +261,7 @@ struct neural_net {
 }
 
 namespace std {
-template<bool b1, bool b2, class T, class F1, class F2, u64... sizes>
+template<bool b1, bool b2, class T, class F1, class F2, usize... sizes>
 void swap(gya::neural_net<b1, b2, T, F1, F2, sizes...> &t1, gya::neural_net<b1, b2, T, F1, F2, sizes...> &t2) {
     auto temp = std::move(t1);
     t1 = std::move(t2);

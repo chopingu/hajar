@@ -5,7 +5,7 @@
 #include "../board.hpp"
 
 namespace gya {
-template<class T, class F1, class F2, u64... sizes>
+template<class T, class F1, class F2, usize... sizes>
 struct neural_net_params {
     using neural_net_t = neural_net<true, false, T, F1, F2, sizes...>;
     using layer_array_t = layer_array<T, sizes...>;
@@ -52,7 +52,7 @@ struct neural_net_player {
         return *this;
     }
 
-    u64 size() const {
+    usize size() const {
         return net.m_weights.data.size() + net.m_biases.data.size();
     }
 
@@ -61,8 +61,8 @@ struct neural_net_player {
             throw std::runtime_error("board is full");
 
         std::array<f32, 42> input{};
-        for (u64 i = 0; i < 6; ++i) {
-            for (u64 j = 0; j < 7; ++j) {
+        for (usize i = 0; i < 6; ++i) {
+            for (usize j = 0; j < 7; ++j) {
                 input[i * 7 + j] = b.data[i][j] * b.turn();
             }
         }

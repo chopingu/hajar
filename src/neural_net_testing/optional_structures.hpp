@@ -5,7 +5,7 @@
 #include "../include.hpp"
 
 namespace gya {
-template<bool used, class T, u64... sizes>
+template<bool used, class T, usize... sizes>
 struct optional_layer_array {
 private:
     struct empty_struct {
@@ -15,17 +15,17 @@ public:
     using layer_array_t = std::conditional_t<used, layer_array<T, sizes...>, empty_struct>;
     layer_array_t m_layer_array;
 
-    constexpr std::span<T> operator[](u64 idx) {
+    constexpr std::span<T> operator[](usize idx) {
         static_assert(used);
         return m_layer_array.operator[](idx);
     }
 
-    constexpr std::span<T const> operator[](u64 idx) const {
+    constexpr std::span<T const> operator[](usize idx) const {
         static_assert(used);
         return m_layer_array.operator[](idx);
     }
 
-    constexpr std::size_t size() const {
+    constexpr usize size() const {
         static_assert(used);
         return m_layer_array.size();
     }
@@ -60,7 +60,7 @@ public:
     }
 };
 
-template<bool used, class T, u64... sizes>
+template<bool used, class T, usize... sizes>
 struct optional_weight_array {
 private:
     struct empty_struct {
@@ -70,12 +70,12 @@ public:
     using weight_array_t = std::conditional_t<used, weight_array<T, sizes...>, empty_struct>;
     weight_array_t m_weight_array;
 
-    constexpr auto operator[](u64 idx) {
+    constexpr auto operator[](usize idx) {
         static_assert(used);
         return m_weight_array.operator[](idx);
     }
 
-    constexpr auto operator[](u64 idx) const {
+    constexpr auto operator[](usize idx) const {
         static_assert(used);
         return m_weight_array.operator[](idx);
     }

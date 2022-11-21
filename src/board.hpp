@@ -256,6 +256,7 @@ requires function input to be formatted as such (same as provided by board::to_s
             }
         }
 
+
         /*
         X X X X
          */
@@ -313,6 +314,79 @@ requires function input to be formatted as such (same as provided by board::to_s
             return game_result{0};
         }
     }
+
+    [[nodiscard]] constexpr bool n_in_a_row(u8 n) const {
+        return (n_top_left_bot_right(n) or n_vertical(n) or n_horizontal(n) or n_top_right_bot_left(n));
+    }
+
+    [[nodiscard]] constexpr bool n_vertical(u8 n) const {
+        for (int i = 0; i < 7; ++i) {
+            for (int j = 0; j + n - 1 < 6; ++j) {
+                int counter = 0;
+                if (data[i][j] == 0)
+                    continue;
+                for (int k = 1; k <= n - 1; k++) {
+                    if (data[i][j] == data[i][j + k])
+                        counter++;
+                    if (counter == n - 1)
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    [[nodiscard]] constexpr bool n_horizontal(u8 n) const {
+        for (int i = 0; i + n - 1 < 7; ++i) {
+            for (int j = 0; j < 6; ++j) {
+                int counter = 0;
+                if (data[i][j] == 0)
+                    continue;
+                for (int k = 1; k <= n - 1; k++) {
+                    if (data[i][j] == data[i + k][j])
+                        counter++;
+                    if (counter == n - 1)
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    [[nodiscard]] constexpr bool n_top_right_bot_left(u8 n) const {
+        for (int i = 0; i + n - 1 < 7; ++i) {
+            for (int j = 0; j + n - 1 < 6; ++j) {
+                int counter = 0;
+                if (data[i][j] == 0)
+                    continue;
+                for (int k = 1; k <= n - 1; k++) {
+                    if (data[i][j] == data[i + k][j + k])
+                        counter++;
+                    if (counter == n - 1)
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    [[nodiscard]] constexpr bool n_top_left_bot_right(u8 n) const {
+        for (int i = 0; i + n - 1 < 7; ++i) {
+            for (int j = 0; j + n - 1 < 6; ++j) {
+                int counter = 0;
+                if (data[i][j + n - 1] == 0)
+                    continue;
+                for (int k = 1; k <= n - 1; k++) {
+                    if (data[i][j + n - 1] == data[i + k][j + n - 1 - k])
+                        counter++;
+                    if (counter == n - 1)
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     [[nodiscard]] std::string to_string() const {
         std::string ret;

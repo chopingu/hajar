@@ -323,7 +323,7 @@ requires function input to be formatted as such (same as provided by board::to_s
         for (int i = 0; i < 7; ++i) {
             for (int j = 0; j + n - 1 < 6; ++j) {
                 int counter = 0;
-                if (data[i][j] == 0)
+                if (data[i][j] != -1)
                     continue;
                 for (int k = 1; k <= n - 1; k++) {
                     if (data[i][j] == data[i][j + k])

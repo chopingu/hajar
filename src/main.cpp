@@ -10,20 +10,20 @@
 #include "heuristic/n_move_solver.hpp"
 #include "heuristic/n_move_solver_simple.hpp"
 #include "pinguml/tensor.hpp"
-#include "pinguml/cost.hpp"
 #include "pinguml/activation.hpp"
+#include "pinguml/cost.hpp"
 
 int main() {
-    /*
     auto print = [](std::string_view s) {
         for (auto c: s) {
             putchar(c);
         }
     };
+    
     while (true) {
         gya::board b;
         int turn = 1;
-        heuristic::n_move_solver s{9};
+        heuristic::n_move_solver_simple s{2};
         while (!b.has_won().is_game_over()) {
             if (turn ^= 1) {
                 print(b.to_string());
@@ -52,7 +52,6 @@ int main() {
             std::puts("you lost!");
         }
     }
-    */
 
     tests:
     {

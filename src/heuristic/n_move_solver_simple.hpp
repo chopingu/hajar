@@ -39,6 +39,13 @@ struct n_move_solver_simple {
         auto actions = b.get_actions();
         lmj::random_shuffle(actions);
 
+        if(!b.n_vertical(3)) {
+            for(u8 move: actions) {
+                if(b.play_copy(move).n_vertical(3)) 
+                    return move;
+            }
+        }
+
         for (u8 move: actions) {
             const auto evaluation = evaluate_board(b.play_copy(move), num_moves - 1) * b.turn();
             if (evaluation > best_eval) {

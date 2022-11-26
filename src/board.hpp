@@ -315,78 +315,81 @@ requires function input to be formatted as such (same as provided by board::to_s
         }
     }
 
-    [[nodiscard]] constexpr bool n_in_a_row(u8 n) const {
-        return (n_top_left_bot_right(n) or n_vertical(n) or n_horizontal(n) or n_top_right_bot_left(n));
+    [[nodiscard]] constexpr u32 n_in_a_row_counter(u8 n, i8 player) const { //player = 1 or -1
+        return n_vertical_count(n, player) + n_horizontal_count(n, player) + n_top_right_diagonal_count(n, player) + (n_top_left_diagonal_count(n, player));
     }
 
-    [[nodiscard]] constexpr bool n_vertical(u8 n) const {
-        for (int i = 0; i < 7; ++i) {
-            for (int j = 0; j + n - 1 < 6; ++j) {
-                int counter = 0;
-                if (data[i][j] != -1)
+    [[nodiscard]] constexpr u32 n_vertical_count(u8 n, i8 player) const {
+        u32 n_in_a_rows = 0;
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j + n - 1 < 6; j++) {
+                u8 counter = 0;
+                if (data[i][j] != player)
                     continue;
                 for (int k = 1; k <= n - 1; k++) {
                     if (data[i][j] == data[i][j + k])
                         counter++;
                     if (counter == n - 1)
-                        return true;
+                        n_in_a_rows++;
                 }
             }
         }
-        return false;
+        return n_in_a_rows;
     }
 
-    [[nodiscard]] constexpr bool n_horizontal(u8 n) const {
-        for (int i = 0; i + n - 1 < 7; ++i) {
-            for (int j = 0; j < 6; ++j) {
-                int counter = 0;
-                if (data[i][j] == 0)
+    [[nodiscard]] constexpr u32 n_horizontal_count(u8 n, i8 player) const {
+        u32 n_in_a_rows = 0;
+        for (int i = 0; i + n - 1 < 7; i++) {
+            for (int j = 0; j < 6; j++) {
+                u8 counter = 0;
+                if (data[i][j] != player)
                     continue;
                 for (int k = 1; k <= n - 1; k++) {
                     if (data[i][j] == data[i + k][j])
                         counter++;
                     if (counter == n - 1)
-                        return true;
+                        n_in_a_rows++;
                 }
             }
         }
-        return false;
+        return n_in_a_rows;
     }
 
-    [[nodiscard]] constexpr bool n_top_right_bot_left(u8 n) const {
-        for (int i = 0; i + n - 1 < 7; ++i) {
-            for (int j = 0; j + n - 1 < 6; ++j) {
-                int counter = 0;
-                if (data[i][j] == 0)
+    [[nodiscard]] constexpr u32 n_top_right_diagonal_count(u8 n, i8 player) const {
+        u32 n_in_a_rows = 0;
+        for (int i = 0; i + n - 1 < 7; i++) {
+            for (int j = 0; j + n - 1 < 6; j++) {
+                u8 counter = 0;
+                if (data[i][j] != player)
                     continue;
                 for (int k = 1; k <= n - 1; k++) {
                     if (data[i][j] == data[i + k][j + k])
                         counter++;
                     if (counter == n - 1)
-                        return true;
+                        n_in_a_rows++;
                 }
             }
         }
-        return false;
+        return n_in_a_rows;
     }
 
-    [[nodiscard]] constexpr bool n_top_left_bot_right(u8 n) const {
-        for (int i = 0; i + n - 1 < 7; ++i) {
-            for (int j = 0; j + n - 1 < 6; ++j) {
-                int counter = 0;
-                if (data[i][j + n - 1] == 0)
+    [[nodiscard]] constexpr u32 n_top_left_diagonal_count(u8 n, i8 player) const {
+        u32 n_in_a_rows = 0;
+        for (int i = 0; i + n - 1 < 7; i++) {
+            for (int j = 0; j + n - 1 < 6; j++) {
+                u8 counter = 0;
+                if (data[i][j + n - 1] != player)
                     continue;
                 for (int k = 1; k <= n - 1; k++) {
                     if (data[i][j + n - 1] == data[i + k][j + n - 1 - k])
                         counter++;
                     if (counter == n - 1)
-                        return true;
+                        n_in_a_rows++;
                 }
             }
         }
-        return false;
+        return n_in_a_rows;
     }
-
 
     [[nodiscard]] std::string to_string() const {
         std::string ret;

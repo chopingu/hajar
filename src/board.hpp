@@ -326,6 +326,7 @@ requires function input to be formatted as such (same as provided by board::to_s
                 u8 counter = 0;
                 if (data[i][j] != player)
                     continue;
+
                 for (int k = 1; k <= n - 1; k++) {
                     if (data[i][j] == data[i][j + k])
                         counter++;
@@ -344,6 +345,7 @@ requires function input to be formatted as such (same as provided by board::to_s
                 u8 counter = 0;
                 if (data[i][j] != player)
                     continue;
+
                 for (int k = 1; k <= n - 1; k++) {
                     if (data[i][j] == data[i + k][j])
                         counter++;
@@ -362,6 +364,7 @@ requires function input to be formatted as such (same as provided by board::to_s
                 u8 counter = 0;
                 if (data[i][j] != player)
                     continue;
+
                 for (int k = 1; k <= n - 1; k++) {
                     if (data[i][j] == data[i + k][j + k])
                         counter++;
@@ -380,6 +383,7 @@ requires function input to be formatted as such (same as provided by board::to_s
                 u8 counter = 0;
                 if (data[i][j + n - 1] != player)
                     continue;
+
                 for (int k = 1; k <= n - 1; k++) {
                     if (data[i][j + n - 1] == data[i + k][j + n - 1 - k])
                         counter++;

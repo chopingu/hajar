@@ -1,15 +1,15 @@
 #pragma once
 
-#include "include.hpp"
+#include "../../include.hpp"
 
 namespace heuristic {
     struct Abias {
-        int num_moves;
-        int n;
+        u32 num_moves;
+        u32 n;
 
-        Abias(int num_moves, int n) : num_moves(num_moves), n(n) {}
+        Abias(u32 num_moves, u32 n) : num_moves(num_moves), n(n) {}
 
-        f64 evaluate_board(gya::board const &b, i32 steps_left) const {
+        f64 evaluate_board(gya::board const &b, u32 steps_left) const {
             if (gya::game_result result = b.has_won(); result.is_game_over()) {
                 if (result.is_tie()) {
                     return -1e5 * b.turn();

@@ -4,11 +4,14 @@
 #include "include.hpp"
 
 #include "neural_net_testing/neural_net_player.hpp"
+
 #include "heuristic/mcts.hpp"
 #include "heuristic/one_move_solver.hpp"
 #include "heuristic/two_move_solver.hpp"
 #include "heuristic/n_move_solver.hpp"
-#include "heuristic/n_move_solver_simple.hpp"
+#include "heuristic/solver_variations/A.hpp"
+#include "heuristic/solver_variations/Abias.hpp"
+
 #include "pinguml/tensor.hpp"
 #include "pinguml/activation.hpp"
 #include "pinguml/cost.hpp"
@@ -23,7 +26,7 @@ int main() {
     while (true) {
         gya::board b;
         int turn = 1;
-        heuristic::n_move_solver_simple s{2};
+        heuristic::A s(5, 3);
         while (!b.has_won().is_game_over()) {
             if (turn ^= 1) {
                 print(b.to_string());

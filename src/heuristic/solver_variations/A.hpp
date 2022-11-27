@@ -1,11 +1,13 @@
 #pragma once
 
-#include "../include.hpp"
+#include "include.hpp"
 
 namespace heuristic {
-struct n_move_solver_simple {
-    int num_moves = 5;
-    constexpr static std::array bias = {0, 1, 2, 3, 2, 1, 0};
+struct A {
+    int num_moves;
+    int n;
+
+    A(int num_moves, int n) : num_moves(num_moves), n(n) {}
 
     f64 evaluate_board(gya::board const &b, i32 steps_left) const {
         if (gya::game_result result = b.has_won(); result.is_game_over()) {
@@ -25,11 +27,10 @@ struct n_move_solver_simple {
         f64 best_eval = 0;
 
         for (auto move: actions) {
-            const auto evaluation = evaluate_board(b.play_copy(move), steps_left - 1) * b.turn() + bias[move];
+            const auto evaluation = evaluate_board(b.play_copy(move), steps_left - 1) * b.turn();
             if (evaluation > best_eval)
                 best_eval = evaluation;
         }
-
         return best_eval * b.turn();
     }
 
@@ -38,12 +39,9 @@ struct n_move_solver_simple {
         u8 best_move = 0;
         auto actions = b.get_actions();
         lmj::random_shuffle(actions);
-
-        if(!b.n_vertical(3)) {
-            for(u8 move: actions) {
-                if(b.play_copy(move).n_vertical(3)) 
-                    return move;
-            }
+        for(u8 move: actions) {
+            if (b.play_copy(move).n_vertical_count(n, -1) > b.n_vertical_count(n, -1))
+                return move;
         }
 
         for (u8 move: actions) {

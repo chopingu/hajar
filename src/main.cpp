@@ -4,6 +4,7 @@
 #include "include.hpp"
 
 #include "neural_net_testing/neural_net_player.hpp"
+#include "neural_net_testing/neural_net_player_deep.hpp"
 
 #include "heuristic/mcts.hpp"
 #include "heuristic/one_move_solver.hpp"

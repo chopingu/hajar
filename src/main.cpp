@@ -15,6 +15,8 @@
 #include "pinguml/tensor.hpp"
 #include "pinguml/activation.hpp"
 #include "pinguml/cost.hpp"
+#include "pinguml/layer/base.hpp"
+#include "pinguml/layer/input_layer.hpp"
 
 int main() {
     auto print = [](std::string_view s) {
@@ -26,7 +28,7 @@ int main() {
     while (true) {
         gya::board b;
         int turn = 1;
-        heuristic::A s(5, 3);
+        heuristic::Abias s(5, 3);
         while (!b.has_won().is_game_over()) {
             if (turn ^= 1) {
                 print(b.to_string());

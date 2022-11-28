@@ -15,8 +15,6 @@
 #include "pinguml/tensor.hpp"
 #include "pinguml/activation.hpp"
 #include "pinguml/cost.hpp"
-#include "pinguml/layer/base.hpp"
-#include "pinguml/layer/input_layer.hpp"
 
 int main() {
     auto print = [](std::string_view s) {

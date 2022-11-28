@@ -6,7 +6,7 @@ namespace heuristic {
 template<bool MULTI_THREAD = false>
 struct n_move_solver {
 
-    int num_moves = 5;
+    int m_num_moves = 5;
 
     using transpo_table_t = lmj::hash_table<gya::compressed_board, i8>;
 
@@ -64,7 +64,7 @@ struct n_move_solver {
         lmj::static_vector<std::pair<f64, u8>, 7> moves;
 
         for (u8 move: actions) {
-            moves.emplace_back(evaluate_board(b.play_copy(move), num_moves - 1) * b.turn(), move);
+            moves.emplace_back(evaluate_board(b.play_copy(move), m_num_moves - 1) * b.turn(), move);
         }
 
         for (auto [score, move]: moves) {

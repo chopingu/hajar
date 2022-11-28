@@ -17,12 +17,13 @@
 #include "pinguml/cost.hpp"
 
 int main() {
+    /*
     auto print = [](std::string_view s) {
         for (auto c: s) {
             putchar(c);
         }
     };
-    
+
     while (true) {
         gya::board b;
         int turn = 1;
@@ -55,10 +56,10 @@ int main() {
             std::puts("you lost!");
         }
     }
+    */
 
-    tests:
     {
-        logic_testing:
+        // tests
         {
             // test logic
             auto a = gya::board::from_string(
@@ -108,7 +109,6 @@ int main() {
             std::cout << "game logic is ok" << std::endl;
         }
 
-        randomness_testing:
         {
             // test randomness
             gya::random_player p;
@@ -122,13 +122,12 @@ int main() {
             std::cout << "randomness is ok" << std::endl;
         }
 
-        random_player_perf:
         {
             // test performance
             gya::random_player p1, p2;
             auto t1 = std::chrono::high_resolution_clock::now();
             for (int j = 0; j < (1 << 10); ++j)
-                volatile gya::board c = gya::test_game(p1, p2);
+                [[maybe_unused]] volatile gya::board c = gya::test_game(p1, p2);
             auto t2 = std::chrono::high_resolution_clock::now();
             auto time = (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 10);
             using std::chrono_literals::operator ""ns;
@@ -137,9 +136,8 @@ int main() {
 
         }
 
-        neural_net_perf:
         {
-            // test neural net runtime  performance
+            // test neural m_net runtime  performance
             gya::random_player p1;
             gya::neural_net_player p2;
 
@@ -163,14 +161,13 @@ int main() {
                 max = std::max(max, time);
                 avg += time;
             }
-            std::cout << "neural net:\n";
+            std::cout << "neural m_net:\n";
             std::cout << "avg_num_moves: " << avg_num_moves / iters << std::endl;
             std::cout << "avg: " << (avg / iters).count() << "ns" << std::endl;
             std::cout << "min: " << (min).count() << "ns" << std::endl;
             std::cout << "max: " << (max).count() << "ns" << std::endl;
         }
 
-        heuristic_solver_testing:
         {
             // test heuristic solvers
             {
@@ -242,7 +239,7 @@ int main() {
                 heuristic::one_move_solver p1, p2;
                 auto t1 = std::chrono::high_resolution_clock::now();
                 for (int j = 0; j < (1 << 10); ++j)
-                    volatile gya::board c = gya::test_game(p1, p2);
+                    [[maybe_unused]] volatile gya::board c = gya::test_game(p1, p2);
                 auto t2 = std::chrono::high_resolution_clock::now();
                 auto time =
                         (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 10);
@@ -254,7 +251,7 @@ int main() {
                 heuristic::two_move_solver p1, p2;
                 auto t1 = std::chrono::high_resolution_clock::now();
                 for (int j = 0; j < (1 << 10); ++j)
-                    volatile gya::board c = gya::test_game(p1, p2);
+                    [[maybe_unused]] volatile gya::board c = gya::test_game(p1, p2);
                 auto t2 = std::chrono::high_resolution_clock::now();
                 auto time =
                         (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 10);
@@ -266,7 +263,7 @@ int main() {
                 heuristic::n_move_solver<false> p1{5}, p2{5};
                 auto t1 = std::chrono::high_resolution_clock::now();
                 for (int j = 0; j < (1 << 10); ++j)
-                    volatile gya::board c = gya::test_game(p1, p2);
+                    [[maybe_unused]] volatile gya::board c = gya::test_game(p1, p2);
                 auto t2 = std::chrono::high_resolution_clock::now();
                 auto time =
                         (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(1 << 10);

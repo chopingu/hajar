@@ -4,10 +4,10 @@
 
 namespace heuristic {
 struct A {
-    u32 num_moves;
-    u32 n;
+    u32 m_num_moves;
+    u32 m_n;
 
-    A(u32 num_moves, u32 n) : num_moves(num_moves), n(n) {}
+    A(u32 num_moves, u32 n) : m_num_moves(num_moves), m_n(n) {}
 
     f64 evaluate_board(gya::board const &b, u32 steps_left) const {
         if (gya::game_result result = b.has_won(); result.is_game_over()) {
@@ -39,13 +39,13 @@ struct A {
         u8 best_move = 0;
         auto actions = b.get_actions();
         lmj::random_shuffle(actions);
-        for(u8 move: actions) {
-            if (b.play_copy(move).n_vertical_count(n, -1) > b.n_vertical_count(n, -1))
+        for (u8 move: actions) {
+            if (b.play_copy(move).n_vertical_count(m_n, -1) > b.n_vertical_count(m_n, -1))
                 return move;
         }
 
         for (u8 move: actions) {
-            const auto evaluation = evaluate_board(b.play_copy(move), num_moves - 1) * b.turn();
+            const auto evaluation = evaluate_board(b.play_copy(move), m_num_moves - 1) * b.turn();
             if (evaluation > best_eval) {
                 best_eval = evaluation;
                 best_move = move;

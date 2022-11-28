@@ -37,23 +37,23 @@ struct neural_net_player {
     using layer_array_t = typename neural_net_params_t::layer_array_t;
     using weight_array_t = typename neural_net_params_t::weight_array_t;
 
-    neural_net_t net;
+    neural_net_t m_net;
 
-    neural_net_player() : net{F1{}, F2{}} {
-        net.update_randomly(0.5);
+    neural_net_player() : m_net{F1{}, F2{}} {
+        m_net.update_randomly(0.5);
     }
 
-    neural_net_player(F1 f, F2 derivative) : net{f, derivative} {
-        net.update_randomly(0.5);
+    neural_net_player(F1 f, F2 derivative) : m_net{f, derivative} {
+        m_net.update_randomly(0.5);
     }
 
     auto &operator=(neural_net_player const &other) {
-        net = other.net;
+        m_net = other.m_net;
         return *this;
     }
 
     usize size() const {
-        return net.m_weights.data.size() + net.m_biases.data.size();
+        return m_net.m_weights.m_data.size() + m_net.m_biases.m_data.size();
     }
 
     [[nodiscard]] u8 operator()(gya::board const &b) {
@@ -66,7 +66,7 @@ struct neural_net_player {
                 input[i * 7 + j] = b.data[i][j] * b.turn();
             }
         }
-        const auto net_output = net.evaluate_const(input);
+        const auto net_output = m_net.evaluate_const(input);
         u8 ans = 0;
         for (u8 i = 0; i < 7; ++i)
             if (b[i].height < 6 && (b[ans].height >= 6 || net_output[i] > net_output[ans]))

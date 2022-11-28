@@ -3,6 +3,7 @@
 #include "defines.hpp"
 #include "board.hpp"
 #include "tester.hpp"
+#include "utilities.hpp"
 #include <bits/stdc++.h>
 #include <future>
 #include <random>

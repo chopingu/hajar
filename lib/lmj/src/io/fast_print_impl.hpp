@@ -24,9 +24,8 @@ inline auto print_impl(FILE *fptr, unsigned_integral auto x) {
                 buff[size++] = (x % 10) + '0';
                 x /= 10;
             } while (x);
-            while (size--) {
-                std::fputc(buff[size], fptr);
-            }
+            std::reverse(buff, buff + size);
+            std::fputs(buff, fptr);
         }
     }
 }

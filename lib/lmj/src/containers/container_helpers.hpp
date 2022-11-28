@@ -5,7 +5,7 @@
 namespace lmj::detail {
 /**
  * @tparam n an unsigned int value
- * @return 0 with the smallest type which can represent n
+ * @return 0 with the smallest type which can represent m_n
  */
 template<std::size_t n>
 consteval auto needed_uint() {

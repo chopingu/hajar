@@ -31,9 +31,9 @@ struct neural_net {
             m_activation_derivative{std::forward<F2_>(derivative)} {}
 
     auto &operator=(neural_net const &other) {
-        m_weights.data = other.m_weights.data;
-        m_values.data = other.m_values.data;
-        m_biases.data = other.m_biases.data;
+        m_weights.m_data = other.m_weights.m_data;
+        m_values.m_data = other.m_values.m_data;
+        m_biases.m_data = other.m_biases.m_data;
         return *this;
     }
 
@@ -45,9 +45,9 @@ struct neural_net {
     void update_randomly(T amount = 0.1) {
         thread_local std::mt19937_64 rng{std::random_device{}()};
         std::uniform_real_distribution<T> dist{-amount, amount};
-        for (auto &v: m_weights.data)
+        for (auto &v: m_weights.m_data)
             v += dist(rng);
-        for (auto &v: m_biases.data)
+        for (auto &v: m_biases.m_data)
             v += dist(rng);
     }
 
@@ -107,14 +107,14 @@ struct neural_net {
                 local_weight_derivatives_loss[0][node][next_node] = weight_derivative_loss;
             }
         }
-        for (usize i = 0; i < m_bias_derivatives_win.m_layer_array.data.size(); ++i)
-            m_bias_derivatives_win.m_layer_array.data[i] += local_bias_derivatives_win.data[i];
-        for (usize i = 0; i < m_bias_derivatives_loss.m_layer_array.data.size(); ++i)
-            m_bias_derivatives_loss.m_layer_array.data[i] += local_bias_derivatives_loss.data[i];
-        for (usize i = 0; i < m_weight_derivatives_win.m_weight_array.data.size(); ++i)
-            m_weight_derivatives_win.m_weight_array.data[i] += local_weight_derivatives_win.data[i];
-        for (usize i = 0; i < m_weight_derivatives_loss.m_weight_array.data.size(); ++i)
-            m_weight_derivatives_loss.m_weight_array.data[i] += local_weight_derivatives_loss.data[i];
+        for (usize i = 0; i < m_bias_derivatives_win.m_layer_array.m_data.size(); ++i)
+            m_bias_derivatives_win.m_layer_array.m_data[i] += local_bias_derivatives_win.m_data[i];
+        for (usize i = 0; i < m_bias_derivatives_loss.m_layer_array.m_data.size(); ++i)
+            m_bias_derivatives_loss.m_layer_array.m_data[i] += local_bias_derivatives_loss.m_data[i];
+        for (usize i = 0; i < m_weight_derivatives_win.m_weight_array.m_data.size(); ++i)
+            m_weight_derivatives_win.m_weight_array.m_data[i] += local_weight_derivatives_win.m_data[i];
+        for (usize i = 0; i < m_weight_derivatives_loss.m_weight_array.m_data.size(); ++i)
+            m_weight_derivatives_loss.m_weight_array.m_data[i] += local_weight_derivatives_loss.m_data[i];
     }
 
     void compute_derivatives_based_on_result(bool won) {
@@ -122,11 +122,11 @@ struct neural_net {
         static_assert(!LABELED_DATA);
         auto &weights_derivatives = won ? m_weight_derivatives_win : m_weight_derivatives_loss;
         auto &bias_derivatives = won ? m_bias_derivatives_win : m_bias_derivatives_loss;
-        for (usize i = 0; i < weights_derivatives.m_weight_array.data.size(); ++i) {
-            m_weight_derivatives_acc.m_weight_array.data[i] += weights_derivatives.m_weight_array.data[i];
+        for (usize i = 0; i < weights_derivatives.m_weight_array.m_data.size(); ++i) {
+            m_weight_derivatives_acc.m_weight_array.m_data[i] += weights_derivatives.m_weight_array.m_data[i];
         }
-        for (usize i = 0; i < bias_derivatives.m_layer_array.data.size(); ++i) {
-            m_bias_derivatives_acc.m_layer_array.data[i] += bias_derivatives.m_layer_array.data[i];
+        for (usize i = 0; i < bias_derivatives.m_layer_array.m_data.size(); ++i) {
+            m_bias_derivatives_acc.m_layer_array.m_data[i] += bias_derivatives.m_layer_array.m_data[i];
         }
         clear_derivatives();
     }
@@ -138,7 +138,7 @@ struct neural_net {
         m_bias_derivatives_loss.fill(0);
     }
 
-    auto compute_derivatives_labeled(std::span<T> correct_output) {
+    auto compute_derivatives_labeled_impl(std::span<T> correct_output) {
         static_assert(USE_BACKPROP);
         static_assert(LABELED_DATA);
         std::span output{m_values.back()};
@@ -166,6 +166,10 @@ struct neural_net {
                 m_weight_derivatives_win[0][node][next_node] = weight_derivative;
             }
         }
+    }
+
+    auto compute_derivatives_labeled(std::span<T> correct_output) {
+        compute_derivatives_labeled_impl(correct_output);
         for (usize i = 0; i < m_bias_derivatives_acc.data.size(); ++i)
             m_bias_derivatives_acc.data[i] += m_weight_derivatives_win.data[i];
         for (usize i = 0; i < m_weight_derivatives_acc.data.size(); ++i)
@@ -197,7 +201,7 @@ struct neural_net {
         apply_derivatives(learning_rate);
     }
 
-    [[nodiscard]] auto evaluate_impl(std::span<T> input, layer_array<T, sizes...> &values) const {
+    [[nodiscard]] std::span<T> evaluate_impl(std::span<T> input, layer_array<T, sizes...> &values) const {
         std::span<T> input_layer{values.front()}, output_layer{values.back()};
         std::copy(input.begin(), input.end(), input_layer.begin());
         for (usize layer = 1; layer < values.size(); ++layer) {
@@ -212,16 +216,16 @@ struct neural_net {
         return output_layer;
     }
 
-    auto evaluate(std::span<T> inp) {
+    std::span<T> evaluate(std::span<T> inp) {
         return evaluate_impl(inp, m_values);
     }
 
-    [[nodiscard]] auto evaluate_const(std::span<T> inp) const {
+    [[nodiscard]] std::array<T, (sizes, ...)> evaluate_const(std::span<T> inp) const {
         layer_array<T, sizes...> values;
-        auto output = evaluate_impl(inp, values);
-        std::array<T, (sizes, ...)> out;
-        std::copy(output.begin(), output.end(), out.begin());
-        return out;
+        std::span<T> output = evaluate_impl(inp, values);
+        std::array<T, util::get_last(sizes...)> out_arr{};
+        std::copy(output.begin(), output.end(), out_arr.begin());
+        return out_arr;
     }
 
     constexpr void swap(neural_net const &x) {
@@ -233,28 +237,28 @@ struct neural_net {
     }
 
     [[nodiscard]] bool operator!=(neural_net const &other) const {
-        return m_weights.data != other.m_weights.data || m_biases.data != other.m_biases.data;
+        return m_weights.m_data != other.m_weights.m_data || m_biases.m_data != other.m_biases.m_data;
     }
 
     [[nodiscard]] bool operator==(neural_net const &other) const {
-        return m_weights.data == other.m_weights.data && m_biases.data == other.m_biases.data;
+        return m_weights.m_data == other.m_weights.m_data && m_biases.m_data == other.m_biases.m_data;
     }
 
     [[nodiscard]] std::string to_string() const {
         std::ostringstream oss;
         oss << std::setprecision(10000);
-        for (T i: m_weights.data)
+        for (T i: m_weights.m_data)
             oss << i << ' ';
-        for (T i: m_biases.data)
+        for (T i: m_biases.m_data)
             oss << i << ' ';
         return oss.str();
     }
 
     void from_string(std::string_view s) {
         std::istringstream iss{std::string(s)};
-        for (auto &i: m_weights.data)
+        for (auto &i: m_weights.m_data)
             iss >> i;
-        for (auto &i: m_biases.data)
+        for (auto &i: m_biases.m_data)
             iss >> i;
     }
 };

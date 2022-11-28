@@ -7,18 +7,19 @@ class weight_array {
     template<class G>
     struct matrix_ref {
         friend weight_array;
-        G *data;
-        usize subarray_len;
     private:
-        constexpr matrix_ref(G *data, usize subarray_len) : data{data}, subarray_len{subarray_len} {}
+        G *m_data;
+        usize m_subarray_len;
+
+        constexpr matrix_ref(G *data, usize subarray_len) : m_data{data}, m_subarray_len{subarray_len} {}
 
     public:
         constexpr std::span<G> operator[](usize idx) {
-            return std::span<G>{data + idx * subarray_len, data + (idx + 1) * subarray_len};
+            return std::span<G>{m_data + idx * m_subarray_len, m_data + (idx + 1) * m_subarray_len};
         }
 
         constexpr std::span<G const> operator[](usize idx) const {
-            return std::span<G const>{data + idx * subarray_len, data + (idx + 1) * subarray_len};
+            return std::span<G const>{m_data + idx * m_subarray_len, m_data + (idx + 1) * m_subarray_len};
         }
     };
 
@@ -37,14 +38,14 @@ private:
     }();
 
 public:
-    std::array<T, indices.back()> data{};
+    std::array<T, indices.back()> m_data{};
 
     constexpr matrix_ref<T> operator[](usize idx) {
-        return matrix_ref<T>{data.data() + indices[idx], layer_sizes[idx + 1]};
+        return matrix_ref<T>{m_data.data() + indices[idx], layer_sizes[idx + 1]};
     }
 
     constexpr matrix_ref<T const> operator[](usize idx) const {
-        return matrix_ref<T const>{data.data() + indices[idx], layer_sizes[idx + 1]};
+        return matrix_ref<T const>{m_data.data() + indices[idx], layer_sizes[idx + 1]};
     }
 
     constexpr usize size() const {
@@ -68,6 +69,6 @@ public:
     }
 
     constexpr auto fill(T const &value) {
-        data.fill(value);
+        m_data.fill(value);
     }
 };

@@ -59,7 +59,7 @@ void identity(std::span<T> input, std::span<const T> bias, const usize _size) {
 }
 
 template<class T>
-T d_identity(std::span<const T> input, const usize index) { return 1.0f; }
+T d_identity([[maybe_unused]] std::span<const T> input, [[maybe_unused]] const usize index) { return 1.0f; }
 
 template<class T>
 void elu(std::span<T> input, std::span<const T> bias, const usize _size) {
@@ -162,7 +162,6 @@ T d_softmax(std::span<const T> input, const usize index) {
 
 namespace util { // without external bias
 
-
 template<class T>
 void dirichlet_noise(std::span<T> input, const T alpha, const T eps) {
     std::gamma_distribution<T> gamma(alpha, 1);
@@ -199,7 +198,7 @@ void tanh(std::span<T> input, const usize _size) {
 }
 
 template<class T>
-void identity(std::span<T> input, const usize _size) {
+void identity([[maybe_unused]] std::span<T> input, [[maybe_unused]] const usize _size) {
     return;
 }
 
@@ -266,4 +265,24 @@ void softmax(std::span<T> input, const usize _size) {
         input[i] = std::exp(x - mx) / sum;
     }
 }
+} // namespace util
+
+namespace util {
+
+template<class T0, class... Ts>
+constexpr auto get_last_impl(T0 &&head, Ts &&... tail) {
+    if constexpr (sizeof...(Ts)) {
+        return get_last_impl(tail...);
+    } else {
+        return head;
+    }
+}
+
+constexpr auto get_last_impl() {}
+
+template<class... T>
+constexpr auto get_last(T &&... pack) {
+    return get_last_impl(pack...);
+}
+
 } // namespace util

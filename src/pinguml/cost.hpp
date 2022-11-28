@@ -11,7 +11,7 @@ auto mse = [](const f32 output, const f32 target) {
 };
 
 auto d_mse = [](const f32 output, const f32 target) {
-    return output-target;
+    return output - target;
 };
 
 // ----- CROSS ENTROPY ----- //

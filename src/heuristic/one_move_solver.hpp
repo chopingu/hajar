@@ -4,7 +4,7 @@
 
 namespace heuristic {
 struct one_move_solver {
-    gya::random_player rp{};
+    gya::random_player m_random_player{};
 
     u8 operator()(gya::board const &b) {
         i8 turn = b.size % 2 ? 1 : -1;
@@ -16,7 +16,7 @@ struct one_move_solver {
             if (copy.has_won().state == turn)
                 return i;
         }
-        return rp(b);
+        return m_random_player(b);
     }
 };
 }

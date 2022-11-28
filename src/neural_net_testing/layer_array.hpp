@@ -16,14 +16,14 @@ private:
         return arr;
     }();
 public:
-    std::array<T, (sizes + ...)> data{};
+    std::array<T, (sizes + ...)> m_data{};
 
     constexpr std::span<T> operator[](usize idx) {
-        return std::span<T>(data.data() + indices[idx], data.data() + indices[idx] + layer_sizes[idx]);
+        return std::span<T>(m_data.data() + indices[idx], m_data.data() + indices[idx] + layer_sizes[idx]);
     }
 
     constexpr std::span<T const> operator[](usize idx) const {
-        return std::span<T const>(data.data() + indices[idx], data.data() + indices[idx] + layer_sizes[idx]);
+        return std::span<T const>(m_data.data() + indices[idx], m_data.data() + indices[idx] + layer_sizes[idx]);
     }
 
     constexpr usize size() const {
@@ -47,6 +47,6 @@ public:
     }
 
     constexpr auto fill(T const &value) {
-        data.fill(value);
+        m_data.fill(value);
     }
 };

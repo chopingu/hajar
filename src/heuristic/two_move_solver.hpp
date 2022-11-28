@@ -5,7 +5,7 @@
 namespace heuristic {
 
 struct two_move_solver {
-    gya::random_player rp{};
+    gya::random_player m_random_player{};
 
     u8 operator()(gya::board const &b) {
         i8 turn = b.turn();
@@ -28,7 +28,7 @@ struct two_move_solver {
         }
         turn = -turn;
         for (int i = 0; i < 16; ++i) {
-            auto move = rp(b);
+            auto move = m_random_player(b);
             gya::board copy = b;
             copy.play(move, turn);
             if (copy.data[move].height < 6)
@@ -36,7 +36,7 @@ struct two_move_solver {
             if ((turn == -1 && copy.has_won().player_1_won()) || (turn == 1 && copy.has_won().player_2_won()))
                 return move;
         }
-        return rp(b);
+        return m_random_player(b);
     }
 };
 }

@@ -102,7 +102,7 @@ requires function input to be formatted as such (same as provided by board::to_s
         if (size == 42)
             throw std::runtime_error("cant play if board is full (possible tie)");
         if (value != 1 && value != -1)
-            throw std::runtime_error("invalid player");
+            throw std::runtime_error("invalid m_player");
         if (data[column].height >= 6) {
             std::cout << std::flush;
             std::cerr << std::flush;
@@ -214,7 +214,7 @@ requires function input to be formatted as such (same as provided by board::to_s
 
     /**
      * @param column
-     * @return board state after playing the given move
+     * @return board m_state after playing the given move
      */
     [[nodiscard]] constexpr gya::board play_copy(u8 column) const {
         gya::board result = *this;
@@ -315,8 +315,9 @@ requires function input to be formatted as such (same as provided by board::to_s
         }
     }
 
-    [[nodiscard]] constexpr u32 n_in_a_row_counter(u8 n, i8 player) const { //player = 1 or -1
-        return n_vertical_count(n, player) + n_horizontal_count(n, player) + n_top_right_diagonal_count(n, player) + (n_top_left_diagonal_count(n, player));
+    [[nodiscard]] constexpr u32 n_in_a_row_counter(u8 n, i8 player) const { //m_player = 1 or -1
+        return n_vertical_count(n, player) + n_horizontal_count(n, player) + n_top_right_diagonal_count(n, player) +
+               (n_top_left_diagonal_count(n, player));
     }
 
     [[nodiscard]] constexpr u32 n_vertical_count(u8 n, i8 player) const {
@@ -433,7 +434,7 @@ struct random_player {
 
     void construct(u64 seed) {
         static u64 offs = 0;
-        if (seed == -1)
+        if (seed == -1ull)
             seed = ++offs * (std::chrono::system_clock::now().time_since_epoch().count() & 0xffffffff);
         set_seed(seed);
     }

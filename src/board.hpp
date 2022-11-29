@@ -15,13 +15,12 @@
 
 namespace gya {
 struct game_result {
-    static constexpr auto GAME_NOT_OVER = 0;
-    static constexpr auto PLAYER_ONE_WON = 1;
-    static constexpr auto PLAYER_TWO_WON = 2;
-    static constexpr auto TIE = -1;
+    static constexpr i8 GAME_NOT_OVER = 0;
+    static constexpr i8 PLAYER_ONE_WON = 1;
+    static constexpr i8 PLAYER_TWO_WON = 2;
+    static constexpr i8 TIE = -1;
 
-    template<class T>
-    constexpr game_result(T v) : state{static_cast<i8>(v)} {}
+    constexpr game_result(i8 v) : state{v} {}
 
     i8 state{};
 
@@ -38,7 +37,7 @@ struct game_result {
 
 struct board_column {
     std::array<i8, 6> data{};
-    i8 height{};
+    u8 height{};
 
     constexpr i8 &push(i8 value) {
         if (height >= 6) {
@@ -65,12 +64,12 @@ struct board_column {
 };
 
 struct board {
-    static constexpr auto PLAYER_ONE = 1;
-    static constexpr auto PLAYER_TWO = -1;
+    static constexpr i8 PLAYER_ONE = 1;
+    static constexpr i8 PLAYER_TWO = -1;
 
     std::array<board_column, 7> data{};
     gya::game_result winner{gya::game_result::GAME_NOT_OVER};
-    i8 size = 0;
+    u8 size = 0;
 
     /*
 requires function input to be formatted as such (same as provided by board::to_string()):
@@ -417,8 +416,8 @@ requires function input to be formatted as such (same as provided by board::to_s
             ret += '\n';
         }
         ret += '|';
-        for (int j = 0; j < 7; ++j) {
-            ret += j + 1 + '0';
+        for (usize j = 0; j < 7; ++j) {
+            ret += char(j + 1 + '0');
             ret += '|';
         }
         ret += '\n';

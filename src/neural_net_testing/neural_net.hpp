@@ -26,15 +26,20 @@ struct neural_net {
     F2 m_activation_derivative;
 
     template<class F1_, class F2_>
-    neural_net(F1_ &&f, F2_ &&derivative) :
+    constexpr neural_net(F1_ &&f, F2_ &&derivative) :
             m_activation_function{std::forward<F1_>(f)},
             m_activation_derivative{std::forward<F2_>(derivative)} {}
 
-    auto &operator=(neural_net const &other) {
+    constexpr auto &operator=(neural_net const &other) {
         m_weights.m_data = other.m_weights.m_data;
         m_values.m_data = other.m_values.m_data;
         m_biases.m_data = other.m_biases.m_data;
         return *this;
+    }
+
+    constexpr neural_net(neural_net const &other) : m_activation_function{other.m_activation_function},
+                                                    m_activation_derivative{other.m_activation_derivative} {
+        *this = other;
     }
 
     void fill_randomly() {
@@ -220,7 +225,7 @@ struct neural_net {
         return evaluate_impl(inp, m_values);
     }
 
-    [[nodiscard]] std::array<T, (sizes, ...)> evaluate_const(std::span<T> inp) const {
+    [[nodiscard]] std::array<T, util::get_last(sizes...)> evaluate_const(std::span<T> inp) const {
         layer_array<T, sizes...> values;
         std::span<T> output = evaluate_impl(inp, values);
         std::array<T, util::get_last(sizes...)> out_arr{};

@@ -47,10 +47,9 @@ struct neural_net_player {
         m_net.update_randomly(0.5);
     }
 
-    auto &operator=(neural_net_player const &other) {
-        m_net = other.m_net;
-        return *this;
-    }
+    constexpr neural_net_player &operator=(neural_net_player const &other) = default;
+
+    constexpr neural_net_player(neural_net_player const &other) = default;
 
     usize size() const {
         return m_net.m_weights.m_data.size() + m_net.m_biases.m_data.size();

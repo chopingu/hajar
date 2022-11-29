@@ -12,10 +12,10 @@ void randomly_update_neural_net_player(gya::neural_net_player<> &p, f32 change_r
     auto rand_i = [&](u64 low, u64 high) { return std::uniform_int_distribution<u64>{low, high}(rng); };
     for (u64 i = 0; i < num_changes; ++i) {
         if (rand_f(0, 1) < 0.5f) {
-            auto &item = p.net.m_weights.data[rand_i(0, p.net.m_weights.data.size() - 1)];
+            auto &item = p.m_net.m_weights.m_data[rand_i(0, p.m_net.m_weights.m_data.size() - 1)];
             item = std::clamp(item + rand_f(-change_rate, change_rate), -1.0f, 1.0f);
         } else {
-            auto &item = p.net.m_biases.data[rand_i(0, p.net.m_biases.data.size() - 1)];
+            auto &item = p.m_net.m_biases.m_data[rand_i(0, p.m_net.m_biases.m_data.size() - 1)];
             item = std::clamp(item + rand_f(-change_rate, change_rate), -1.0f, 1.0f);
         }
     }
@@ -41,7 +41,7 @@ int main() {
     std::vector<gya::neural_net_player<>> players(num_players);
 
     for (auto &player: players)
-        player.net.fill_randomly();
+        player.m_net.fill_randomly();
 
     for (int iter = 0;; ++iter) {
         try {
@@ -87,7 +87,7 @@ int main() {
                     for (i32 j = num_players * surviving_portion + 1; j < num_players; ++j)
                         gya::randomly_update_neural_net_player(players[j],
                                                                std::clamp(0.2f, 0.8f, 1.0f / (iter * 0.01f + 1.0f)));
-//                        players[j].net.fill_randomly();
+//                        players[j].m_net.fill_randomly();
                     std::vector<std::thread> threads;
                     for (u64 j = 0; j < num_players; ++j) {
                         std::atomic<i32> wins = 0;
@@ -115,7 +115,7 @@ int main() {
 
                     std::function<void(i32, i32)> recursive_swap = [&](i32 a, i32 b) {
                         if (a != b) {
-                            std::swap(players[a].net, players[b].net);
+                            std::swap(players[a].m_net, players[b].m_net);
                             recursive_swap(a, num_wins[b].second);
                         }
                     };

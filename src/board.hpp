@@ -17,15 +17,15 @@ namespace gya {
 struct game_result {
     i8 state{};
 
-    constexpr bool player_1_won() const { return state == 1; }
+    [[nodiscard]] constexpr bool player_1_won() const { return state == 1; }
 
-    constexpr bool player_2_won() const { return state == 2; }
+    [[nodiscard]] constexpr bool player_2_won() const { return state == 2; }
 
-    constexpr bool is_game_over() const { return player_1_won() || player_2_won() || is_tie(); }
+    [[nodiscard]] constexpr bool is_game_over() const { return player_1_won() || player_2_won() || is_tie(); }
 
-    constexpr bool is_tie() const { return state == -1; }
+    [[nodiscard]] constexpr bool is_tie() const { return state == -1; }
 
-    constexpr bool operator==(gya::game_result other) const { return state == other.state; }
+    constexpr bool operator==(gya::game_result const &other) const = default;
 };
 
 struct board_column {
@@ -112,97 +112,99 @@ requires function input to be formatted as such (same as provided by board::to_s
         auto &ret = data[column].push(value);
         ++size;
 
-        int col = column;
-        int row = data[column].height - 1;
+        if (!winner.is_game_over()) {
+            int col = column;
+            int row = data[column].height - 1;
 
-        int hor = 1;
-        if (col > 0 && data[col - 1][row] == value) {
-            hor++;
-            if (col > 1 && data[col - 2][row] == value) {
+            int hor = 1;
+            if (col > 0 && data[col - 1][row] == value) {
                 hor++;
-                if (col > 2 && data[col - 3][row] == value) {
+                if (col > 1 && data[col - 2][row] == value) {
                     hor++;
+                    if (col > 2 && data[col - 3][row] == value) {
+                        hor++;
+                    }
                 }
             }
-        }
-        if (col < 6 && data[col + 1][row] == value) {
-            hor++;
-            if (col < 5 && data[col + 2][row] == value) {
+            if (col < 6 && data[col + 1][row] == value) {
                 hor++;
-                if (col < 4 && data[col + 3][row] == value) {
+                if (col < 5 && data[col + 2][row] == value) {
                     hor++;
+                    if (col < 4 && data[col + 3][row] == value) {
+                        hor++;
+                    }
                 }
             }
-        }
-        if (hor >= 4) {
-            winner.state = value == -1 ? 2 : 1;
-            return ret;
-        }
-        int ver = 1;
-        if (row > 0 && data[col][row - 1] == value) {
-            ver++;
-            if (row > 1 && data[col][row - 2] == value) {
+            if (hor >= 4) {
+                winner.state = value == -1 ? 2 : 1;
+                return ret;
+            }
+            int ver = 1;
+            if (row > 0 && data[col][row - 1] == value) {
                 ver++;
-                if (row > 2 && data[col][row - 3] == value) {
+                if (row > 1 && data[col][row - 2] == value) {
                     ver++;
+                    if (row > 2 && data[col][row - 3] == value) {
+                        ver++;
+                    }
                 }
             }
-        }
-        if (ver >= 4) {
-            winner.state = value == -1 ? 2 : 1;
-            return ret;
-        }
+            if (ver >= 4) {
+                winner.state = value == -1 ? 2 : 1;
+                return ret;
+            }
 
-        int diag_tl = 1;
-        if (col > 0 && row > 0 && data[col - 1][row - 1] == value) {
-            diag_tl++;
-            if (col > 1 && row > 1 && data[col - 2][row - 2] == value) {
+            int diag_tl = 1;
+            if (col > 0 && row > 0 && data[col - 1][row - 1] == value) {
                 diag_tl++;
-                if (col > 2 && row > 2 && data[col - 3][row - 3] == value) {
+                if (col > 1 && row > 1 && data[col - 2][row - 2] == value) {
                     diag_tl++;
+                    if (col > 2 && row > 2 && data[col - 3][row - 3] == value) {
+                        diag_tl++;
+                    }
                 }
             }
-        }
-        if (col < 6 && row < 5 && data[col + 1][row + 1] == value) {
-            diag_tl++;
-            if (col < 5 && row < 4 && data[col + 2][row + 2] == value) {
+            if (col < 6 && row < 5 && data[col + 1][row + 1] == value) {
                 diag_tl++;
-                if (col < 4 && row < 3 && data[col + 3][row + 3] == value) {
+                if (col < 5 && row < 4 && data[col + 2][row + 2] == value) {
                     diag_tl++;
+                    if (col < 4 && row < 3 && data[col + 3][row + 3] == value) {
+                        diag_tl++;
+                    }
                 }
             }
-        }
-        if (diag_tl >= 4) {
-            winner.state = value == -1 ? 2 : 1;
-            return ret;
-        }
+            if (diag_tl >= 4) {
+                winner.state = value == -1 ? 2 : 1;
+                return ret;
+            }
 
-        int diag_tr = 1;
-        if (col > 0 && row < 5 && data[col - 1][row + 1] == value) {
-            diag_tr++;
-            if (col > 1 && row < 4 && data[col - 2][row + 2] == value) {
+            int diag_tr = 1;
+            if (col > 0 && row < 5 && data[col - 1][row + 1] == value) {
                 diag_tr++;
-                if (col > 2 && row < 3 && data[col - 3][row + 3] == value) {
+                if (col > 1 && row < 4 && data[col - 2][row + 2] == value) {
                     diag_tr++;
+                    if (col > 2 && row < 3 && data[col - 3][row + 3] == value) {
+                        diag_tr++;
+                    }
                 }
             }
-        }
-        if (col < 6 && row > 0 && data[col + 1][row - 1] == value) {
-            diag_tr++;
-            if (col < 5 && row > 1 && data[col + 2][row - 2] == value) {
+            if (col < 6 && row > 0 && data[col + 1][row - 1] == value) {
                 diag_tr++;
-                if (col < 4 && row > 2 && data[col + 3][row - 3] == value) {
+                if (col < 5 && row > 1 && data[col + 2][row - 2] == value) {
                     diag_tr++;
+                    if (col < 4 && row > 2 && data[col + 3][row - 3] == value) {
+                        diag_tr++;
+                    }
                 }
             }
-        }
-        if (diag_tr >= 4) {
-            winner.state = value == -1 ? 2 : 1;
-            return ret;
-        }
+            if (diag_tr >= 4) {
+                winner.state = value == -1 ? 2 : 1;
+                return ret;
+            }
 
-        if (size == 42) {
-            winner.state = -1;
+            if (size == 42) {
+                winner.state = -1;
+            }
         }
 
         return ret;
@@ -520,13 +522,7 @@ public:
         return res;
     }
 
-    constexpr bool operator==(gya::compressed_column c) const {
-        return data == c.data;
-    }
-
-    constexpr bool operator!=(gya::compressed_column c) const {
-        return data != c.data;
-    }
+    constexpr bool operator==(gya::compressed_column const &c) const = default;
 };
 
 static_assert([] { // loop through all possible columns and verify they are compressed and decompressed properly
@@ -576,13 +572,7 @@ public:
         return res;
     }
 
-    constexpr bool operator==(gya::compressed_board const &b) const {
-        return data == b.data;
-    }
-
-    constexpr bool operator!=(gya::compressed_board const &b) const {
-        return data != b.data;
-    }
+    constexpr bool operator==(gya::compressed_board const &b) const = default;
 };
 
 static_assert([] { // test some randomly generated games to make sure they are compressed and decompressed properly

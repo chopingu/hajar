@@ -15,15 +15,23 @@
 
 namespace gya {
 struct game_result {
+    static constexpr auto GAME_NOT_OVER = 0;
+    static constexpr auto PLAYER_ONE_WON = 1;
+    static constexpr auto PLAYER_TWO_WON = 2;
+    static constexpr auto TIE = -1;
+
+    template<class T>
+    constexpr game_result(T v) : state{static_cast<i8>(v)} {}
+
     i8 state{};
 
-    [[nodiscard]] constexpr bool player_1_won() const { return state == 1; }
+    [[nodiscard]] constexpr bool player_1_won() const { return state == PLAYER_ONE_WON; }
 
-    [[nodiscard]] constexpr bool player_2_won() const { return state == 2; }
+    [[nodiscard]] constexpr bool player_2_won() const { return state == PLAYER_TWO_WON; }
 
-    [[nodiscard]] constexpr bool is_game_over() const { return player_1_won() || player_2_won() || is_tie(); }
+    [[nodiscard]] constexpr bool is_game_over() const { return state != GAME_NOT_OVER; }
 
-    [[nodiscard]] constexpr bool is_tie() const { return state == -1; }
+    [[nodiscard]] constexpr bool is_tie() const { return state == TIE; }
 
     constexpr bool operator==(gya::game_result const &other) const = default;
 };
@@ -57,8 +65,11 @@ struct board_column {
 };
 
 struct board {
+    static constexpr auto PLAYER_ONE = 1;
+    static constexpr auto PLAYER_TWO = -1;
+
     std::array<board_column, 7> data{};
-    gya::game_result winner{0};
+    gya::game_result winner{gya::game_result::GAME_NOT_OVER};
     i8 size = 0;
 
     /*
@@ -80,9 +91,9 @@ requires function input to be formatted as such (same as provided by board::to_s
             for (int col = 0; col < 7; ++col) {
                 const auto curr = std::tolower(str[row * 16 + col * 2 + 1]);
                 if (curr == 'x') {
-                    b.play(col, 1);
+                    b.play(col, PLAYER_ONE);
                 } else if (curr == 'o') {
-                    b.play(col, -1);
+                    b.play(col, PLAYER_TWO);
                 }
             }
         }
@@ -101,7 +112,7 @@ requires function input to be formatted as such (same as provided by board::to_s
     constexpr i8 &play(u8 column, i8 value) {
         if (size == 42)
             throw std::runtime_error("cant play if board is full (possible tie)");
-        if (value != 1 && value != -1)
+        if (value != PLAYER_ONE && value != PLAYER_TWO)
             throw std::runtime_error("invalid m_player");
         if (data[column].height >= 6) {
             std::cout << std::flush;
@@ -136,7 +147,7 @@ requires function input to be formatted as such (same as provided by board::to_s
                 }
             }
             if (hor >= 4) {
-                winner.state = value == -1 ? 2 : 1;
+                winner.state = value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
                 return ret;
             }
             int ver = 1;
@@ -150,7 +161,7 @@ requires function input to be formatted as such (same as provided by board::to_s
                 }
             }
             if (ver >= 4) {
-                winner.state = value == -1 ? 2 : 1;
+                winner.state = value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
                 return ret;
             }
 
@@ -174,7 +185,7 @@ requires function input to be formatted as such (same as provided by board::to_s
                 }
             }
             if (diag_tl >= 4) {
-                winner.state = value == -1 ? 2 : 1;
+                winner.state = value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
                 return ret;
             }
 
@@ -198,12 +209,12 @@ requires function input to be formatted as such (same as provided by board::to_s
                 }
             }
             if (diag_tr >= 4) {
-                winner.state = value == -1 ? 2 : 1;
+                winner.state = value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
                 return ret;
             }
 
             if (size == 42) {
-                winner.state = -1;
+                winner.state = game_result::TIE;
             }
         }
 
@@ -235,11 +246,11 @@ requires function input to be formatted as such (same as provided by board::to_s
     }
 
     [[nodiscard]] constexpr game_result has_won() const {
-        return game_result{winner};
+        return winner;
     }
 
     [[nodiscard]] constexpr game_result has_won_test() const {
-        if (size < 7) return game_result{0};
+        if (size < 7) return game_result::GAME_NOT_OVER;
         /*
         X
         X
@@ -253,7 +264,7 @@ requires function input to be formatted as such (same as provided by board::to_s
                 if (data[i][j] == data[i][j + 1] &&
                     data[i][j] == data[i][j + 2] &&
                     data[i][j] == data[i][j + 3]) {
-                    return data[i][j] == 1 ? game_result{1} : game_result{2};
+                    return data[i][j] == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
                 }
             }
         }
@@ -269,7 +280,7 @@ requires function input to be formatted as such (same as provided by board::to_s
                 if (data[i][j] == data[i + 1][j] &&
                     data[i][j] == data[i + 2][j] &&
                     data[i][j] == data[i + 3][j]) {
-                    return data[i][j] == 1 ? game_result{1} : game_result{2};
+                    return data[i][j] == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
                 }
             }
         }
@@ -287,7 +298,7 @@ requires function input to be formatted as such (same as provided by board::to_s
                 if (data[i][j] == data[i + 1][j + 1] &&
                     data[i][j] == data[i + 2][j + 2] &&
                     data[i][j] == data[i + 3][j + 3]) {
-                    return data[i][j] == 1 ? game_result{1} : game_result{2};
+                    return data[i][j] == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
                 }
             }
         }
@@ -305,19 +316,19 @@ requires function input to be formatted as such (same as provided by board::to_s
                 if (data[i][j + 3] == data[i + 1][j + 2] &&
                     data[i][j + 3] == data[i + 2][j + 1] &&
                     data[i][j + 3] == data[i + 3][j]) {
-                    return data[i][j + 3] == 1 ? game_result{1} : game_result{2};
+                    return data[i][j + 3] == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
                 }
             }
         }
 
         if (std::all_of(data.begin(), data.end(), [](auto &col) { return col.height == 6; })) {
-            return game_result{-1};
+            return game_result::TIE;
         } else {
-            return game_result{0};
+            return game_result::GAME_NOT_OVER;
         }
     }
 
-    [[nodiscard]] constexpr u32 n_in_a_row_counter(u8 n, i8 player) const { //m_player = 1 or -1
+    [[nodiscard]] constexpr u32 n_in_a_row_counter(u8 n, i8 player) const { // player = 1 or -1
         return n_vertical_count(n, player) + n_horizontal_count(n, player) + n_top_right_diagonal_count(n, player) +
                (n_top_left_diagonal_count(n, player));
     }
@@ -400,7 +411,7 @@ requires function input to be formatted as such (same as provided by board::to_s
         for (int i = 6; i-- > 0;) {
             ret += '|';
             for (int j = 0; j < 7; ++j) {
-                ret += data[j][i] == 0 ? ' ' : data[j][i] == 1 ? 'X' : 'O';
+                ret += data[j][i] == 0 ? ' ' : data[j][i] == PLAYER_ONE ? 'X' : 'O';
                 ret += '|';
             }
             ret += '\n';
@@ -419,7 +430,7 @@ requires function input to be formatted as such (same as provided by board::to_s
     }
 
     [[nodiscard]] constexpr i8 turn() const {
-        return size % 2 ? -1 : 1;
+        return size % 2 ? PLAYER_TWO : PLAYER_ONE;
     }
 };
 

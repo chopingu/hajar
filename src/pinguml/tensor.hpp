@@ -49,7 +49,7 @@ public:
 
     u32 size() const { return m_size; }
 
-    u32 _channel_stride(const u32 h, const u32 w) {
+    u32 channel_stride(const u32 h, const u32 w) {
         u32 x = h * w;
 
 #ifdef NORMAL
@@ -74,7 +74,7 @@ public:
     tensor() : m_size(0), m_capacity(0), m_rows(0), m_cols(0), m_channels(0), m_channel_stride(0), m_ptr(0) {}
 
     tensor(const u32 h, const u32 w, const u32 c, const f32 *data = nullptr) : m_rows(h), m_cols(w), m_channels(c) {
-        m_channel_stride = _channel_stride(h, w);
+        m_channel_stride = channel_stride(h, w);
         m_size = m_capacity = m_channel_stride * m_channels;
         m_ptr = _new(m_size);
         if (data) std::memcpy(m_ptr, data, m_size * sizeof(f32));
@@ -187,7 +187,6 @@ public:
         for (u32 i = 0; i < m_size; i++) m_ptr[i] = generator(seed);
     }
 
-    tensor
     tensor_pad(const u32 dy_top, const u32 dy_bottom, const u32 dx_left, const u32 dx_right, const u8 pad_type) const {
         tensor tns(m_rows + dy_top + dy_bottom, m_cols + dx_left + dx_right, m_channels);
         tns.fill(0);

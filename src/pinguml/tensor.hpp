@@ -187,7 +187,7 @@ public:
         for (u32 i = 0; i < m_size; i++) m_ptr[i] = generator(seed);
     }
 
-    tensor_pad(const u32 dy_top, const u32 dy_bottom, const u32 dx_left, const u32 dx_right, const u8 pad_type) const {
+    tensor tensor_pad(const u32 dy_top, const u32 dy_bottom, const u32 dx_left, const u32 dx_right, const u8 pad_type) const {
         tensor tns(m_rows + dy_top + dy_bottom, m_cols + dx_left + dx_right, m_channels);
         tns.fill(0);
 
@@ -257,7 +257,7 @@ public:
     }
 
     void resize(const u32 h, const u32 w, const u32 c) {
-        const u32 new_stride = _channel_stride(h, w);
+        const u32 new_stride = channel_stride(h, w);
         const u32 sz = new_stride * c;
         if (sz > m_capacity) {
             if (m_capacity) _delete();

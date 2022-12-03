@@ -22,7 +22,7 @@
 \newpage
 
 \begin{abstract}
-In October 2022 DeepMind announced an artificial intelligence in a preprint \cite{alphazero} that was called AlphaTensor. It utilized \emph{artificial neural networks} in combination with \emph{heuristic algorithms} in order to solve the unsolved problem of finding faster algorithms for matrix multiplication. AlphaTensor was succesful and has shed light on the process of finding new algorithms. In this paper we aim to study the effectiveness of different \emph{neural networks} and \emph{heuristic algorithms} such as the one used in AlphaTensor. More precisely, we intend to analyze the efficiency of those networks and algorithms in combination with varying \emph{optimizations, parameters, hyperparameters} and \emph {architectures} applied to the classic games \emph{Connect Four} and \emph{Othello}. 
+In October 2022 DeepMind announced an artificial intelligence in a preprint \cite{alphatensor} that was called AlphaTensor. It utilized \emph{artificial neural networks} in combination with \emph{heuristic algorithms} in order to solve the unsolved problem of finding faster algorithms for matrix multiplication. AlphaTensor was succesful and has shed light on the process of finding new algorithms. In this paper we aim to study the effectiveness of different \emph{neural networks} and \emph{heuristic algorithms} such as the one used in AlphaTensor. More precisely, we intend to analyze the efficiency of those networks and algorithms in combination with varying \emph{optimizations, parameters, hyperparameters} and \emph {architectures} applied to the classic games \emph{Connect Four} and \emph{Othello}. 
 
 \vskip 1cm
 
@@ -30,16 +30,29 @@ In October 2022 DeepMind announced an artificial intelligence in a preprint \cit
 
 \end{abstract} 
 
-\pagenumbering{roman}
-
-\tableofcontents
-
-\newpage 
+\newpage
 
 \section*{Preface}
-\addcontentsline{toc}{section}{Preface}
+
+\vskip 0.8cm
+
+\epigraph{
+\hspace{2.1cm} The only true wisdom is in knowing you know nothing. 
+}
+\vskip -0.2cm
+\centerline{\scriptsize --Socrates}
+
+\vskip 1.2cm
+
+\subsection*{Background}
+
+\vskip 0.5cm
+
+The concept of artificial intelligence was only popularized during the first half of the 20th century through science fiction. Computers before 1950 lacked key prerequisite for intelligence: they could not store commands, only execute them immediately. Allen Newell, Cliff Shaw and Herbert Simon created in 1956 what is often considered the first artificial intelligence program and it catalyzed the next 20 years of research in this field. Gordon Moore predicted in 1965 that the memory and speed of computers would double every year and the prediction, known as Moore's law, has been true ever since. The growth led to new possibilities for the field of artificial intelligence and many landmark goals were achieved during the 1990s and 2000s. In 1997 reigning world chess champion and grandmaster Gary Kasparov was defeated by IBM's computer program Deep Blue \cite{deep_blue}. 19 years later Deepmind's artificial intelligence AlphaGo \cite{alphago} beat the South Korean grandmaster Lee Sedol regarded as one of the best Go players of all time. Go is due to its large search space considerably more complex than chess and AlphaGo taught itself how to play without any proprietary knowledge in comparison to Deep Blue that was heavily influensed by the pre-coded strategies. Shortly after the success of AlphaGo Deepmind began working on protein structure prediction. The artificial intelligence AlphaFold \cite{alphafold} is now by a huge margine the most accurate in prediciting protein structures and it is accelerating research in nearly every field of biology. As this field of research is becoming a substantial part of today's science we find it important to analyze different aspects of it. 
 
 \newpage
+
+\pagenumbering{roman}
 
 \section*{\huge Summary of Notation}
 \addcontentsline{toc}{section}{Summary of Notation}
@@ -62,13 +75,47 @@ I am a forest, and a night of dark trees: but he who is not afraid of my darknes
 
 \newpage
 
+\tableofcontents
+
+\newpage 
+
 \clearpage
 \pagenumbering{arabic}
 
-\newpage
+\section{Introduction}
+
+\vskip 0.8cm
+
+\epigraph{
+A thinker sees his own actions as experiments and questions--as attempts to find out something. Success and failure are for him answers above all.
+\attr{Friedrich Nietzsche}
+}
 
 \subsection{Background}
+
+Artificial neural networks \cite{ann} are computing systems consisting of connected nodes called artifical neurons and are inspired by biological neural networks that constitue human brains. The artificial networks have recently been used in different forms in order to solve various complex and abstract problems. A recent example is Deepmind's AlphaTensor \cite{alphatensor} which in October 2022 found a faster algorithm for matrix multiplication. 
+
+\vskip 0.5cm
+
+\noindent
+The greatest factors of an artificial neural network's success is its architecture and how it is applied to the problem presented. AlphaZero \cite{alphazero} and AlphaGo \cite{alphago} are computer programs whose artifical neural networks only differ in the method of application. Even though AlphaZero uses the same type of network it beats AlphaGo 100 to 0 in the board game Go which demonstrates how delicate artificial networks are. In this project we take a closer look at the intricacies of artificial neural networks with the help of two board games, Connect Four and Othello.
+
 \subsection{Analysis}
+
+In this paper we aim to analyse the effects various algorithms, parameters and training methods have on rate and quality of learning of an artificial intelligence.
+
+\vskip 1cm
+
+\subsection{Delimitations}
+
+This project is limited to less complex games due to the limitations of computing power and time.
+
+\newpage
+
+\subsection{Division of Work}
+
+Different parts of this project have been divided amongst the authors in order to make to process more effective. 
+(More details coming) 
 
 \newpage
 
@@ -113,6 +160,8 @@ I am a forest, and a night of dark trees: but he who is not afraid of my darknes
 \newpage
 
 \subsection{Generalizing Neural Networks}
+\subsubsection{Regularization}
+\subsubsection{Dropout}
 
 \newpage
 
@@ -126,12 +175,7 @@ I am a forest, and a night of dark trees: but he who is not afraid of my darknes
 
 \section{Reinforcement Learning}
 
-\newpage
-
 \subsection{Introduction}
-
-\newpage
-
 \subsection{Monte Carlo Tree Search}
 \subsubsection{Upper Confidence Bound}
 
@@ -139,10 +183,34 @@ I am a forest, and a night of dark trees: but he who is not afraid of my darknes
 
 \section{Heuristic Algorithms}
 \subsection{MiniMax}
+\subsection{AlphaBeta Pruning}
 
 \newpage
 
-\bibliographystyle{plain}
+\section{Method}
+
+\subsection{Implementation}
+
+\newpage
+
+\section{Results}
+
+\newpage
+
+\section{Conclusions}
+
+\newpage
+
+\appendix
+
+\section{Appendix}
+\subsection{Source Code}
+
+\centerline{\href{https://github.com/chopingu/hajar}{https://github.com/chopingu/hajar}}
+
+\newpage
+
+\bibliographystyle{unsrt}
 \bibliography{refs}
 
 \end{document}

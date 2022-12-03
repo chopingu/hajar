@@ -390,7 +390,7 @@ requires function input to be formatted as such (same as provided by board::to_s
 |1|2|3|4|5|6|7|
      */
     static constexpr auto from_string(std::string_view str) {
-        constexpr auto NUM_CHARS_REQUIRED = 112;
+        [[maybe_unused]] constexpr auto NUM_CHARS_REQUIRED = 112;
         assert(str.size() == NUM_CHARS_REQUIRED);
 
         board b;
@@ -544,7 +544,7 @@ public:
 
 static_assert([] { // loop through all possible columns and verify they are compressed and decompressed properly
     for (usize num_moves = 0; num_moves <= BOARD_HEIGHT; ++num_moves) {
-        for (usize i = 0; i < (1 << num_moves); ++i) {
+        for (usize i = 0; i < (1ull << num_moves); ++i) {
             gya::board_column c;
             for (usize j = 0; j < num_moves; ++j)
                 c.push((i & (1 << j)) ? board::PLAYER_ONE : board::PLAYER_TWO);

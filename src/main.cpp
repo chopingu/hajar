@@ -1,6 +1,3 @@
-#include "defines.hpp"
-#include "board.hpp"
-#include "tester.hpp"
 #include "include.hpp"
 
 #include "neural_net_testing/neural_net_player.hpp"

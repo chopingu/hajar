@@ -1,17 +1,7 @@
 #pragma once
 
-#include <array>
-#include <string>
-#include <string_view>
-#include <algorithm>
-#include <cassert>
-#include <iostream>
-#include <chrono>
-#include <type_traits>
-
+#include "precomp_header.hpp"
 #include "defines.hpp"
-
-#include "../lib/lmj/src/containers/static_vector.hpp"
 
 namespace gya {
 
@@ -94,103 +84,13 @@ struct board {
             std::cerr << to_string() << std::endl;
             std::cerr << "column: " << (int) column << std::endl;
         }
+
+        if (const auto res = is_winning_move(column); res.is_game_over()) {
+            winner = res;
+        }
+        
         auto &ret = data[column].push(value);
         ++size;
-
-        if (!winner.is_game_over()) {
-            int const col = column;
-            int const row = data[column].height - 1;
-
-            int hor = 1;
-            if (col > 0 && data[col - 1][row] == value) {
-                hor++;
-                if (col > 1 && data[col - 2][row] == value) {
-                    hor++;
-                    if (col > 2 && data[col - 3][row] == value) {
-                        hor++;
-                    }
-                }
-            }
-            if (col + 1 < BOARD_WIDTH && data[col + 1][row] == value) {
-                hor++;
-                if (col + 2 < BOARD_WIDTH && data[col + 2][row] == value) {
-                    hor++;
-                    if (col + 3 < BOARD_WIDTH && data[col + 3][row] == value) {
-                        hor++;
-                    }
-                }
-            }
-            if (hor >= 4) {
-                winner.state = value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
-                return ret;
-            }
-            int ver = 1;
-            if (row > 0 && data[col][row - 1] == value) {
-                ver++;
-                if (row > 1 && data[col][row - 2] == value) {
-                    ver++;
-                    if (row > 2 && data[col][row - 3] == value) {
-                        ver++;
-                    }
-                }
-            }
-            if (ver >= 4) {
-                winner.state = value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
-                return ret;
-            }
-
-            int diag_tl = 1;
-            if (col > 0 && row > 0 && data[col - 1][row - 1] == value) {
-                diag_tl++;
-                if (col > 1 && row > 1 && data[col - 2][row - 2] == value) {
-                    diag_tl++;
-                    if (col > 2 && row > 2 && data[col - 3][row - 3] == value) {
-                        diag_tl++;
-                    }
-                }
-            }
-            if (col + 1 < BOARD_WIDTH && row + 1 < BOARD_HEIGHT && data[col + 1][row + 1] == value) {
-                diag_tl++;
-                if (col + 2 < BOARD_WIDTH && row + 2 < BOARD_HEIGHT && data[col + 2][row + 2] == value) {
-                    diag_tl++;
-                    if (col + 3 < BOARD_WIDTH && row + 3 < BOARD_HEIGHT && data[col + 3][row + 3] == value) {
-                        diag_tl++;
-                    }
-                }
-            }
-            if (diag_tl >= 4) {
-                winner.state = value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
-                return ret;
-            }
-
-            int diag_tr = 1;
-            if (col > 0 && row + 1 < BOARD_HEIGHT && data[col - 1][row + 1] == value) {
-                diag_tr++;
-                if (col > 1 && row + 2 < BOARD_HEIGHT && data[col - 2][row + 2] == value) {
-                    diag_tr++;
-                    if (col > 2 && row + 3 < BOARD_HEIGHT && data[col - 3][row + 3] == value) {
-                        diag_tr++;
-                    }
-                }
-            }
-            if (col + 1 < BOARD_WIDTH && row > 0 && data[col + 1][row - 1] == value) {
-                diag_tr++;
-                if (col + 2 < BOARD_WIDTH && row > 1 && data[col + 2][row - 2] == value) {
-                    diag_tr++;
-                    if (col + 3 < BOARD_WIDTH && row > 2 && data[col + 3][row - 3] == value) {
-                        diag_tr++;
-                    }
-                }
-            }
-            if (diag_tr >= 4) {
-                winner.state = value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
-                return ret;
-            }
-
-            if (size == BOARD_WIDTH * BOARD_HEIGHT) {
-                winner.state = game_result::TIE;
-            }
-        }
 
         return ret;
     }
@@ -207,6 +107,100 @@ struct board {
         gya::board result = *this;
         result.play(column);
         return result;
+    }
+
+    [[nodiscard]] constexpr gya::game_result is_winning_move(u8 column) const {
+        int const col = column;
+        int const row = data[column].height;
+        int const value = turn();
+
+        int hor = 1;
+        if (col > 0 && data[col - 1][row] == value) {
+            hor++;
+            if (col > 1 && data[col - 2][row] == value) {
+                hor++;
+                if (col > 2 && data[col - 3][row] == value) {
+                    hor++;
+                }
+            }
+        }
+        if (col + 1 < BOARD_WIDTH && data[col + 1][row] == value) {
+            hor++;
+            if (col + 2 < BOARD_WIDTH && data[col + 2][row] == value) {
+                hor++;
+                if (col + 3 < BOARD_WIDTH && data[col + 3][row] == value) {
+                    hor++;
+                }
+            }
+        }
+        if (hor >= 4) {
+            return value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
+        }
+        int ver = 1;
+        if (row > 0 && data[col][row - 1] == value) {
+            ver++;
+            if (row > 1 && data[col][row - 2] == value) {
+                ver++;
+                if (row > 2 && data[col][row - 3] == value) {
+                    ver++;
+                }
+            }
+        }
+        if (ver >= 4) {
+            return value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
+        }
+
+        int diag_tl = 1;
+        if (col > 0 && row > 0 && data[col - 1][row - 1] == value) {
+            diag_tl++;
+            if (col > 1 && row > 1 && data[col - 2][row - 2] == value) {
+                diag_tl++;
+                if (col > 2 && row > 2 && data[col - 3][row - 3] == value) {
+                    diag_tl++;
+                }
+            }
+        }
+        if (col + 1 < BOARD_WIDTH && row + 1 < BOARD_HEIGHT && data[col + 1][row + 1] == value) {
+            diag_tl++;
+            if (col + 2 < BOARD_WIDTH && row + 2 < BOARD_HEIGHT && data[col + 2][row + 2] == value) {
+                diag_tl++;
+                if (col + 3 < BOARD_WIDTH && row + 3 < BOARD_HEIGHT && data[col + 3][row + 3] == value) {
+                    diag_tl++;
+                }
+            }
+        }
+        if (diag_tl >= 4) {
+            return value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
+        }
+
+        int diag_tr = 1;
+        if (col > 0 && row + 1 < BOARD_HEIGHT && data[col - 1][row + 1] == value) {
+            diag_tr++;
+            if (col > 1 && row + 2 < BOARD_HEIGHT && data[col - 2][row + 2] == value) {
+                diag_tr++;
+                if (col > 2 && row + 3 < BOARD_HEIGHT && data[col - 3][row + 3] == value) {
+                    diag_tr++;
+                }
+            }
+        }
+        if (col + 1 < BOARD_WIDTH && row > 0 && data[col + 1][row - 1] == value) {
+            diag_tr++;
+            if (col + 2 < BOARD_WIDTH && row > 1 && data[col + 2][row - 2] == value) {
+                diag_tr++;
+                if (col + 3 < BOARD_WIDTH && row > 2 && data[col + 3][row - 3] == value) {
+                    diag_tr++;
+                }
+            }
+        }
+        if (diag_tr >= 4) {
+            return value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
+        }
+
+        if (size == BOARD_WIDTH * BOARD_HEIGHT) {
+            return game_result::TIE;
+        } else {
+            return game_result::GAME_NOT_OVER;
+        }
     }
 
     [[nodiscard]] lmj::static_vector<u8, BOARD_WIDTH> get_actions() const {
@@ -379,15 +373,15 @@ struct board {
         return n_in_a_rows;
     }
 
-    /*
-requires function input to be formatted as such (same as provided by board::to_string()):
-| | | | | | | |
-| | | | | | | |
-|X| | | | | | |
-|O|X| | | | | |
-|O|O|X| | | | |
-|X|O|O|X| | | |
-|1|2|3|4|5|6|7|
+    /**
+     * requires function input to be formatted as such (same as provided by board::to_string()):
+     * | | | | | | | |
+     * | | | | | | | |
+     * |X| | | | | | |
+     * |O|X| | | | | |
+     * |O|O|X| | | | |
+     * |X|O|O|X| | | |
+     * |1|2|3|4|5|6|7|
      */
     static constexpr auto from_string(std::string_view str) {
         [[maybe_unused]] constexpr auto NUM_CHARS_REQUIRED = 112;

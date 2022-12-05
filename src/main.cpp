@@ -29,7 +29,6 @@ int main() {
         while (!b.has_won().is_game_over()) {
             if (turn ^= 1) {
                 print(b.to_string());
-//                std::cout << (int) heuristic::n_move_solver{}.evaluate_board(b, 5) * b.turn() << '\n';
                 u8 move;
                 {
                     lmj::timer t{false};
@@ -39,7 +38,6 @@ int main() {
                 b.play(move);
             } else {
                 print(b.to_string());
-//                std::cout << (int) heuristic::n_move_solver{}.evaluate_board(b, 5) * b.turn() << '\n';
                 int move;
                 std::cin >> move;
                 b.play(move - 1);

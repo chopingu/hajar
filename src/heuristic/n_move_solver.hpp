@@ -5,75 +5,86 @@
 namespace heuristic {
 template<bool MULTI_THREAD = false>
 struct n_move_solver {
+    struct eval_result {
+        bool m_winning: 1;
+        bool m_losing: 1;
+        i8 m_depth_until_over: 6 = 0; 
 
-    int m_num_moves = 5;
+        constexpr eval_result() : m_winning{}, m_losing{}, m_depth_until_over{} {}
 
-    using transpo_table_t = lmj::hash_table<gya::compressed_board, i8>;
+        constexpr eval_result(bool winning, bool losing, i8 depth = 0) : m_winning{winning}, m_losing{losing}, m_depth_until_over{depth} {}
 
-    i16 evaluate_board(gya::board const &b, i32 steps_left, i32 recursion_depth = 0) const {
-        if (gya::game_result result = b.has_won(); result.is_game_over()) {
-            if (result.is_tie()) {
-                return static_cast<i16>(-127 * b.turn());
-            } else if (result.player_1_won()) {
-                return 32767;
+        constexpr eval_result incremented() const {
+            if (m_winning | m_losing) {
+                return eval_result{!m_winning, !m_losing, static_cast<i8>(m_depth_until_over + 1)};
             } else {
-                return -32767;
+                return *this;
             }
         }
 
-        if (steps_left == 0) return 0;
-        constexpr std::array<int, 7> biases = {0, 1, 2, 3, 2, 1, 0};
-//        constexpr std::array<int, 7> biases = {};
+        constexpr bool operator>(eval_result other) const {
+            if (m_winning && !other.m_winning)
+                return true;
+            if (!m_losing && other.m_losing)
+                return true;
+            if (m_winning && other.m_winning)
+                return m_depth_until_over < other.m_depth_until_over;
+            if (m_losing && other.m_losing)
+                return m_depth_until_over > other.m_depth_until_over;
+            return false;
+        }
 
-        std::array<i16, 7> scores{};
-        lmj::static_vector<i16, 7> move_scores;
-        const auto actions = b.get_actions();
-        const auto eval_move = [=, this, &scores, &biases, &move_scores](u8 move) {
-            const auto evaluation = static_cast<i16>(
-                    (evaluate_board(b.play_copy(move), steps_left - 1, recursion_depth + 1)
-                     - 10) * b.turn() + biases[move]);
-            scores[move] = evaluation;
-            move_scores.push_back(evaluation);
-        };
-        if (recursion_depth < 2 && actions.size() > 3 && MULTI_THREAD) {
-            lmj::static_vector<std::future<void>, 7> futures;
-            for (u8 move: actions) {
-                futures.push_back(std::async(std::launch::async, eval_move, move));
-            }
-            for (auto &&future: futures) {
-                future.get();
-            }
+        constexpr bool operator<(eval_result other) const {
+            return other > *this;
+        }
+
+        operator const char*() const {
+            if (m_winning)
+                return "WINNING";
+            if (m_losing) 
+                return "LOSING";
+            return "NEUTRAL";
+        }
+    };
+    static_assert(sizeof(eval_result) == 1);
+
+    static constexpr eval_result WINNING_MOVE{true, false};
+    static constexpr eval_result LOSING_MOVE{false, true};
+    static constexpr eval_result NEUTRAL_MOVE{};
+
+    i32 m_depth = 5;
+
+
+    [[nodiscard]] eval_result evaluate_board(gya::board const& board, i32 remaining_moves = -1) const {
+        if (remaining_moves == -1) remaining_moves = m_depth;
+
+        if (board.has_won().player_1_won()) {
+            return board.turn() == gya::board::PLAYER_ONE ? WINNING_MOVE : LOSING_MOVE;
+        }
+        if (board.has_won().player_2_won()) {
+            return board.turn() == gya::board::PLAYER_TWO ? WINNING_MOVE : LOSING_MOVE;
+        }
+        if (board.has_won().is_tie() || remaining_moves == 0) {
+            return NEUTRAL_MOVE;
         } else {
-            for (u8 move: actions) {
-                eval_move(move);
-                if (scores[move] >= 32757) {
-                    return static_cast<i16>(scores[move] * b.turn());
-                }
+            eval_result best_eval = LOSING_MOVE;        
+            for (u8 move: board.get_actions()) {
+                eval_result eval = evaluate_board(board.play_copy(move), remaining_moves - 1).incremented();
+                if (eval > best_eval) 
+                    best_eval = eval;
             }
+            return best_eval;
         }
-        return static_cast<i16>(*std::max_element(std::begin(move_scores), std::end(move_scores)) * b.turn());
     }
 
-    u8 operator()(gya::board const &b) const {
-        f64 best_score = -1e9;
-        u8 best_move = 0;
-        auto actions = b.get_actions();
-//        std::shuffle(actions.begin(), actions.end(), std::default_random_engine{
-//                static_cast<u32>(std::chrono::high_resolution_clock::now().time_since_epoch().count())});
-        lmj::random_shuffle(actions);
-        lmj::static_vector<std::pair<f64, u8>, 7> moves;
-
-        for (u8 move: actions) {
-            moves.emplace_back(evaluate_board(b.play_copy(move), m_num_moves - 1) * b.turn(), move);
+    [[nodiscard]] u8 operator()(gya::board const& board) const {
+        u8 best_move = -1;
+        eval_result best_move_eval = LOSING_MOVE;
+        for (u8 move: board.get_actions()) {
+            const auto eval = evaluate_board(board.play_copy(move)).incremented();
+            if (best_move == static_cast<u8>(-1) || eval > best_move_eval)
+                best_move = move, best_move_eval = eval;
         }
-
-        for (auto [score, move]: moves) {
-            if (score > best_score) {
-                best_score = score;
-                best_move = move;
-            }
-        }
-
         return best_move;
     }
 };

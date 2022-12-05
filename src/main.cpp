@@ -15,20 +15,14 @@
 #include "pinguml/cost.hpp"
 
 int main() {
-    /*
-    auto print = [](std::string_view s) {
-        for (auto c: s) {
-            putchar(c);
-        }
-    };
-
     while (true) {
         gya::board b;
         int turn = 1;
-        heuristic::Abias s(5, 3);
+        heuristic::n_move_solver s{5};
         while (!b.has_won().is_game_over()) {
+            lmj::print((std::string) s.evaluate_board(b));
             if (turn ^= 1) {
-                print(b.to_string());
+                lmj::print(b.to_string());
                 u8 move;
                 {
                     lmj::timer t{false};
@@ -37,13 +31,17 @@ int main() {
                 }
                 b.play(move);
             } else {
-                print(b.to_string());
+                lmj::print(b.to_string());
                 int move;
                 std::cin >> move;
                 b.play(move - 1);
             }
         }
-        print(b.to_string());
+        lmj::print(b.to_string());
+        lmj::print((std::string) s.evaluate_board(b));
+        lmj::print(b.has_won().player_1_won());
+        lmj::print(b.has_won().player_2_won());
+
         if (b.has_won().is_tie()) {
             std::puts("tie!");
         } else if (b.has_won().player_1_won()) {
@@ -52,7 +50,6 @@ int main() {
             std::puts("you lost!");
         }
     }
-    */
 
     {
         // tests

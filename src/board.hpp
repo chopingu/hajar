@@ -79,16 +79,17 @@ struct board {
         if (value != PLAYER_ONE && value != PLAYER_TWO)
             throw std::runtime_error("invalid m_player");
         if (data[column].height >= BOARD_HEIGHT) {
-            std::cout << std::flush;
-            std::cerr << std::flush;
-            std::cerr << to_string() << std::endl;
-            std::cerr << "column: " << (int) column << std::endl;
+            std::cout.flush();
+            std::cerr.flush();
+            std::cerr << to_string() << '\n';
+            std::cerr << "column: " << (int) (column + 1) << " (one-indexed)\n";
+            std::cerr.flush();
         }
 
-        if (const auto res = is_winning_move(column); res.is_game_over()) {
+        if (const auto res = is_winning_move(column, value); res != winner) {
             winner = res;
         }
-        
+
         auto &ret = data[column].push(value);
         ++size;
 
@@ -109,10 +110,9 @@ struct board {
         return result;
     }
 
-    [[nodiscard]] constexpr gya::game_result is_winning_move(u8 column) const {
+    [[nodiscard]] constexpr gya::game_result is_winning_move(u8 column, i8 value) const {
         int const col = column;
         int const row = data[column].height;
-        int const value = turn();
 
         int hor = 1;
         if (col > 0 && data[col - 1][row] == value) {
@@ -196,7 +196,7 @@ struct board {
             return value == PLAYER_ONE ? game_result::PLAYER_ONE_WON : game_result::PLAYER_TWO_WON;
         }
 
-        if (size == BOARD_WIDTH * BOARD_HEIGHT) {
+        if (size + 1 == BOARD_WIDTH * BOARD_HEIGHT) {
             return game_result::TIE;
         } else {
             return game_result::GAME_NOT_OVER;
@@ -204,8 +204,6 @@ struct board {
     }
 
     [[nodiscard]] lmj::static_vector<u8, BOARD_WIDTH> get_actions() const {
-        if (size == BOARD_WIDTH * BOARD_HEIGHT)
-            throw std::runtime_error("no actions if board is full (possible tie)");
         lmj::static_vector<u8, BOARD_WIDTH> res;
         for (u8 i = 0; i < BOARD_WIDTH; ++i)
             if (data[i].height < BOARD_HEIGHT)

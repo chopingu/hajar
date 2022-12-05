@@ -8,7 +8,7 @@ struct one_move_solver {
 
     u8 operator()(gya::board const &b) {
         for (u8 move: b.get_actions()) {
-            if (b.is_winning_move(move).is_game_over()) {
+            if (b.is_winning_move(move, b.turn()).is_game_over()) {
                 return move;
             }
         }

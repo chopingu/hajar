@@ -18,7 +18,7 @@ int main() {
     while (true) {
         gya::board b;
         int turn = 1;
-        heuristic::n_move_solver s{5};
+        heuristic::n_move_solver<true> s{5};
         while (!b.has_won().is_game_over()) {
             lmj::print((std::string) s.evaluate_board(b));
             if (turn ^= 1) {

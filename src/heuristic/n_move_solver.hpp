@@ -67,7 +67,7 @@ struct n_move_solver {
         if (board.has_won().is_tie() || remaining_moves == 0) {
             return NEUTRAL_MOVE;
         } else {
-            eval_result best_eval = LOSING_MOVE;        
+            eval_result best_eval = LOSING_MOVE;
             for (u8 move: board.get_actions()) {
                 eval_result eval = evaluate_board(board.play_copy(move), remaining_moves - 1).incremented();
                 if (eval > best_eval) 
@@ -79,11 +79,35 @@ struct n_move_solver {
 
     [[nodiscard]] u8 operator()(gya::board const& board) const {
         u8 best_move = -1;
-        eval_result best_move_eval = LOSING_MOVE;
-        for (u8 move: board.get_actions()) {
-            const auto eval = evaluate_board(board.play_copy(move)).incremented();
-            if (best_move == static_cast<u8>(-1) || eval > best_move_eval)
-                best_move = move, best_move_eval = eval;
+        eval_result best_eval = LOSING_MOVE;
+        if (!MULTI_THREAD || m_depth < 5) {
+            for (u8 move: board.get_actions()) {
+                const auto eval = evaluate_board(board.play_copy(move)).incremented();
+                if (best_move == static_cast<u8>(-1) || eval > best_eval)
+                    best_move = move, best_eval = eval;
+            }
+        } else {
+            std::array<bool, 7> used{};
+            std::array<std::pair<eval_result, u8>, 7> moves{};
+            std::vector<std::future<void>> futures;
+            auto actions = board.get_actions();
+            for (u8 move: actions) {
+                futures.emplace_back(std::async(std::launch::async,
+                    [&, move] {
+                        moves[move] = {evaluate_board(board.play_copy(move)).incremented(), move};
+                        used[move] = true;
+                    }
+                ));
+            }
+            for (auto &&i: futures) i.get();
+            for (auto [eval, move]: moves) {
+                if (used[move]) {
+                    if (eval > best_eval) {
+                        best_eval = eval;
+                        best_move = move;
+                    }
+                }
+            }
         }
         return best_move;
     }

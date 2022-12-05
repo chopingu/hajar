@@ -2,8 +2,9 @@
 
 #include <cstdio>
 #include <cstdint>
+#include <cinttypes>
 #include "../utils/utils.hpp"
-#include "concepts"
+#include "../utils/concepts.hpp"
 
 namespace lmj::fast_print {
 
@@ -16,7 +17,7 @@ inline auto print_impl(FILE *fptr, unsigned_integral auto x) {
         std::fputc(x, fptr);
     } else {
         if constexpr (sizeof(x) <= 8) {
-            std::fprintf(fptr, "%llu", static_cast<uint64_t>(x));
+            std::fprintf(fptr, PRIu64, static_cast<uint64_t>(x));
         } else {
             char buff[(sizeof(x) * 8 * 10 + 2) / 3]{};
             std::size_t size = 0;

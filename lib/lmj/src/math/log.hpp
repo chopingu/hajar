@@ -19,18 +19,18 @@ constexpr auto log_impl(long double n) {
     auto low = approximation{1.0l, 0.0l};
 
     constexpr long double thousand_exp = 2.716923932235892457383l; // (not) coincidentally close to e
-    while (low.value * thousand_exp < n) // speed up finding first value less than m_n
+    while (low.value * thousand_exp < n) // speed up finding first value less than n
         low.value *= thousand_exp, low.exponent += 1000.0l;
 
     constexpr long double hundred_exp = 1.105115697720767968379l;
-    while (low.value * hundred_exp < n) // speed up finding first value less than m_n
+    while (low.value * hundred_exp < n) // speed up finding first value less than n
         low.value *= hundred_exp, low.exponent += 100.0l;
 
-    while (low.value * 1.001l < n) // find the greatest power of 1.001 strictly less than m_n (1.001 ^ low.second < m_n)
+    while (low.value * 1.001l < n) // find the greatest power of 1.001 strictly less than n (1.001 ^ low.second < n)
         low.value *= 1.001l, low.exponent += 1.0l;
 
     auto high = low;
-    while (high.value < n) // find the smallest power of 1.001 strictly greater than m_n (1.001 ^ high.second > m_n)
+    while (high.value < n) // find the smallest power of 1.001 strictly greater than n (1.001 ^ high.second > n)
         high.value *= 1.001l, high.exponent += 1.0l;
 
     if (low.value == n) // if an exact value is found, return early
@@ -39,7 +39,7 @@ constexpr auto log_impl(long double n) {
         return high.exponent * ln_1001;
 
     auto const t = (high.value - n) / (high.value - low.value); // for linear interpolation below
-    auto const approx = (high.exponent - (high.exponent - low.exponent) * t); // approximately ln(m_n) / ln(1.001)
+    auto const approx = (high.exponent - (high.exponent - low.exponent) * t); // approximately ln(n) / ln(1.001)
     return approx * ln_1001;
 }
 }

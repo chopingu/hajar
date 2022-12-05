@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../utils/concepts.hpp"
 #include "newton_raphson.hpp"
 #include "../containers/container_helpers.hpp"
 

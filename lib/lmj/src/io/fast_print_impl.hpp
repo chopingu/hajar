@@ -17,7 +17,7 @@ inline auto print_impl(FILE *fptr, unsigned_integral auto x) {
         std::fputc(x, fptr);
     } else {
         if constexpr (sizeof(x) <= 8) {
-            std::fprintf(fptr, PRIu64, static_cast<uint64_t>(x));
+            std::fprintf(fptr, "%" PRIu64, static_cast<uint64_t>(x));
         } else {
             char buff[(sizeof(x) * 8 * 10 + 2) / 3]{};
             std::size_t size = 0;
@@ -35,6 +35,10 @@ inline auto print_impl(FILE *fptr, signed_integral auto x) {
     if constexpr (std::is_same_v<decltype(x), signed char> || std::is_same_v<decltype(x), char>) {
         std::fputc(x, fptr);
     } else {
+        if constexpr (sizeof(x) <= 8) {
+            std::fprintf(fptr, PRId64, static_cast<uint64_t>(x));
+            return;
+        }
         if (x < 0) {
             std::fputc('-', fptr);
             if (x == std::numeric_limits<decltype(x)>::min()) {

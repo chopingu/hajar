@@ -52,7 +52,7 @@ struct board_column {
         return data[idx];
     }
 
-    constexpr bool operator==(board_column const &other) = default;
+    constexpr bool operator==(board_column const &other) const = default;
 };
 
 struct board {

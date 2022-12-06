@@ -58,7 +58,7 @@ struct n_move_solver {
 
 
     [[nodiscard]] eval_result evaluate_board(gya::board const &board, i32 remaining_moves = -1) const {
-        if (remaining_moves == -1) remaining_moves = m_depth;
+        if (remaining_moves == -1) remaining_moves = m_depth - 1;
 
         if (board.has_won().player_1_won()) {
             return board.turn() == gya::board::PLAYER_ONE ? WINNING_MOVE : LOSING_MOVE;

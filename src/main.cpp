@@ -15,11 +15,13 @@
 #include "pinguml/cost.hpp"
 
 int main() {
-    /*
     while (true) {
         gya::board b;
         int turn = 1;
-        heuristic::n_move_solver<true> s{5};
+        std::cout << "solver depth? ";
+        int depth;
+        std::cin >> depth;
+        heuristic::n_move_solver<true> s{depth};
         while (!b.has_won().is_game_over()) {
             lmj::print((std::string) s.evaluate_board(b));
             if (turn ^= 1) {
@@ -51,7 +53,6 @@ int main() {
             std::puts("you lost!");
         }
     }
-    */
 
     {
         // tests

@@ -56,7 +56,6 @@ struct n_move_solver {
 
     i32 m_depth = 5;
 
-
     [[nodiscard]] eval_result evaluate_board(gya::board const &board, i32 remaining_moves = -1) const {
         if (remaining_moves == -1) remaining_moves = m_depth - 1;
 
@@ -74,7 +73,7 @@ struct n_move_solver {
                 eval_result eval = evaluate_board(board.play_copy(move), remaining_moves - 1).incremented();
                 if (eval > best_eval)
                     best_eval = eval;
-                if (eval.m_depth_until_over == 1)
+                if (eval.m_depth_until_over == 1 || eval.m_winning == true)
                     break;
             }
             return best_eval;
@@ -82,7 +81,7 @@ struct n_move_solver {
     }
 
     [[nodiscard]] u8 operator()(gya::board const &board) const {
-        u8 best_move = -1;
+        u8 best_move = gya::BOARD_WIDTH;
         eval_result best_eval = LOSING_MOVE;
         auto actions = board.get_actions();
         // put indices closer to the middle first
@@ -93,7 +92,7 @@ struct n_move_solver {
         if (!MULTI_THREAD || m_depth < 5) {
             for (u8 move: actions) {
                 const auto eval = evaluate_board(board.play_copy(move)).incremented();
-                if (best_move == static_cast<u8>(-1) || eval > best_eval)
+                if (best_move == gya::BOARD_WIDTH || eval > best_eval)
                     best_move = move, best_eval = eval;
             }
         } else {

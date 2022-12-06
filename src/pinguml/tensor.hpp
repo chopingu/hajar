@@ -54,20 +54,19 @@ public:
 
 #ifdef NORMAL
         return x;
-#endif
-
-        u8 chunk_size;
+#else
 
 #ifdef AVX
-        chunk_size = 8;
+        constexpr u8 chunk_size = 8;
 #endif
 
 #ifdef SSE
-        chunk_size = 4;
+        constexpr u8 chunk_size = 4;
 #endif
 
+#endif
         const u32 rem = x % chunk_size;
-        if (rem) x += (-rem) + chunk_size;
+        if (rem) x += chunk_size - rem;
         return x;
     }
 
@@ -187,7 +186,11 @@ public:
         for (u32 i = 0; i < m_size; i++) m_ptr[i] = generator(seed);
     }
 
-    tensor tensor_pad(const u32 dy_top, const u32 dy_bottom, const u32 dx_left, const u32 dx_right, const u8 pad_type) const {
+    tensor tensor_pad(const u32 dy_top,
+                      const u32 dy_bottom,
+                      const u32 dx_left,
+                      const u32 dx_right,
+                      const u8 pad_type) const {
         tensor tns(m_rows + dy_top + dy_bottom, m_cols + dx_left + dx_right, m_channels);
         tns.fill(0);
 

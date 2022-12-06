@@ -12,7 +12,8 @@ struct n_move_solver {
 
         constexpr eval_result() : m_winning{}, m_losing{}, m_depth_until_over{} {}
 
-        constexpr eval_result(bool winning, bool losing, i8 depth = 0) : m_winning{winning}, m_losing{losing}, m_depth_until_over{depth} {}
+        constexpr eval_result(bool winning, bool losing, i8 depth = 0) : m_winning{winning}, m_losing{losing},
+                                                                         m_depth_until_over{depth} {}
 
         constexpr eval_result incremented() const {
             if (m_winning | m_losing) {
@@ -38,7 +39,7 @@ struct n_move_solver {
             return other > *this;
         }
 
-        constexpr operator const char*() const {
+        constexpr operator const char *() const {
             if (m_winning)
                 return "WINNING";
             if (m_losing)
@@ -46,6 +47,7 @@ struct n_move_solver {
             return "NEUTRAL";
         }
     };
+
     static_assert(sizeof(eval_result) == 1);
 
     static constexpr eval_result WINNING_MOVE{true, false};
@@ -55,7 +57,7 @@ struct n_move_solver {
     i32 m_depth = 5;
 
 
-    [[nodiscard]] eval_result evaluate_board(gya::board const& board, i32 remaining_moves = -1) const {
+    [[nodiscard]] eval_result evaluate_board(gya::board const &board, i32 remaining_moves = -1) const {
         if (remaining_moves == -1) remaining_moves = m_depth;
 
         if (board.has_won().player_1_won()) {
@@ -79,12 +81,14 @@ struct n_move_solver {
         }
     }
 
-    [[nodiscard]] u8 operator()(gya::board const& board) const {
+    [[nodiscard]] u8 operator()(gya::board const &board) const {
         u8 best_move = -1;
         eval_result best_eval = LOSING_MOVE;
         auto actions = board.get_actions();
         // put indices closer to the middle first
-        std::sort(std::begin(actions), std::end(actions), [] (u8 lhs, u8 rhs) { return std::abs(lhs - gya::BOARD_WIDTH / 2) < std::abs(rhs - gya::BOARD_WIDTH / 2); });
+        std::sort(std::begin(actions), std::end(actions), [](u8 lhs, u8 rhs) {
+            return std::abs(lhs - gya::BOARD_WIDTH / 2) < std::abs(rhs - gya::BOARD_WIDTH / 2);
+        });
 
         if (!MULTI_THREAD || m_depth < 5) {
             for (u8 move: actions) {
@@ -98,10 +102,11 @@ struct n_move_solver {
             lmj::static_vector<std::future<void>, 7> futures;
             for (u8 move: actions) {
                 futures.emplace_back(std::async(std::launch::async,
-                    [&, move] {
-                        evaluations[move] = evaluate_board(board.play_copy(move)).incremented();
-                        used[move] = true;
-                    }
+                                                [&, move] {
+                                                    evaluations[move] = evaluate_board(
+                                                            board.play_copy(move)).incremented();
+                                                    used[move] = true;
+                                                }
                 ));
             }
             for (auto &&i: futures) i.get();

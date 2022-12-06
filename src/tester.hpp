@@ -1,6 +1,5 @@
 #pragma once
 
-#include <chrono>
 #include "board.hpp"
 #include "defines.hpp"
 

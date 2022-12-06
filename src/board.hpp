@@ -1,6 +1,6 @@
 #pragma once
 
-#include "precomp_header.hpp"
+#include "../lib/lmj/src/include_all.hpp"
 #include "defines.hpp"
 
 namespace gya {
@@ -191,6 +191,10 @@ struct board {
         } else {
             return game_result::GAME_NOT_OVER;
         }
+    }
+
+    [[nodiscard]] constexpr gya::game_result is_winning_move(u8 column) const {
+        return is_winning_move(column, turn());
     }
 
     [[nodiscard]] lmj::static_vector<u8, BOARD_WIDTH> get_actions() const {

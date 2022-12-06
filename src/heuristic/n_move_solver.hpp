@@ -8,7 +8,7 @@ struct n_move_solver {
     struct eval_result {
         bool m_winning: 1;
         bool m_losing: 1;
-        i8 m_depth_until_over: 6 = 0; 
+        i8 m_depth_until_over: 6 = 0;
 
         constexpr eval_result() : m_winning{}, m_losing{}, m_depth_until_over{} {}
 
@@ -38,10 +38,10 @@ struct n_move_solver {
             return other > *this;
         }
 
-        operator const char*() const {
+        constexpr operator const char*() const {
             if (m_winning)
                 return "WINNING";
-            if (m_losing) 
+            if (m_losing)
                 return "LOSING";
             return "NEUTRAL";
         }
@@ -70,8 +70,10 @@ struct n_move_solver {
             eval_result best_eval = LOSING_MOVE;
             for (u8 move: board.get_actions()) {
                 eval_result eval = evaluate_board(board.play_copy(move), remaining_moves - 1).incremented();
-                if (eval > best_eval) 
+                if (eval > best_eval)
                     best_eval = eval;
+                if (eval.m_depth_until_over == 1)
+                    break;
             }
             return best_eval;
         }
@@ -80,30 +82,33 @@ struct n_move_solver {
     [[nodiscard]] u8 operator()(gya::board const& board) const {
         u8 best_move = -1;
         eval_result best_eval = LOSING_MOVE;
+        auto actions = board.get_actions();
+        // put indices closer to the middle first
+        std::sort(std::begin(actions), std::end(actions), [] (u8 lhs, u8 rhs) { return std::abs(lhs - gya::BOARD_WIDTH / 2) < std::abs(rhs - gya::BOARD_WIDTH / 2); });
+
         if (!MULTI_THREAD || m_depth < 5) {
-            for (u8 move: board.get_actions()) {
+            for (u8 move: actions) {
                 const auto eval = evaluate_board(board.play_copy(move)).incremented();
                 if (best_move == static_cast<u8>(-1) || eval > best_eval)
                     best_move = move, best_eval = eval;
             }
         } else {
             std::array<bool, 7> used{};
-            std::array<std::pair<eval_result, u8>, 7> moves{};
-            std::vector<std::future<void>> futures;
-            auto actions = board.get_actions();
+            std::array<eval_result, 7> evaluations{};
+            lmj::static_vector<std::future<void>, 7> futures;
             for (u8 move: actions) {
                 futures.emplace_back(std::async(std::launch::async,
                     [&, move] {
-                        moves[move] = {evaluate_board(board.play_copy(move)).incremented(), move};
+                        evaluations[move] = evaluate_board(board.play_copy(move)).incremented();
                         used[move] = true;
                     }
                 ));
             }
             for (auto &&i: futures) i.get();
-            for (auto [eval, move]: moves) {
+            for (auto move: actions) {
                 if (used[move]) {
-                    if (eval > best_eval) {
-                        best_eval = eval;
+                    if (evaluations[move] > best_eval) {
+                        best_eval = evaluations[move];
                         best_move = move;
                     }
                 }

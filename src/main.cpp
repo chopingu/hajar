@@ -15,6 +15,7 @@
 #include "pinguml/cost.hpp"
 
 int main() {
+    /*
     while (true) {
         gya::board b;
         int turn = 1;
@@ -50,7 +51,8 @@ int main() {
             std::puts("you lost!");
         }
     }
-
+    */
+    
     {
         // tests
         {

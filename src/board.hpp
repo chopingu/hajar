@@ -16,7 +16,7 @@ struct game_result {
 
     constexpr game_result(i8 v) : state{v} {}
 
-    i8 state{};
+    i8 state = GAME_NOT_OVER;
 
     [[nodiscard]] constexpr bool player_1_won() const { return state == PLAYER_ONE_WON; }
 
@@ -26,7 +26,7 @@ struct game_result {
 
     [[nodiscard]] constexpr bool is_tie() const { return state == TIE; }
 
-    constexpr bool operator==(gya::game_result const &other) const = default;
+    [[nodiscard]] constexpr bool operator==(gya::game_result const &other) const = default;
 };
 
 struct board_column {
@@ -52,9 +52,7 @@ struct board_column {
         return data[idx];
     }
 
-    constexpr bool operator==(board_column const &other) const {
-        return height == other.height && data == other.data;
-    }
+    constexpr bool operator==(board_column const &other) = default;
 };
 
 struct board {
@@ -64,14 +62,6 @@ struct board {
     std::array<board_column, BOARD_WIDTH> data{};
     gya::game_result winner{gya::game_result::GAME_NOT_OVER};
     u8 size = 0;
-
-    constexpr board_column &operator[](u64 idx) {
-        return data[idx];
-    }
-
-    constexpr board_column const &operator[](u64 idx) const {
-        return data[idx];
-    }
 
     constexpr i8 &play(u8 column, i8 value) {
         if (size == BOARD_WIDTH * BOARD_HEIGHT)
@@ -422,9 +412,15 @@ struct board {
         return ret;
     }
 
-    constexpr bool operator==(board const &other) const {
-        return size == other.size && winner == other.winner && data == other.data;
+    constexpr board_column &operator[](u64 idx) {
+        return data[idx];
     }
+
+    constexpr board_column const &operator[](u64 idx) const {
+        return data[idx];
+    }
+
+    constexpr bool operator==(board const &other) const = default;
 
     [[nodiscard]] constexpr i8 turn() const {
         return size % 2 ? PLAYER_TWO : PLAYER_ONE;

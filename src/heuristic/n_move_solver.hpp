@@ -57,15 +57,14 @@ struct n_move_solver {
     i32 m_depth = 5;
 
 
-    [[nodiscard]] eval_result evaluate_board(gya::board const &board, i32 remaining_moves = -1) const {
-        if (remaining_moves == -1) remaining_moves = m_depth - 1;
-
-        if (board.has_won().player_1_won()) {
+    [[nodiscard]] constexpr eval_result evaluate_board(gya::board const &board, i32 remaining_moves = -1) const {
+        if (remaining_moves == -1)
+            remaining_moves = m_depth - 1;
+        if (board.has_won().player_1_won())
             return board.turn() == gya::board::PLAYER_ONE ? WINNING_MOVE : LOSING_MOVE;
-        }
-        if (board.has_won().player_2_won()) {
+        if (board.has_won().player_2_won())
             return board.turn() == gya::board::PLAYER_TWO ? WINNING_MOVE : LOSING_MOVE;
-        }
+
         if (board.has_won().is_tie() || remaining_moves == 0) {
             return NEUTRAL_MOVE;
         } else {
@@ -81,7 +80,7 @@ struct n_move_solver {
         }
     }
 
-    [[nodiscard]] u8 operator()(gya::board const &board) const {
+    [[nodiscard]] constexpr u8 operator()(gya::board const &board) const {
         u8 best_move = -1;
         eval_result best_eval = LOSING_MOVE;
         auto actions = board.get_actions();
@@ -90,7 +89,7 @@ struct n_move_solver {
             return std::abs(lhs - gya::BOARD_WIDTH / 2) < std::abs(rhs - gya::BOARD_WIDTH / 2);
         });
 
-        if (!MULTI_THREAD || m_depth < 5) {
+        if (!MULTI_THREAD || m_depth < 5 || std::is_constant_evaluated()) {
             for (u8 move: actions) {
                 const auto eval = evaluate_board(board.play_copy(move)).incremented();
                 if (best_move == static_cast<u8>(-1) || eval > best_eval)

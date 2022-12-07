@@ -42,8 +42,6 @@ int main() {
         }
         lmj::print(b.to_string());
         lmj::print((std::string) s.evaluate_board(b));
-        lmj::print(b.has_won().player_1_won());
-        lmj::print(b.has_won().player_2_won());
 
         if (b.has_won().is_tie()) {
             std::puts("tie!");

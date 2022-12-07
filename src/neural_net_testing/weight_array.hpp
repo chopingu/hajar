@@ -11,6 +11,7 @@ class weight_array {
         G *m_data;
         usize m_subarray_len;
 
+        // private to disallow creating a matrix_ref outside of weight_array
         constexpr matrix_ref(G *data, usize subarray_len) : m_data{data}, m_subarray_len{subarray_len} {}
 
     public:
@@ -70,5 +71,13 @@ public:
 
     constexpr auto fill(T const &value) {
         m_data.fill(value);
+    }
+
+    constexpr auto data() {
+        return m_data.data();
+    }
+
+    constexpr auto data() const {
+        return m_data.data();
     }
 };

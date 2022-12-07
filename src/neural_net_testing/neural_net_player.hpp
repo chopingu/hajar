@@ -59,10 +59,10 @@ struct neural_net_player {
         if (std::all_of(b.data.begin(), b.data.end(), [](auto &x) { return x.height == 6; }))
             throw std::runtime_error("board is full");
 
-        std::array<f32, 42> input{};
-        for (usize i = 0; i < 6; ++i) {
-            for (usize j = 0; j < 7; ++j) {
-                input[i * 7 + j] = b.data[i][j] * b.turn();
+        std::array<f32, gya::BOARD_WIDTH * gya::BOARD_HEIGHT> input{};
+        for (usize i = 0; i < gya::BOARD_HEIGHT; ++i) {
+            for (usize j = 0; j < gya::BOARD_WIDTH; ++j) {
+                input[i * gya::BOARD_WIDTH + j] = b.data[i][j] * b.turn();
             }
         }
         const auto net_output = m_net.evaluate_const(input);

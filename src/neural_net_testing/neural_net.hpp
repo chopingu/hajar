@@ -22,6 +22,9 @@ struct neural_net {
     optional_layer_array<USE_BACKPROP && !LABELED_DATA, T, sizes...> m_bias_derivatives_loss;
     optional_weight_array<USE_BACKPROP && !LABELED_DATA, T, sizes...> m_weight_derivatives_loss;
 
+    // for passing around derivatives
+    using derivative_pair_t = std::pair<weight_array<T, sizes...>, layer_array<T, sizes...>>;
+
     F1 m_activation_function;
     F2 m_activation_derivative;
 
@@ -65,7 +68,7 @@ struct neural_net {
         return sum;
     }
 
-    auto compute_derivatives_unlabeled(std::span<T> choice) {
+    [[deprecated]] auto compute_derivatives_unlabeled(std::span<T> choice) {
         static_assert(USE_BACKPROP);
         static_assert(!LABELED_DATA);
         thread_local layer_array<T, sizes...> local_bias_derivatives_win;
@@ -122,7 +125,7 @@ struct neural_net {
             m_weight_derivatives_loss.m_weight_array.m_data[i] += local_weight_derivatives_loss.m_data[i];
     }
 
-    void compute_derivatives_based_on_result(bool won) {
+    [[deprecated]] void compute_derivatives_based_on_result(bool won) {
         static_assert(USE_BACKPROP);
         static_assert(!LABELED_DATA);
         auto &weights_derivatives = won ? m_weight_derivatives_win : m_weight_derivatives_loss;
@@ -143,7 +146,7 @@ struct neural_net {
         m_bias_derivatives_loss.fill(0);
     }
 
-    auto compute_derivatives_labeled_impl(std::span<T> correct_output) {
+    [[deprecated]] auto compute_derivatives_labeled_impl(std::span<T> correct_output) {
         static_assert(USE_BACKPROP);
         static_assert(LABELED_DATA);
         std::span output{m_values.back()};
@@ -173,7 +176,7 @@ struct neural_net {
         }
     }
 
-    auto compute_derivatives_labeled(std::span<T> correct_output) {
+    [[deprecated]] auto compute_derivatives_labeled(std::span<T> correct_output) {
         compute_derivatives_labeled_impl(correct_output);
         for (usize i = 0; i < m_bias_derivatives_acc.data.size(); ++i)
             m_bias_derivatives_acc.data[i] += m_weight_derivatives_win.data[i];
@@ -181,7 +184,7 @@ struct neural_net {
             m_weight_derivatives_acc.data[i] += m_weight_derivatives_win.data[i];
     }
 
-    auto apply_derivatives(T learning_rate = 0.01) {
+    [[deprecated]] auto apply_derivatives(T learning_rate = 0.01) {
         static_assert(USE_BACKPROP);
         const usize num_layers = size();
         for (usize layer = num_layers; layer-- > 0;) {
@@ -198,7 +201,7 @@ struct neural_net {
         clear_derivatives();
     }
 
-    auto train(std::span<T> input, std::span<T> correct_output, T learning_rate = 0.01) {
+    [[deprecated]] auto train(std::span<T> input, std::span<T> correct_output, T learning_rate = 0.01) {
         static_assert(USE_BACKPROP);
         static_assert(LABELED_DATA);
         evaluate(input);
@@ -206,7 +209,7 @@ struct neural_net {
         apply_derivatives(learning_rate);
     }
 
-    [[nodiscard]] std::span<T> evaluate_impl(std::span<T> input, layer_array<T, sizes...> &values) const {
+    [[nodiscard]] std::span<T> forward_propagate(std::span<T> input, layer_array<T, sizes...> &values) const {
         std::span<T> input_layer{values.front()}, output_layer{values.back()};
         std::copy(input.begin(), input.end(), input_layer.begin());
         for (usize layer = 1; layer < values.size(); ++layer) {
@@ -221,13 +224,61 @@ struct neural_net {
         return output_layer;
     }
 
-    std::span<T> evaluate(std::span<T> inp) {
-        return evaluate_impl(inp, m_values);
+    [[nodiscard]] constexpr derivative_pair_t
+    backward_propagate(layer_array<T, sizes...> const &node_values,
+                       std::span<T> correct_output,
+                       bool post_activation_variables) const {
+        // result variables
+        weight_array<T, sizes...> weight_derivatives{};
+        layer_array<T, sizes...> bias_derivatives{};
+
+        const std::span output{node_values.back()};
+        const usize num_layers = size();
+        
+        // process last layer
+        for (usize node = 0; node < output.size(); ++node) {
+            bias_derivatives.back()[node] = m_activation_derivative(output[node]) * (output[node] - correct_output[node]);
+        }
+
+        // process all layers between last and first layer (exclusive)
+        for (usize layer = num_layers - 2; layer > 0; --layer) {
+            for (usize node = 0; node < node_values[layer].size(); ++node) {
+                T sum = 0;
+                for (usize next_node = 0; next_node < node_values[layer + 1].size(); ++next_node) {
+                    const T weight_derivative = node_values[layer][node] * bias_derivatives[layer + 1][next_node];
+                    sum += weight_derivative;
+                    weight_derivatives[layer][node][next_node] = weight_derivative;
+                }
+                const T bias_derivative = m_activation_derivative(node_values[layer][node]) * sum;
+                bias_derivative[layer][node] = bias_derivative;
+            }
+        }
+
+        // process first layer
+        for (usize node = 0; node < node_values[0].size(); ++node) {
+            for (usize next_node = 0; next_node < node_values[1].size(); ++next_node) {
+                const T weight_derivative = node_values[0][node] * bias_derivatives[1][next_node];
+                weight_derivatives[0][node][next_node] = weight_derivative;
+            }
+        }
+
+        return {weight_derivatives, bias_derivatives};
+    }
+
+    void apply_derivatives(derivative_pair_t const& derivatives, T learning_rate) {
+        auto &[weight_derivatives, bias_derivatives] = derivatives;
+        for (usize i = 0; i < weight_derivatives.size(); ++i) {
+            m_weights.data()[i] += weight_derivatives.data()[i];
+        }
+    }
+
+    [[nodiscard]] std::span<T> evaluate(std::span<T> inp) {
+        return forward_propagate(inp, m_values);
     }
 
     [[nodiscard]] std::array<T, util::get_last(sizes...)> evaluate_const(std::span<T> inp) const {
         layer_array<T, sizes...> values;
-        std::span<T> output = evaluate_impl(inp, values);
+        std::span<T> output = forward_propagate(inp, values);
         std::array<T, util::get_last(sizes...)> out_arr{};
         std::copy(output.begin(), output.end(), out_arr.begin());
         return out_arr;

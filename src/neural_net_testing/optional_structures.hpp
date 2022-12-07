@@ -58,6 +58,14 @@ public:
         static_assert(used);
         m_layer_array.fill(value);
     }
+    
+    constexpr auto data() {
+        return m_layer_array.data();
+    }
+
+    constexpr auto data() const {
+        return m_layer_array.data();
+    }
 };
 
 template<bool used, class T, usize... sizes>

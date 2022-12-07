@@ -6,7 +6,7 @@
 
 namespace gya {
 
-template<class F1 = decltype(fast_activation_function), class F2 = decltype(fast_activation_derivative)>
+template<class F1 = decltype(tanh_activation_function), class F2 = decltype(tanh_activation_derivative)>
 struct neural_net_player_deep {
     using neural_net_params_t = neural_net_params<f32, F1, F2, 42, 128, 128, 7>;
     using neural_net_t = typename neural_net_params_t::neural_net_t;
@@ -48,26 +48,27 @@ struct neural_net_player_deep {
 
         const f32 last_tdiff = learning_rate * (reward - last_outp.back()[last_move]);
 
-        std::array<f32, 7> correct = last_outp.back();
-        correct[last_move] += last_tdiff;
+        std::array<f32, gya::BOARD_WIDTH> correct_last_output = last_outp.back();
+        correct_last_output[last_move] += last_tdiff;
 
-        m_net.m_values = last_outp;
+        m_net.apply_derivatives(m_net.backpropagate(correct_last_output));
 
         for (usize i = m_prev_states.size() - 1; i-- > 0;) {
-            std::array<f32, 7> outp = m_prev_states[i].first.back();
-            u8 chosen = m_prev_states[i].second;
+            const std::span output = m_prev_states[i].first.back();
+            const u8 move = m_prev_states[i].second;
+            std::array<f32, gya::BOARD_WIDTH> correct_output = output;
 
         }
     }
 
     [[nodiscard]] u8 operator()(gya::board const &b) {
-        if (std::all_of(b.data.begin(), b.data.end(), [](auto &x) { return x.height == 6; }))
+        if (std::all_of(b.data.begin(), b.data.end(), [](auto &x) { return x.height == gya::BOARD_HEIGHT; }))
             throw std::runtime_error("board is full");
 
-        std::array<f32, 42> input{};
-        for (usize i = 0; i < 6; ++i) {
-            for (usize j = 0; j < 7; ++j) {
-                input[7 * i + j] = static_cast<f32>(b[i][j] * b.turn());
+        std::array<f32, gya::BOARD_WIDTH * gya::BOARD_HEIGHT> input{};
+        for (usize i = 0; i < gya::BOARD_HEIGHT; ++i) {
+            for (usize j = 0; j < gya::BOARD_WIDTH; ++j) {
+                input[gya::BOARD_WIDTH * i + j] = static_cast<f32>(b[i][j] * b.turn());
             }
         }
 
@@ -75,11 +76,11 @@ struct neural_net_player_deep {
 
         u8 ans = 0;
         f32 ans_val = -1e9;
-        for (u8 i = 0; i < 7; ++i) {
-            if (b[i].height >= 6)
+        for (u8 i = 0; i < gya::BOARD_WIDTH; ++i) {
+            if (b[i].height == gya::BOARD_HEIGHT)
                 continue;
-            f32 val = net_output[7 * i + b[i].height];
-            if (val > ans_val || b[ans].height == 6) {
+            f32 val = net_output[gya::BOARD_WIDTH * i + b[i].height];
+            if (val > ans_val || b[ans].height == gya::BOARD_HEIGHT) {
                 ans = i;
                 ans_val = val;
             }

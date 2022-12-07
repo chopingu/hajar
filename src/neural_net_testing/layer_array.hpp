@@ -49,4 +49,12 @@ public:
     constexpr auto fill(T const &value) {
         m_data.fill(value);
     }
+
+    constexpr auto data() {
+        return m_data.data();
+    }
+
+    constexpr auto data() const {
+        return m_data.data();
+    }
 };

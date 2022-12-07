@@ -217,8 +217,8 @@ struct board {
         X
         X
          */
-        for (int i = 0; i < BOARD_WIDTH; ++i) {
-            for (int j = 0; j + 3 < BOARD_HEIGHT; ++j) {
+        for (usize i = 0; i < BOARD_WIDTH; ++i) {
+            for (usize j = 0; j + 3 < BOARD_HEIGHT; ++j) {
                 if (data[i][j] == 0)
                     continue;
                 if (data[i][j] == data[i][j + 1] &&
@@ -233,8 +233,8 @@ struct board {
         /*
         X X X X
          */
-        for (int i = 0; i + 3 < BOARD_WIDTH; ++i) {
-            for (int j = 0; j < BOARD_HEIGHT; ++j) {
+        for (usize i = 0; i + 3 < BOARD_WIDTH; ++i) {
+            for (usize j = 0; j < BOARD_HEIGHT; ++j) {
                 if (data[i][j] == 0)
                     continue;
                 if (data[i][j] == data[i + 1][j] &&
@@ -251,8 +251,8 @@ struct board {
           X
          X
         */
-        for (int i = 0; i + 3 < BOARD_WIDTH; ++i) {
-            for (int j = 0; j + 3 < BOARD_HEIGHT; ++j) {
+        for (usize i = 0; i + 3 < BOARD_WIDTH; ++i) {
+            for (usize j = 0; j + 3 < BOARD_HEIGHT; ++j) {
                 if (data[i][j] == 0)
                     continue;
                 if (data[i][j] == data[i + 1][j + 1] &&
@@ -269,8 +269,8 @@ struct board {
            X
             X
         */
-        for (int i = 0; i + 3 < BOARD_WIDTH; ++i) {
-            for (int j = 0; j + 3 < BOARD_HEIGHT; ++j) {
+        for (usize i = 0; i + 3 < BOARD_WIDTH; ++i) {
+            for (usize j = 0; j + 3 < BOARD_HEIGHT; ++j) {
                 if (data[i][j + 3] == 0)
                     continue;
                 if (data[i][j + 3] == data[i + 1][j + 2] &&
@@ -295,8 +295,8 @@ struct board {
 
     [[nodiscard]] constexpr u32 n_vertical_count(u8 n, i8 player) const {
         u32 n_in_a_rows = 0;
-        for (int i = 0; i < BOARD_WIDTH; i++) {
-            for (int j = 0; j + n - 1 < BOARD_HEIGHT; j++) {
+        for (usize i = 0; i < BOARD_WIDTH; i++) {
+            for (usize j = 0; j + n - 1 < BOARD_HEIGHT; j++) {
                 u8 counter = 0;
                 if (data[i][j] != player)
                     continue;
@@ -313,8 +313,8 @@ struct board {
 
     [[nodiscard]] constexpr u32 n_horizontal_count(u8 n, i8 player) const {
         u32 n_in_a_rows = 0;
-        for (int i = 0; i + n - 1 < BOARD_WIDTH; i++) {
-            for (int j = 0; j < BOARD_HEIGHT; j++) {
+        for (usize i = 0; i + n - 1 < BOARD_WIDTH; i++) {
+            for (usize j = 0; j < BOARD_HEIGHT; j++) {
                 u8 counter = 0;
                 if (data[i][j] != player)
                     continue;
@@ -331,8 +331,8 @@ struct board {
 
     [[nodiscard]] constexpr u32 n_top_right_diagonal_count(u8 n, i8 player) const {
         u32 n_in_a_rows = 0;
-        for (int i = 0; i + n - 1 < BOARD_WIDTH; i++) {
-            for (int j = 0; j + n - 1 < BOARD_HEIGHT; j++) {
+        for (usize i = 0; i + n - 1 < BOARD_WIDTH; i++) {
+            for (usize j = 0; j + n - 1 < BOARD_HEIGHT; j++) {
                 u8 counter = 0;
                 if (data[i][j] != player)
                     continue;
@@ -349,8 +349,8 @@ struct board {
 
     [[nodiscard]] constexpr u32 n_top_left_diagonal_count(u8 n, i8 player) const {
         u32 n_in_a_rows = 0;
-        for (int i = 0; i + n - 1 < BOARD_WIDTH; i++) {
-            for (int j = 0; j + n - 1 < BOARD_HEIGHT; j++) {
+        for (usize i = 0; i + n - 1 < BOARD_WIDTH; i++) {
+            for (usize j = 0; j + n - 1 < BOARD_HEIGHT; j++) {
                 u8 counter = 0;
                 if (data[i][j + n - 1] != player)
                     continue;
@@ -381,8 +381,8 @@ struct board {
 
         board b;
 
-        for (int row = BOARD_HEIGHT; row-- > 0;) {
-            for (int col = 0; col < BOARD_WIDTH; ++col) {
+        for (usize row = BOARD_HEIGHT; row-- > 0;) {
+            for (usize col = 0; col < BOARD_WIDTH; ++col) {
                 const auto curr = std::tolower(str[row * 16 + col * 2 + 1]);
                 if (curr == 'x') {
                     b.play(col, PLAYER_ONE);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../include.hpp"
+#include "../../include.hpp"
 
 namespace pinguml {
 
@@ -16,25 +16,19 @@ private:
         m_memory = nullptr;
     }
 
-#ifdef AVX
-
+#if defined(AVX)
     f32 *_new(const u32 sz) {
         m_memory = new f32[sz + 31];
         m_ptr = (f32 *) (((std::uintptr_t) m_memory + 32) & ~(std::uintptr_t) 0x1F);
         return m_ptr;
     }
-
-#endif
-
-#ifdef SSE
+#elif (SSE)
     f32 *_new(const u32 sz) { 
         m_memory = new f32[sz + 15];
         m_ptr = (f32 *)(((std::uintptr_t)m_memory + 16) & ~(std::uintptr_t)0x0F);
         return m_ptr;
     }
-#endif
-
-#ifdef NORMAL
+#elif defined(NORMAL)
     f32 *_new(const u32 sz) { 
         m_memory = new f32[sz];
         m_ptr = (f32 *)((std::uintptr_t)m_memory);
@@ -51,19 +45,12 @@ public:
 
     u32 channel_stride(const u32 h, const u32 w) {
         u32 x = h * w;
-
-#ifdef NORMAL
+#if defined(NORMAL)
         return x;
-#else
-
-#ifdef AVX
+#elif defined(AVX)
         constexpr u8 chunk_size = 8;
-#endif
-
-#ifdef SSE
+#elif (SSE)
         constexpr u8 chunk_size = 4;
-#endif
-
 #endif
         const u32 rem = x % chunk_size;
         if (rem) x += chunk_size - rem;
@@ -141,33 +128,6 @@ public:
                             &m_ptr[i * m_channel_stride + j * m_cols], m_cols * sizeof(f32));
 
         return tns;
-    }
-
-    f32 average_decrease() {
-        const u32 area = m_rows * m_cols;
-        f32 average = 0;
-        for (u32 i = 0; i < m_channels; i++) {
-            const u32 channel_id = i * m_channel_stride;
-            for (u32 j = channel_id; j < channel_id + area; j++)
-                average += m_ptr[j];
-        }
-        average /= f32(area * m_channels);
-
-        for (u32 i = 0; i < m_size; i++) m_ptr[i] -= average; // add SIMD
-        return average;
-    }
-
-    f32 average_decrease(const u32 channel) {
-        const u32 area = m_rows * m_cols;
-        const u32 channel_id = channel * m_channel_stride;
-
-        f32 average = 0;
-        for (u32 i = channel_id; i < channel_id + area; i++) average += m_ptr[i]; // add SIMD
-
-        average /= f32(area);
-        for (u32 i = channel_id; i < channel_id + area; i++) m_ptr[i] -= average; // add SIMD
-
-        return average;
     }
 
     void fill(const f32 value) { // add SIMD

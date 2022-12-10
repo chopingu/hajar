@@ -10,9 +10,15 @@
 #include "heuristic/solver_variations/A.hpp"
 #include "heuristic/solver_variations/Abias.hpp"
 
-#include "pinguml/tensor.hpp"
-#include "pinguml/activation.hpp"
-#include "pinguml/cost.hpp"
+#include "pinguml/utils/tensor.hpp"
+#include "pinguml/utils/activation.hpp"
+#include "pinguml/utils/cost.hpp"
+#include "pinguml/utils/math.hpp"
+#include "pinguml/layer/layer_base.hpp"
+#include "pinguml/layer/input_layer.hpp"
+#include "pinguml/layer/fully_connected_layer.hpp"
+#include "pinguml/layer/create_layer.hpp"
+//#include "pinguml/neural_network.hpp"
 
 int main() {
     while (true) {

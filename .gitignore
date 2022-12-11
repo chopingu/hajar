@@ -1,6 +1,7 @@
-\cmake-build-*
-\.idea
-\.vscode
+cmake-build-*/
+.idea/
+.vscode/
+.PVS-Studio/
 
 *.exe
 *.o

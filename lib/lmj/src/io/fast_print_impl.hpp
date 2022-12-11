@@ -36,7 +36,7 @@ inline auto print_impl(FILE *fptr, signed_integral auto x) {
         std::fputc(x, fptr);
     } else {
         if constexpr (sizeof(x) <= 8) {
-            std::fprintf(fptr, PRId64, static_cast<uint64_t>(x));
+            std::fprintf(fptr, "%" PRId64, static_cast<uint64_t>(x));
             return;
         }
         if (x < 0) {

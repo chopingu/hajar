@@ -68,7 +68,7 @@ public:
     }
 
     hash_table &operator=(hash_table &&other) noexcept {
-        if (this == &other || m_table == other.m_table || m_is_set == other.m_is_set)
+        if ((this == &other) | (m_table == other.m_table) | (m_is_set == other.m_is_set))
             return *this;
         delete[] m_table;
         delete[] m_is_set;
@@ -88,7 +88,7 @@ public:
     }
 
     hash_table &operator=(hash_table const &other) {
-        if (this == &other || m_table == other.m_table || m_is_set == other.m_is_set)
+        if ((this == &other) | (m_table == other.m_table) | (m_is_set == other.m_is_set))
             return *this;
         _alloc_size(other.m_capacity);
         for (size_type i = 0; i < other.m_capacity; ++i) {
@@ -252,7 +252,7 @@ public:
     }
 
     /**
-     * @return _table_capacity of table
+     * @return capacity of table
      */
     [[nodiscard]] size_type capacity() const {
         return m_capacity;
@@ -354,7 +354,10 @@ private:
     }
 
     [[nodiscard]] size_type _new_idx(size_type const idx) const {
-        return _clamp_size(idx + 1);
+        if (idx + 1 < m_capacity)
+            return idx + 1;
+        else
+            return 0;
     }
 
     [[nodiscard]] size_type _get_index_read(key_type const &key) const {

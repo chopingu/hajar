@@ -14,10 +14,10 @@ struct hash {
     }
 };
 
-template<class key_t, class value_t, std::size_t _table_capacity, class hash_t>
+template<class key_t, class value_t, std::size_t _capacity, class hash_t>
 class static_hash_table_iterator;
 
-template<class key_t, class value_t, std::size_t _table_capacity, class hash_t>
+template<class key_t, class value_t, std::size_t _capacity, class hash_t>
 class static_hash_table_const_iterator;
 
 template<class key_type, class value_type, std::size_t _capacity, class hash_type = lmj::hash<key_type>>
@@ -28,7 +28,7 @@ class static_hash_table {
         TOMBSTONE = 2,
     };
 public:
-    static_assert(_capacity && "a _table_capacity of zero is not allowed");
+    static_assert(_capacity && "a table with a capacity of zero is not allowed");
     using pair_type = std::pair<key_type, value_type>;
     using size_type = decltype(detail::needed_uint<_capacity>());
     using bool_type = std::uint8_t;
@@ -191,7 +191,7 @@ public:
     }
 
     /**
-     * @return _table_capacity of table
+     * @return capacity of table
      */
     [[nodiscard]] constexpr size_type capacity() const {
         return _capacity;
@@ -264,7 +264,10 @@ private:
     }
 
     [[nodiscard]] constexpr size_type _new_idx(size_type const idx) const {
-        return _clamp_size(idx + 1);
+        if (idx < _capacity - 1)
+            return idx + 1;
+        else
+            return 0;
     }
 
     [[nodiscard]] constexpr size_type _get_index_read(key_type const &key) const {
@@ -302,7 +305,7 @@ private:
     }
 };
 
-template<class key_t, class value_t, std::size_t _table_capacity, class hash_t>
+template<class key_t, class value_t, std::size_t _capacity, class hash_t>
 class static_hash_table_iterator {
     enum active_enum {
         INACTIVE = 0,
@@ -319,10 +322,10 @@ public:
     using pointer = pair_type *;
     using reference = pair_type &;
 
-    static_hash_table<key_t, value_t, _table_capacity, hash_t> *const m_table_ptr;
+    static_hash_table<key_t, value_t, _capacity, hash_t> *const m_table_ptr;
     size_type m_index;
 
-    constexpr static_hash_table_iterator(static_hash_table<key_t, value_t, _table_capacity, hash_t> *ptr,
+    constexpr static_hash_table_iterator(static_hash_table<key_t, value_t, _capacity, hash_t> *ptr,
                                          size_type idx) : m_table_ptr{ptr}, m_index{idx} {}
 
     constexpr auto &operator++() {
@@ -356,7 +359,7 @@ public:
     }
 };
 
-template<class key_t, class value_t, std::size_t _table_capacity, class hash_t>
+template<class key_t, class value_t, std::size_t _capacity, class hash_t>
 class static_hash_table_const_iterator {
     enum active_enum {
         INACTIVE = 0,
@@ -373,11 +376,11 @@ public:
     using pointer = pair_type const *;
     using reference = pair_type const &;
 
-    static_hash_table<key_t, value_t, _table_capacity, hash_t> const *const m_table_ptr;
+    static_hash_table<key_t, value_t, _capacity, hash_t> const *const m_table_ptr;
     size_type m_index;
 
     constexpr static_hash_table_const_iterator(
-            static_hash_table<key_t, value_t, _table_capacity, hash_t> const *ptr,
+            static_hash_table<key_t, value_t, _capacity, hash_t> const *ptr,
             size_type idx) : m_table_ptr{ptr}, m_index{idx} {}
 
     constexpr auto &operator++() {

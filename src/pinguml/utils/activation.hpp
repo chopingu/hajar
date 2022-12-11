@@ -191,16 +191,18 @@ public:
     }
 };
 
-activation_base *create_activation(const std::string name) {
-    if(name == "null") return new null();
-    else if(name == "identity") return new identity();
-    else if(name == "tanh") return new tanh();
-    else if(name == "elu") return new elu();
-    else if(name == "relu") return new relu();
-    else if(name == "lrelu") return new lrelu();
-    else if(name == "vlrelu") return new vlrelu();
-    else if(name == "sigmoid") return new sigmoid();
-    else throw std::runtime_error("invalid activation-function '" + name + "'");
+activation_base *create_activation(const std::string type) {
+    if(type == "null") return new null();
+    else if(type == "identity") return new identity();
+    else if(type == "tanh") return new tanh();
+    else if(type == "elu") return new elu();
+    else if(type == "relu") return new relu();
+    else if(type == "lrelu") return new lrelu();
+    else if(type == "vlrelu") return new vlrelu();
+    else if(type == "sigmoid") return new sigmoid();
+    else throw std::runtime_error("invalid activation-function '" + type + "'");
+
+    return nullptr;
 }
 
-} // namespace pinguml
+} // typespace pinguml

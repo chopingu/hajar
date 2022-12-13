@@ -234,10 +234,11 @@ struct neural_net {
 
         const std::span output{node_values.back()};
         const usize num_layers = size();
-        
+
         // process last layer
         for (usize node = 0; node < output.size(); ++node) {
-            bias_derivatives.back()[node] = m_activation_derivative(output[node]) * (output[node] - correct_output[node]);
+            bias_derivatives.back()[node] =
+                    m_activation_derivative(output[node]) * (output[node] - correct_output[node]);
         }
 
         // process all layers between last and first layer (exclusive)
@@ -265,7 +266,7 @@ struct neural_net {
         return {weight_derivatives, bias_derivatives};
     }
 
-    void apply_derivatives(derivative_pair_t const& derivatives, T learning_rate) {
+    void apply_derivatives(derivative_pair_t const &derivatives, T learning_rate) {
         auto &[weight_derivatives, bias_derivatives] = derivatives;
         for (usize i = 0; i < weight_derivatives.size(); ++i) {
             m_weights.data()[i] += weight_derivatives.data()[i];

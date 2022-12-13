@@ -7,7 +7,7 @@ namespace lmj {
 using namespace std::chrono;
 
 struct timer {
-    time_point <high_resolution_clock> start_time = high_resolution_clock::now();
+    time_point<high_resolution_clock> start_time = high_resolution_clock::now();
 
     bool print = true;
 

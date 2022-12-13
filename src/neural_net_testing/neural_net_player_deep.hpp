@@ -40,7 +40,7 @@ struct neural_net_player_deep {
         // reward for last state
         f32 reward = won - lost;
 
-        constexpr f32 learning_rate = 0.01f, discount_factor = 0.9;
+        constexpr f32 learning_rate = 0.01f, discount_factor = 0.9f;
 
         // temporal difference for last move
         const auto &last_outp = m_prev_states.back().first;

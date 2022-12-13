@@ -58,7 +58,7 @@ public:
         static_assert(used);
         m_layer_array.fill(value);
     }
-    
+
     constexpr auto data() {
         return m_layer_array.data();
     }

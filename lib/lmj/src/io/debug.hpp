@@ -20,7 +20,7 @@ inline void debug(auto &&x) {
 inline void debug(auto &&x, auto &&...pack) {
     fast_print::print_impl_pretty(stderr, x);
     fast_print::print_impl_pretty(stderr, ' ');
-    print(pack...);
+    debug(pack...);
 }
 
 #else

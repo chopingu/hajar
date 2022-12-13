@@ -16,7 +16,7 @@ constexpr std::size_t compute_hash(char const *s, std::size_t size) { // FNV has
 }
 
 constexpr std::size_t seed_from_str(std::string_view v) {
-    return compute_hash(v.begin(), v.size());
+    return compute_hash(&*v.begin(), v.size());
 }
 
 class constexpr_rand_generator { // based on xorshift random number generator by George Marsaglia

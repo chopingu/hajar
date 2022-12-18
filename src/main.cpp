@@ -7,6 +7,7 @@
 #include "heuristic/one_move_solver.hpp"
 #include "heuristic/two_move_solver.hpp"
 #include "heuristic/n_move_solver.hpp"
+#include "heuristic/transposition_table_solver.hpp"
 #include "heuristic/solver_variations/A.hpp"
 #include "heuristic/solver_variations/Abias.hpp"
 
@@ -27,9 +28,9 @@ int main() {
         std::cout << "solver depth? ";
         int depth;
         std::cin >> depth;
-        heuristic::n_move_solver<true> s{depth};
+        heuristic::transposition_table_solver s{depth};
         while (!b.has_won().is_game_over()) {
-            lmj::print((std::string) s.evaluate_board(b));
+            lmj::print((std::string) s.evaluate_board(b), s.m_ttable.size());
             if (turn ^= 1) {
                 lmj::print(b.to_string());
                 u8 move;
@@ -178,7 +179,7 @@ int main() {
         {
             // test heuristic solvers
             {
-                heuristic::n_move_solver<false> const s{4};
+                heuristic::n_move_solver const s{4};
                 gya::random_player p;
                 constexpr auto NUM_ITERS = 100;
                 constexpr auto NUM_GAMES = NUM_ITERS * 2;
@@ -191,7 +192,7 @@ int main() {
                           << std::endl;
             }
             {
-                heuristic::n_move_solver<false> const s{5}, p{2};
+                heuristic::n_move_solver const s{5}, p{2};
                 constexpr auto NUM_ITERS = 100;
                 constexpr auto NUM_GAMES = NUM_ITERS * 2;
                 int wins = 0;
@@ -203,7 +204,7 @@ int main() {
                           << std::endl;
             }
             {
-                heuristic::n_move_solver<false> const s{4};
+                heuristic::n_move_solver const s{4};
                 heuristic::two_move_solver p;
                 constexpr auto NUM_ITERS = 100;
                 constexpr auto NUM_GAMES = NUM_ITERS * 2;
@@ -278,7 +279,7 @@ int main() {
                 std::cout << "avg: " << time.count() / NUM_GAMES << "us" << std::endl;
             }
             {
-                heuristic::n_move_solver<false> const p1{5}, p2{5};
+                heuristic::n_move_solver const p1{5}, p2{5};
                 constexpr auto NUM_GAMES = 1 << 10;
                 auto const t1 = std::chrono::high_resolution_clock::now();
                 for (usize j = 0; j < NUM_GAMES; ++j)

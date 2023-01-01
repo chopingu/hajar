@@ -5,13 +5,6 @@
 #include "../board.hpp"
 
 namespace gya {
-template<class T, class F1, class F2, usize... sizes>
-struct neural_net_params {
-    using neural_net_t = neural_net<true, false, T, F1, F2, sizes...>;
-    using layer_array_t = layer_array<T, sizes...>;
-    using weight_array_t = weight_array<T, sizes...>;
-};
-
 constexpr static auto fast_activation_function = [](f32 x) {
     return std::clamp(x * 0.2f + 0.5f, 0.0f, 1.0f);
 };
@@ -32,7 +25,14 @@ constexpr static auto tanh_activation_derivative = [](f32 x) {
 
 template<class F1 = decltype(fast_activation_function), class F2 = decltype(fast_activation_derivative)>
 struct neural_net_player {
-    using neural_net_params_t = neural_net_params<f32, F1, F2, 42, 128, 128, 7>;
+    template<class T, class F1_, class F2_, usize... sizes>
+    struct neural_net_params {
+        using neural_net_t = neural_net<false, false, T, F1_, F2_, sizes...>;
+        using layer_array_t = layer_array<T, sizes...>;
+        using weight_array_t = weight_array<T, sizes...>;
+    };
+
+    using neural_net_params_t = neural_net_params<f32, F1, F2, 42, 35, 28, 21, 14, 7>;
     using neural_net_t = typename neural_net_params_t::neural_net_t;
     using layer_array_t = typename neural_net_params_t::layer_array_t;
     using weight_array_t = typename neural_net_params_t::weight_array_t;
@@ -51,7 +51,7 @@ struct neural_net_player {
 
     constexpr neural_net_player(neural_net_player const &other) = default;
 
-    usize size() const {
+    [[nodiscard]] constexpr usize size() const {
         return m_net.m_weights.m_data.size() + m_net.m_biases.m_data.size();
     }
 

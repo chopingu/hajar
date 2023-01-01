@@ -13,14 +13,14 @@ struct neural_net {
     layer_array<T, sizes...> m_biases;
     weight_array<T, sizes...> m_weights;
 
-    optional_layer_array<USE_BACKPROP, T, sizes...> m_bias_derivatives_acc;
-    optional_weight_array<USE_BACKPROP, T, sizes...> m_weight_derivatives_acc;
+    [[no_unique_address]] optional_layer_array<USE_BACKPROP, T, sizes...> m_bias_derivatives_acc;
+    [[no_unique_address]] optional_weight_array<USE_BACKPROP, T, sizes...> m_weight_derivatives_acc;
 
-    optional_layer_array<USE_BACKPROP, T, sizes...> m_bias_derivatives_win;
-    optional_weight_array<USE_BACKPROP, T, sizes...> m_weight_derivatives_win;
+    [[no_unique_address]] optional_layer_array<USE_BACKPROP, T, sizes...> m_bias_derivatives_win;
+    [[no_unique_address]] optional_weight_array<USE_BACKPROP, T, sizes...> m_weight_derivatives_win;
 
-    optional_layer_array<USE_BACKPROP && !LABELED_DATA, T, sizes...> m_bias_derivatives_loss;
-    optional_weight_array<USE_BACKPROP && !LABELED_DATA, T, sizes...> m_weight_derivatives_loss;
+    [[no_unique_address]] optional_layer_array<USE_BACKPROP && !LABELED_DATA, T, sizes...> m_bias_derivatives_loss;
+    [[no_unique_address]] optional_weight_array<USE_BACKPROP && !LABELED_DATA, T, sizes...> m_weight_derivatives_loss;
 
     // for passing around derivatives
     using derivative_pair_t = std::pair<weight_array<T, sizes...>, layer_array<T, sizes...>>;

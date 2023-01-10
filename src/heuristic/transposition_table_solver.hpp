@@ -17,9 +17,8 @@ struct transposition_table_solver {
     }
 
     struct compressed_board_hasher {
-        usize operator()(gya::compressed_board const &b) const noexcept {
-            return hash_bytes(
-                    std::span(reinterpret_cast<const char *>(&b), sizeof(b)));
+        constexpr usize operator()(gya::compressed_board const &b) const noexcept {
+            return hash_bytes(std::span(std::bit_cast<const char *>(&b), sizeof(b)));
         };
     };
 

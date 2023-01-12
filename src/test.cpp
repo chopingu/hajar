@@ -61,9 +61,9 @@ int main() {
             }
 
             gya::random_player p1, p2;
-            gya::board c = gya::test_game(p1, p2);
+            gya::board c = util::test_game(p1, p2);
             while (!c.has_won().is_tie()) {
-                c = gya::test_game(p1, p2);
+                c = util::test_game(p1, p2);
             }
 
             if (!c.has_won_test().is_tie()) {
@@ -92,7 +92,7 @@ int main() {
             constexpr auto NUM_GAMES = 1 << 10;
             auto const t1 = std::chrono::high_resolution_clock::now();
             for (int j = 0; j < NUM_GAMES; ++j)
-                [[maybe_unused]] volatile gya::board const c = gya::test_game(p1, p2);
+                [[maybe_unused]] volatile gya::board const c = util::test_game(p1, p2);
             auto const t2 = std::chrono::high_resolution_clock::now();
             auto const time =
                     (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) / static_cast<double>(NUM_GAMES);
@@ -122,7 +122,7 @@ int main() {
                 const auto t1 = std::chrono::high_resolution_clock::now();
                 usize move_count = 0;
                 for (usize j = 0; j < NUM_GAMES; ++j) {
-                    gya::board const b = gya::test_game(p1, p2);
+                    gya::board const b = util::test_game(p1, p2);
                     move_count += b.size / 2;
                 }
                 const auto t2 = std::chrono::high_resolution_clock::now();
@@ -148,8 +148,8 @@ int main() {
                 constexpr auto NUM_GAMES = NUM_ITERS * 2;
                 int wins = 0;
                 for (int i = 0; i < NUM_ITERS; ++i) {
-                    wins += gya::test_game(s, p).has_won().player_1_won();
-                    wins += gya::test_game(p, s).has_won().player_2_won();
+                    wins += util::test_game(s, p).has_won().player_1_won();
+                    wins += util::test_game(p, s).has_won().player_2_won();
                 }
                 std::cout << "4 move solver win-rate against random player: " << wins * 1e2 / NUM_GAMES << "%"
                           << std::endl;
@@ -160,8 +160,8 @@ int main() {
                 constexpr auto NUM_GAMES = NUM_ITERS * 2;
                 int wins = 0;
                 for (int i = 0; i < NUM_ITERS; ++i) {
-                    wins += gya::test_game(s, p).has_won().player_1_won();
-                    wins += gya::test_game(p, s).has_won().player_2_won();
+                    wins += util::test_game(s, p).has_won().player_1_won();
+                    wins += util::test_game(p, s).has_won().player_2_won();
                 }
                 std::cout << "4 move solver win-rate against 2 move solver: " << wins * 1e2 / NUM_GAMES << "%"
                           << std::endl;
@@ -173,8 +173,8 @@ int main() {
                 constexpr auto NUM_GAMES = NUM_ITERS * 2;
                 int wins = 0;
                 for (usize i = 0; i < NUM_ITERS; ++i) {
-                    wins += gya::test_game(s, p).has_won().player_1_won();
-                    wins += gya::test_game(p, s).has_won().player_2_won();
+                    wins += util::test_game(s, p).has_won().player_1_won();
+                    wins += util::test_game(p, s).has_won().player_2_won();
                 }
                 std::cout << "4 move solver win-rate against two_move_solver: " << wins * 1e2 / NUM_GAMES << "%"
                           << std::endl;
@@ -218,7 +218,7 @@ int main() {
                 constexpr auto NUM_GAMES = 1 << 10;
                 auto const t1 = std::chrono::high_resolution_clock::now();
                 for (usize j = 0; j < NUM_GAMES; ++j)
-                    [[maybe_unused]] volatile gya::board const c = gya::test_game(p1, p2);
+                    [[maybe_unused]] volatile gya::board const c = util::test_game(p1, p2);
                 auto const t2 = std::chrono::high_resolution_clock::now();
                 auto const time =
                         (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) /
@@ -232,7 +232,7 @@ int main() {
                 constexpr auto NUM_GAMES = 1 << 10;
                 auto const t1 = std::chrono::high_resolution_clock::now();
                 for (usize j = 0; j < NUM_GAMES; ++j)
-                    [[maybe_unused]] volatile gya::board const c = gya::test_game(p1, p2);
+                    [[maybe_unused]] volatile gya::board const c = util::test_game(p1, p2);
                 auto const t2 = std::chrono::high_resolution_clock::now();
                 auto const time =
                         (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) /
@@ -246,7 +246,7 @@ int main() {
                 constexpr auto NUM_GAMES = 1 << 10;
                 auto const t1 = std::chrono::high_resolution_clock::now();
                 for (usize j = 0; j < NUM_GAMES; ++j)
-                    [[maybe_unused]] volatile gya::board const c = gya::test_game(p1, p2);
+                    [[maybe_unused]] volatile gya::board const c = util::test_game(p1, p2);
                 auto const t2 = std::chrono::high_resolution_clock::now();
                 auto const time = (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)) /
                                   static_cast<double>(NUM_GAMES);

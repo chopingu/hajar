@@ -24,7 +24,7 @@ struct n_move_solver {
         for (u8 move: board.get_actions()) {
             // look at the state after playing the current move, recurse
             // .incremented() flips the winning/losing state and increments the number of moves
-            // until the winning move until one is found
+            // until the winning move if one is found
             eval_result eval = evaluate_board(board.play_copy(move), depth - 1).incremented();
 
             // an eval is said to be better than another eval if it's either a better result (eg winning vs tied)

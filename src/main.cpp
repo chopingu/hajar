@@ -19,6 +19,8 @@
 #include "pinguml/utils/cost.hpp"
 #include "pinguml/utils/math.hpp"
 #include "pinguml/utils/tensor.hpp"
+#include "pinguml/utils/solver.hpp"
+#include "pinguml/network.hpp"
 
 int main() {
     while (true) {
@@ -57,4 +59,47 @@ int main() {
             std::puts("you lost!");
         }
     }
+
+    /*
+     
+    pinguml::network nn("sgd");
+    nn.set_batch_size(24);
+
+    nn.push_back("I1", "input 1 1 1");
+    nn.push_back("H1", "fully_connected 10 tanh");
+    nn.push_back("H2", "fully_connected 15 tanh");
+    nn.push_back("H3", "fully_connected 20 tanh");
+    nn.push_back("H4", "fully_connected 15 tanh");
+    nn.push_back("H5", "fully_connected 1 tanh");
+
+    nn.connect();
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dist(-10000000000, 100000000000);
+
+    std::vector<f32> x, y;
+    for(u32 i = 0; i < 1000000; i++) {
+        f32 val = dist(gen);
+        x.push_back(val);
+        y.push_back(std::sin(val));
+    }
+
+    while(1) {
+        nn.start_epoch("mse");
+
+        #pragma omp parallel
+	      #pragma omp for schedule(dynamic)
+        for(u32 i = 0; i < (u32)x.size(); i++) 
+            nn.train_target(&x[i], &y[i]);
+
+        nn.end_epoch();
+
+        if(nn.over()) break;
+    }
+
+    for(u32 i = 0; i < x.size(); i++) 
+        std::cout << x[i] << ' ' << nn.forward(&x[i])[0] << "\n";
+
+    */
 }

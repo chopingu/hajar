@@ -4,21 +4,21 @@
 #include "neural_net_testing/neural_net_player_deep.hpp"
 
 #include "heuristic/mcts.hpp"
-#include "heuristic/one_move_solver.hpp"
-#include "heuristic/two_move_solver.hpp"
 #include "heuristic/n_move_solver.hpp"
-#include "heuristic/transposition_table_solver.hpp"
+#include "heuristic/one_move_solver.hpp"
 #include "heuristic/solver_variations/A.hpp"
 #include "heuristic/solver_variations/Abias.hpp"
+#include "heuristic/transposition_table_solver.hpp"
+#include "heuristic/two_move_solver.hpp"
 
-#include "pinguml/utils/tensor.hpp"
+#include "pinguml/layer/create_layer.hpp"
+#include "pinguml/layer/fully_connected_layer.hpp"
+#include "pinguml/layer/input_layer.hpp"
+#include "pinguml/layer/layer_base.hpp"
 #include "pinguml/utils/activation.hpp"
 #include "pinguml/utils/cost.hpp"
 #include "pinguml/utils/math.hpp"
-#include "pinguml/layer/layer_base.hpp"
-#include "pinguml/layer/input_layer.hpp"
-#include "pinguml/layer/fully_connected_layer.hpp"
-#include "pinguml/layer/create_layer.hpp"
+#include "pinguml/utils/tensor.hpp"
 
 int main() {
     while (true) {

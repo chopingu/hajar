@@ -39,4 +39,4 @@ struct two_move_solver {
         return m_random_player(b);
     }
 };
-}
+} // namespace heuristic

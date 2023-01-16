@@ -2,6 +2,8 @@
 
 #include "../include.hpp"
 
+namespace gya {
+
 template<class T, usize... sizes>
 class layer_array {
 private:
@@ -15,6 +17,7 @@ private:
         }
         return arr;
     }();
+
 public:
     std::array<T, (sizes + ...)> m_data{};
 
@@ -58,3 +61,4 @@ public:
         return m_data.data();
     }
 };
+}

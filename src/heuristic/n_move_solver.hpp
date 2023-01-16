@@ -8,9 +8,11 @@ struct n_move_solver {
     i32 m_depth = 5;
     bool multi_thread = false;
 
-    [[nodiscard]] constexpr eval_result evaluate_board(gya::board const &board, i32 depth = -1) const {
-        if (depth == -1) // if depth is not passed in use the default depth
-            depth = m_depth - 1;
+    [[nodiscard]] eval_result evaluate_board(gya::board const &board) const {
+        return evaluate_board(board, m_depth - 1);
+    }
+
+    [[nodiscard]] eval_result evaluate_board(gya::board const &board, i32 depth) const {
         if (board.has_won().player_1_won()) // someone already won
             return board.turn() == gya::board::PLAYER_ONE ? WINNING_MOVE : LOSING_MOVE;
         if (board.has_won().player_2_won()) // someone already won
@@ -36,8 +38,7 @@ struct n_move_solver {
             // or if we find a winning sequence of moves we may stop evaluating
             // this may lead to not finding a shorter sequence of winning moves, but this is unlikely
             // may be worth investigating
-            if (eval.m_depth_until_over == 1 || eval.is_winning() == true)
-                break;
+            if (eval.is_winning()) break;
         }
         return best_eval;
     }
@@ -61,13 +62,13 @@ struct n_move_solver {
             std::array<bool, 7> used{};
             std::array<eval_result, 7> evaluations{};
             lmj::static_vector<std::future<void>, 7> futures;
-            for (u8 move : actions) {
+            for (u8 move: actions) {
                 futures.emplace_back(std::async(std::launch::async, [&, move] {
                     evaluations[move] = evaluate_board(board.play_copy(move)).incremented();
                     used[move] = true;
                 }));
             }
-            for (auto &&i : futures) i.get();
+            for (auto &&i: futures) i.get();
             for (auto move: actions) {
                 if (used[move]) {
                     if (evaluations[move] > best_eval) {
@@ -80,4 +81,4 @@ struct n_move_solver {
         return best_move;
     }
 };
-}
+} // namespace heuristic

@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../board.hpp"
 #include "../include.hpp"
 #include "neural_net.hpp"
-#include "../board.hpp"
 
 namespace gya {
 constexpr static auto fast_activation_function = [](f32 x) {

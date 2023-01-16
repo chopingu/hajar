@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../include.hpp"
 #include "../board.hpp"
+#include "../include.hpp"
 #include "layer_array.hpp"
-#include "weight_array.hpp"
 #include "optional_structures.hpp"
+#include "weight_array.hpp"
 
 namespace gya {
 template<bool USE_BACKPROP, bool LABELED_DATA, class T, class F1, class F2, usize... sizes>
@@ -29,9 +29,8 @@ struct neural_net {
     F2 m_activation_derivative;
 
     template<class F1_, class F2_>
-    constexpr neural_net(F1_ &&f, F2_ &&derivative) :
-            m_activation_function{std::forward<F1_>(f)},
-            m_activation_derivative{std::forward<F2_>(derivative)} {}
+    constexpr neural_net(F1_ &&f, F2_ &&derivative) : m_activation_function{std::forward<F1_>(f)},
+                                                      m_activation_derivative{std::forward<F2_>(derivative)} {}
 
     constexpr auto &operator=(neural_net const &other) {
         m_weights.m_data = other.m_weights.m_data;
@@ -237,7 +236,7 @@ struct neural_net {
         // process last layer
         for (usize node = 0; node < output.size(); ++node) {
             bias_derivatives.back()[node] =
-                m_activation_derivative(output[node]) * (output[node] - correct_output[node]);
+                    m_activation_derivative(output[node]) * (output[node] - correct_output[node]);
         }
 
         // process all layers between last and first layer (exclusive)
@@ -326,7 +325,7 @@ struct neural_net {
             iss >> i;
     }
 };
-}
+} // namespace gya
 
 namespace std {
 template<bool b1, bool b2, class T, class F1, class F2, usize... sizes>
@@ -335,4 +334,4 @@ void swap(gya::neural_net<b1, b2, T, F1, F2, sizes...> &t1, gya::neural_net<b1, 
     t1 = std::move(t2);
     t2 = std::move(temp);
 }
-}
+} // namespace std

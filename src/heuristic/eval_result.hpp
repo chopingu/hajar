@@ -4,14 +4,14 @@
 
 namespace heuristic {
 struct eval_result {
-    bool m_winning: 1;
-    bool m_losing: 1;
-    i8 m_depth_until_over: 6 = 0;
+    bool m_winning : 1;
+    bool m_losing : 1;
+    i8 m_depth_until_over : 6 = 0;
 
     constexpr eval_result() : m_winning{}, m_losing{}, m_depth_until_over{} {}
 
     constexpr eval_result(bool winning, bool losing, i8 depth = 0) : m_winning{winning}, m_losing{losing},
-                                                                        m_depth_until_over{depth} {}
+                                                                     m_depth_until_over{depth} {}
 
     constexpr eval_result incremented() const {
         if (m_winning | m_losing) {
@@ -37,7 +37,7 @@ struct eval_result {
         return other > *this;
     }
 
-    constexpr bool operator==(eval_result const& other) const = default;
+    constexpr bool operator==(eval_result const &other) const = default;
 
     constexpr operator const char *() const {
         if (is_tied())
@@ -63,4 +63,4 @@ static constexpr eval_result LOSING_MOVE{false, true};
 static constexpr eval_result NEUTRAL_MOVE{};
 static constexpr eval_result TIE_MOVE{true, true};
 static_assert(sizeof(eval_result) == sizeof(i8));
-}
+} // namespace heuristic

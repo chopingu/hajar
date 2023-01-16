@@ -46,7 +46,7 @@ struct transposition_table_solver {
         for (u8 move: board.get_actions()) {
             eval_result eval = evaluate_board(board.play_copy(move), depth - 1).incremented();
             if (eval > best_eval) best_eval = eval;
-            if (eval.m_depth_until_over == 1 || eval.is_winning()) break;
+            if (eval.is_winning()) break;
         }
 
         if (best_eval.is_game_over()) m_ttable.emplace(board, best_eval);
@@ -54,7 +54,7 @@ struct transposition_table_solver {
     }
 
     [[nodiscard]] u8 operator()(gya::board const &board) {
-        for (auto &[b, eval] : m_ttable)
+        for (auto &[b, eval]: m_ttable)
             if (gya::compressed_board::decompress(b).size < board.size) m_ttable.erase(b);
         u8 best_move = gya::BOARD_WIDTH;
         eval_result best_eval = LOSING_MOVE;
@@ -72,4 +72,4 @@ struct transposition_table_solver {
         return best_move;
     }
 };
-}  // namespace heuristic
+} // namespace heuristic

@@ -7,7 +7,7 @@
 namespace gya {
 
 template<class F1 = decltype(tanh_activation_function),
-        class F2 = decltype(tanh_activation_derivative)>
+         class F2 = decltype(tanh_activation_derivative)>
 struct neural_net_player_deep {
     template<class T, class F1_, class F2_, usize... sizes>
     struct neural_net_params {
@@ -78,17 +78,15 @@ struct neural_net_player_deep {
             const f32 state_output = m_state_net.evaluate(m_prev_states[i].board);
             const f32 q_state = state_output + learning_rate * (discount_factor * next_q_value - state_output);
             const f32 q_move = move_output + learning_rate * (discount_factor * next_q_value - move_output);
-            
+
             const std::array<f32, 1> temp{q_state};
             m_state_net.apply_derivatives(m_state_net.compute_derivatives(temp, false));
 
             move_output[m_prev_states[i].move] = q_move;
             m_move_net.apply_derivatives(m_move_net.compute_derivatives(move_output, false));
-            
+
             next_q_value = state_output;
         }
-
-        
     }
 
     [[nodiscard]] u8 operator()(gya::board const &b) {
@@ -121,4 +119,4 @@ struct neural_net_player_deep {
         return ans;
     }
 };
-}  // namespace gya
+} // namespace gya

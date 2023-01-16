@@ -1,7 +1,7 @@
 #include "../defines.hpp"
-#include "neural_net_player.hpp"
 #include "../heuristic/one_move_solver.hpp"
 #include "../heuristic/two_move_solver.hpp"
+#include "neural_net_player.hpp"
 #include <bits/stdc++.h>
 
 namespace gya {
@@ -28,14 +28,14 @@ gya::board get_starting_pos(i32 num_random_moves) {
         starting_pos.play(p(starting_pos), i % 2 == 0 ? 1 : -1);
     return starting_pos;
 }
-}
+} // namespace gya
 
 int main() {
     constexpr auto num_players = 50;
 
     constexpr auto surviving_portion = 0.9;
 
-//    gya::two_move_solver untrained_player;
+    //    gya::two_move_solver untrained_player;
     gya::neural_net_player untrained_player;
 
     std::vector<gya::neural_net_player<>> players(num_players);
@@ -46,7 +46,7 @@ int main() {
     for (int iter = 0;; ++iter) {
         try {
             {
-//                lmj::timer t;
+                //                lmj::timer t;
                 int wins_1 = 0, wins_2 = 0;
                 int ties_1 = 0, ties_2 = 0;
                 int losses_1 = 0, losses_2 = 0;
@@ -79,7 +79,7 @@ int main() {
                 std::cout << std::endl;
             }
             for (int iter2 = 0; iter2 < 24; ++iter2) {
-//                lmj::timer t;
+                //                lmj::timer t;
                 std::array<std::pair<i32, u64>, num_players> num_wins{};
                 for (int i = 0; i < 1; ++i) {
                     auto last_gen = players;
@@ -87,7 +87,7 @@ int main() {
                     for (i32 j = num_players * surviving_portion + 1; j < num_players; ++j)
                         gya::randomly_update_neural_net_player(players[j],
                                                                std::clamp(0.2f, 0.8f, 1.0f / (iter * 0.01f + 1.0f)));
-//                        players[j].m_net.fill_randomly();
+                    //                        players[j].m_net.fill_randomly();
                     std::vector<std::thread> threads;
                     for (u64 j = 0; j < num_players; ++j) {
                         std::atomic<i32> wins = 0;
@@ -132,7 +132,7 @@ int main() {
         } catch (std::exception const &e) {
             std::cerr << "ERROR\n";
             std::cerr << e.what() << std::endl;
-//            std::cin.get();
+            //            std::cin.get();
         }
     }
 }

@@ -2,11 +2,13 @@
 
 #include "../include.hpp"
 
+namespace gya {
 template<class T, usize... sizes>
 class weight_array {
     template<class G>
     struct matrix_ref {
         friend weight_array;
+
     private:
         G *m_data;
         usize m_subarray_len;
@@ -81,3 +83,4 @@ public:
         return m_data.data();
     }
 };
+}

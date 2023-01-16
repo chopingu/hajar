@@ -20,8 +20,7 @@ public:
     std::default_random_engine m_gen;
     std::vector<std::unique_ptr<Node>> m_children;
 
-    Node(i8 player, i8 action, T prior)
-            : m_player(player), m_action(action), m_prior(prior) {}
+    Node(i8 player, i8 action, T prior) : m_player(player), m_action(action), m_prior(prior) {}
 
     T ucb_score(Node *child) {
         u64 sum = 0; // maybe change for performance reasons

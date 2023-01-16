@@ -55,4 +55,4 @@ struct A {
         return best_move;
     }
 };
-}
+} // namespace heuristic

@@ -54,4 +54,4 @@ struct Abias {
         return best_move;
     }
 };
-}
+} // namespace heuristic

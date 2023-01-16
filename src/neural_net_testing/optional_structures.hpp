@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../include.hpp"
 #include "layer_array.hpp"
 #include "weight_array.hpp"
-#include "../include.hpp"
 
 namespace gya {
 template<bool used, class T, usize... sizes>
@@ -122,4 +122,4 @@ public:
         m_weight_array.fill(value);
     }
 };
-}
+} // namespace gya

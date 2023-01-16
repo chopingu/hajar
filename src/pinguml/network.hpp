@@ -23,12 +23,6 @@ const u8 MAIN_COPY = 0;
 
 class network {
 private:
-    u32 m_output_size;
-    u32 m_nr_threads;
-    u32 m_batch_size;  
-
-    cost_base *m_cost_f;
-    solver_base *m_solver;
 
 #if defined(OMP)
     omp_lock_t m_lock_batch;
@@ -44,6 +38,13 @@ private:
     void destroy_lock() {}
     u32 thread_num() { return 0; }
 #endif
+
+    u32 m_output_size;
+    u32 m_nr_threads;
+    u32 m_batch_size;  
+
+    cost_base *m_cost_f;
+    solver_base *m_solver;
 
 public:	
     u32 m_current_epoch;

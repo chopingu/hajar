@@ -37,12 +37,17 @@ struct eval_result {
         return other > *this;
     }
 
+    constexpr bool operator==(eval_result const& other) const = default;
+
     constexpr operator const char *() const {
-        if (m_winning)
+        if (is_tied())
+            return "TIED";
+        else if (is_winning())
             return "WINNING";
-        if (m_losing)
+        else if (is_losing())
             return "LOSING";
-        return "NEUTRAL";
+        else
+            return "NEUTRAL";
     }
 
     constexpr bool is_winning() const { return m_winning & !m_losing; }

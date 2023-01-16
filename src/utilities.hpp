@@ -269,6 +269,20 @@ void softmax(std::span<T> input, const usize _size) {
 
 namespace util {
 
+template<class player1_t, class player2_t>
+gya::board test_game(player1_t &&player1, player2_t &&player2, gya::board b = {}) {
+i32 turn = 0;
+while (!b.has_won_test().is_game_over()) {
+    turn ^= 1;
+    if (turn) {
+        b.play(player1(b), 1);
+    } else {
+        b.play(player2(b), -1);
+    }
+}
+return b;
+}
+
 template<class T0, class... Ts>
 constexpr auto get_last_impl(T0 &&head, Ts &&... tail) {
     if constexpr (sizeof...(Ts)) {

@@ -23,7 +23,7 @@ struct neural_net {
     [[no_unique_address]] optional_weight_array<USE_BACKPROP && !LABELED_DATA, T, sizes...> m_weight_derivatives_loss;
 
     // for passing around derivatives
-    using derivative_pair_t = std::pair<weight_array<T, sizes...>, layer_array<T, sizes...>>;
+    using derivative_pair_t = std::pair<std::unique_ptr<weight_array<T, sizes...>>, std::unique_ptr<layer_array<T, sizes...>>>;
 
     F1 m_activation_function;
     F2 m_activation_derivative;
@@ -224,13 +224,12 @@ struct neural_net {
         return output_layer;
     }
 
-    [[nodiscard]] constexpr derivative_pair_t
-    backward_propagate(layer_array<T, sizes...> const &node_values,
-                       std::span<T> correct_output,
-                       bool post_activation_variables) const {
+    [[nodiscard]] constexpr derivative_pair_t backward_propagate(layer_array<T, sizes...> const &node_values,
+                                                                 std::span<T> correct_output,
+                                                                 bool post_activation_variables) const {
         // result variables
-        weight_array<T, sizes...> weight_derivatives{};
-        layer_array<T, sizes...> bias_derivatives{};
+        std::unique_ptr<weight_array<T, sizes...>> weight_derivatives = std::make_unique<weight_array<T, sizes...>>();
+        std::unique_ptr<layer_array<T, sizes...>> bias_derivatives = std::make_unique<layer_array<T, sizes...>>();
 
         const std::span output{node_values.back()};
         const usize num_layers = size();
@@ -238,7 +237,7 @@ struct neural_net {
         // process last layer
         for (usize node = 0; node < output.size(); ++node) {
             bias_derivatives.back()[node] =
-                    m_activation_derivative(output[node]) * (output[node] - correct_output[node]);
+                m_activation_derivative(output[node]) * (output[node] - correct_output[node]);
         }
 
         // process all layers between last and first layer (exclusive)
@@ -266,10 +265,18 @@ struct neural_net {
         return {weight_derivatives, bias_derivatives};
     }
 
+    [[nodiscard]] constexpr derivative_pair_t compute_derivatives(std::span<T> correct_output,
+                                                                  bool post_activation_variables) {
+        return backward_propagate(m_values, correct_output, post_activation_variables);
+    }
+
     void apply_derivatives(derivative_pair_t const &derivatives, T learning_rate) {
         auto &[weight_derivatives, bias_derivatives] = derivatives;
         for (usize i = 0; i < weight_derivatives.size(); ++i) {
-            m_weights.data()[i] += weight_derivatives.data()[i];
+            m_weights.data()[i] += weight_derivatives->data()[i] * learning_rate;
+        }
+        for (usize i = 0; i < bias_derivatives.size(); ++i) {
+            m_biases.data()[i] += bias_derivatives->data[i] * learning_rate;
         }
     }
 

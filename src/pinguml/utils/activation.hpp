@@ -8,6 +8,7 @@ namespace pinguml {
 
 class activation_base {
 public:
+    std::string m_name;
     virtual void activation([[maybe_unused]] f32 *input, [[maybe_unused]] const f32 *biases, [[maybe_unused]] const u32 size) = 0;
     virtual void activation_c([[maybe_unused]] f32 *input, [[maybe_unused]] const f32 bias, [[maybe_unused]] const u32 size) = 0;
     virtual f32 activation_d([[maybe_unused]] const f32 *x, [[maybe_unused]] const u32 index) = 0;
@@ -17,6 +18,10 @@ public:
 
 class null : public activation_base {
 public:
+    null() : activation_base() {
+        m_name = "null";
+    }
+
     virtual void activation([[maybe_unused]] f32 *input, [[maybe_unused]] const f32 *biases, [[maybe_unused]] const u32 size) {
         return;
     }
@@ -34,6 +39,10 @@ public:
 
 class identity : public activation_base {
 public:
+    identity() : activation_base() { 
+        m_name = "identity";
+    }
+
     virtual void activation([[maybe_unused]] f32 *input, [[maybe_unused]] const f32 *biases, [[maybe_unused]] const u32 size) {
         for(u32 i = 0; i < size; i++) 
             input[i] += biases[i];
@@ -53,6 +62,10 @@ public:
 
 class tanh : public activation_base {
 public:
+    tanh() : activation_base() {
+        m_name = "tanh";
+    }
+
     virtual void activation([[maybe_unused]] f32 *input, [[maybe_unused]] const f32 *biases, [[maybe_unused]] const u32 size) {
         for(u32 i = 0; i < size; i++) 
             input[i] = std::tanh(input[i] + biases[i]);
@@ -72,6 +85,10 @@ public:
 
 class elu : public activation_base {
 public:
+    elu() : activation_base() {
+        m_name = "elu";
+    }
+
     virtual void activation([[maybe_unused]] f32 *input, [[maybe_unused]] const f32 *biases, [[maybe_unused]] const u32 size) {
         for(u32 i = 0; i < size; i++) {
             const f32 x = input[i] + biases[i];
@@ -98,6 +115,10 @@ public:
 
 class relu : public activation_base {
 public:
+    relu() : activation_base() {
+        m_name = "relu";
+    }
+
     virtual void activation([[maybe_unused]] f32 *input, [[maybe_unused]] const f32 *biases, [[maybe_unused]] const u32 size) {
         for(u32 i = 0; i < size; i++) {
             const f32 x = input[i] + biases[i];
@@ -124,6 +145,10 @@ public:
 
 class lrelu : public activation_base {
 public:
+    lrelu() : activation_base() {
+        m_name = "lrelu";
+    }
+
     virtual void activation([[maybe_unused]] f32 *input, [[maybe_unused]] const f32 *biases, [[maybe_unused]] const u32 size) {
         for(u32 i = 0; i < size; i++) {
             const f32 x = input[i] + biases[i];
@@ -150,6 +175,10 @@ public:
 
 class vlrelu : public activation_base {
 public:
+    vlrelu() : activation_base() {
+        m_name = "vlrelu";
+    }
+
     virtual void activation([[maybe_unused]] f32 *input, [[maybe_unused]] const f32 *biases, [[maybe_unused]] const u32 size) {
         for (u32 i = 0; i < size; i++) {
             const f32 x = input[i] + biases[i];
@@ -176,6 +205,10 @@ public:
 
 class sigmoid : public activation_base { 
 public:
+    sigmoid() : activation_base() {
+        m_name = "sigmoid";
+    }
+
     virtual void activation([[maybe_unused]] f32 *input, [[maybe_unused]] const f32 *biases, [[maybe_unused]] const u32 size) {
         for(u32 i = 0; i < size; i++) 
             input[i] = 1.f / (1.f + std::exp(-(input[i] + biases[i])));

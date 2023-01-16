@@ -18,6 +18,10 @@ public:
     virtual ~input_layer() {}
 
     virtual void activate() {}
+
+    virtual std::string config_string() {
+        return "input " + std::to_string(m_nodes.m_rows) + " " + std::to_string(m_nodes.m_cols) + " " + std::to_string(m_nodes.m_channels) + " " + m_f->m_name + "\n"; 
+    }
 };
 
 } // namespace pinguml

@@ -19,7 +19,11 @@ public:
         m_biases.fill(0.f);
     }
 
-    virtual void push_forward(const layer_base &left_layer, const tensor &weights) {
+    virtual std::string config_string() { 
+        return "fully_connected " + std::to_string(m_nodes.size()) + " " + m_f->m_name + "\n";
+    }
+
+    virtual void push_forward(const layer_base &left_layer, const tensor &weights, [[maybe_unused]] const i32 train = 0) {
         const u32 channel_size = left_layer.m_nodes.m_rows * left_layer.m_nodes.m_cols;
         if (left_layer.m_nodes.m_channel_stride != channel_size) {
             for (u32 i = 0; i < weights.m_rows; i++) 
@@ -37,7 +41,7 @@ public:
             m_biases.m_ptr[i] -= delta_biases.m_ptr[i] * alpha; // ADD SIMD
     }
 
-    virtual void propogate_delta(layer_base &left_layer, const tensor &weights) {
+    virtual void propogate_delta(layer_base &left_layer, const tensor &weights, [[maybe_unused]] const i32 train = 1) {
         const u32 channel_size = left_layer.m_delta.m_cols * left_layer.m_delta.m_rows;
         if(channel_size != left_layer.m_delta.m_channel_stride) {
             for(u32 i = 0; i < m_delta.size(); i++) {
@@ -51,12 +55,12 @@ public:
             for(u32 i = 0; i < m_delta.size(); i++) {
                 const f32 x = m_delta.m_ptr[i];
                 for(u32 j = 0; j < left_layer.m_delta.size(); j++) 
-                    left_layer.m_delta += x * weights.m_ptr[i * weights.m_cols + j];
+                    left_layer.m_delta.m_ptr[j] += x * weights.m_ptr[i * weights.m_cols + j];
             }
         }
     }
 
-    virtual void calculate_delta_weights(const layer_base &left_layer, tensor &delta_weights) {
+    virtual void calculate_delta_weights(const layer_base &left_layer, tensor &delta_weights, [[maybe_unused]] const i32 train = 1) {
         const u32 left_size = left_layer.m_nodes.m_rows * left_layer.m_nodes.m_cols * left_layer.m_nodes.m_channels;
         const u32 delta_size = m_delta.size();
         delta_weights.resize(delta_size, left_size, 1);

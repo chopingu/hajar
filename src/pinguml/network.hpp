@@ -97,6 +97,7 @@ public:
         if (!nr_threads) nr_threads = omp_get_num_procs();
         m_nr_threads = nr_threads;
         omp_set_nested(1);
+        omp_set_num_threads(m_nr_threads);
 #else
         if (nr_threads > 1) throw std::runtime_error("Define OpenMP for threading");
         m_nr_threads = 1;
@@ -161,8 +162,10 @@ public:
 
     f32 *forward(const f32 *input, i32 copy_id = -1, u32 training=0) {
         if(copy_id < 0) copy_id = thread_num();
-        if (copy_id > (i32)m_nr_threads && m_nr_threads > 0) throw std::runtime_error("threading error\n");
-        if (copy_id >= (i32)m_network_copies.size()) throw std::runtime_error("threading error\n");
+        if (copy_id > (i32)m_nr_threads && m_nr_threads > 0)
+            throw std::runtime_error("threading error\n");
+        if (copy_id >= (i32)m_network_copies.size())
+            throw std::runtime_error("threading error\n");
 
         std::vector<layer_base*> inputs;
         for(auto layer: m_network_copies[copy_id]) {

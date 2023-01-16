@@ -283,10 +283,10 @@ struct neural_net {
         return forward_propagate(inp, m_values);
     }
 
-    [[nodiscard]] std::array<T, util::get_last(sizes...)> evaluate_const(std::span<T> inp) const {
+    [[nodiscard]] std::array<T, (sizes, ...)> evaluate_const(std::span<T> inp) const {
         layer_array<T, sizes...> values;
         std::span<T> output = forward_propagate(inp, values);
-        std::array<T, util::get_last(sizes...)> out_arr{};
+        std::array<T, (sizes, ...)> out_arr{};
         std::copy(output.begin(), output.end(), out_arr.begin());
         return out_arr;
     }

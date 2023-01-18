@@ -2,6 +2,34 @@
 
 #include <cmath>
 
+template<class ContainerType>
+concept Container = requires(ContainerType a, const ContainerType b)
+{
+    requires std::regular<ContainerType>;
+    requires std::swappable<ContainerType>;
+    requires std::destructible<typename ContainerType::value_type>;
+    requires std::same_as<typename ContainerType::reference, typename ContainerType::value_type &>;
+    requires std::same_as<typename ContainerType::const_reference, const typename ContainerType::value_type &>;
+    requires std::forward_iterator<typename ContainerType::iterator>;
+    requires std::forward_iterator<typename ContainerType::const_iterator>;
+    requires std::signed_integral<typename ContainerType::difference_type>;
+    requires std::same_as<typename ContainerType::difference_type, typename std::iterator_traits<typename ContainerType::iterator>::difference_type>;
+    requires std::same_as<typename ContainerType::difference_type, typename std::iterator_traits<typename ContainerType::const_iterator>::difference_type>;
+    { a.begin() } -> std::same_as<typename ContainerType::iterator>;
+    { a.end() } -> std::same_as<typename ContainerType::iterator>;
+    { b.begin() } -> std::same_as<typename ContainerType::const_iterator>;
+    { b.end() } -> std::same_as<typename ContainerType::const_iterator>;
+    { a.cbegin() } -> std::same_as<typename ContainerType::const_iterator>;
+    { a.cend() } -> std::same_as<typename ContainerType::const_iterator>;
+    { a.size() } -> std::same_as<typename ContainerType::size_type>;
+    { a.max_size() } -> std::same_as<typename ContainerType::size_type>;
+    { a.empty() } -> std::same_as<bool>;
+};
+
+static_assert(Container<lmj::static_vector<int, 1>>);
+static_assert(Container<lmj::static_hash_table<int, int, 1>>);
+static_assert(Container<lmj::hash_table<int, int>>);
+
 int main() {
     {
         // ensure basic functionality of lmj::hash_table
@@ -17,40 +45,40 @@ int main() {
         lmj::print("Test 1 passed!");
     }
     {
-        // miscellaneous test of lmj::hash_table
-        constexpr int NUM_TESTS = 1e3;
+        // miscellaneous test of lmj::hash_table ("do random bullsh*t and see if the standard version ends up the same")
+        constexpr int N = 1 << 10;
         std::unordered_map<int, int> map;
         lmj::hash_table<int, int> check;
-        for (int i = 0; i < NUM_TESTS; ++i) {
+        for (int i = 0; i < N; ++i) {
             int key = i / 2, value = i;
-            if (i > NUM_TESTS / 32)
+            if (i > N / 32)
                 value = -i;
             map[key] = value;
             check[key] = value;
         }
-        for (int i = 0; i < NUM_TESTS; ++i) {
+        for (int i = 0; i < N; ++i) {
             const int key = lmj::rand<int>();
             map.erase(key);
             check.erase(key);
         }
-        for (int i = 0; i < NUM_TESTS; ++i) {
+        for (int i = 0; i < N; ++i) {
             const int key = lmj::rand<int>();
             const int val = lmj::rand<int>();
             map[key] = val;
             check[key] = val;
         }
-        for (int i = 0; i < NUM_TESTS; ++i) {
+        for (int i = 0; i < N; ++i) {
             const int key = lmj::rand<int>();
             map.erase(key);
             check.erase(key);
         }
-        for (int i = 0; i < NUM_TESTS; ++i) {
+        for (int i = 0; i < N; ++i) {
             const int key = lmj::rand<int>();
             const int val = lmj::rand<int>();
             map[key] = val;
             check[key] = val;
         }
-        for (int i = 0; i < NUM_TESTS; ++i) {
+        for (int i = 0; i < N; ++i) {
             const int key = lmj::rand<int>();
             for (int j = 0; j < 100; ++j) {
                 const int val = lmj::rand<int>();
@@ -58,7 +86,7 @@ int main() {
                 check[key] = val;
             }
         }
-        for (auto &[key, val]: map)
+        for ([[maybe_unused]] auto &[key, val]: map)
             assert(check[key] == val);
         lmj::print("Test 2 passed!");
     }
@@ -72,6 +100,7 @@ int main() {
 
         constexpr int n = 1 << 20;
 
+        vals.reserve(n);
         for (int i = 0; i < n; ++i)
             vals.push_back(lmj::rand<int>());
 
@@ -82,7 +111,7 @@ int main() {
 
         assert(map.size() == check.size());
 
-        for (auto &[key, val]: check)
+        for ([[maybe_unused]] auto &[key, val]: check)
             assert(map.at(key) == val);
 
         for (int i = 0; i < n; i += 2) {
@@ -90,7 +119,7 @@ int main() {
             check.erase(vals[i]);
         }
 
-        for (auto &[key, val]: check)
+        for ([[maybe_unused]] auto &[key, val]: check)
             assert(map.at(key) == val);
 
         assert(map.size() == check.size());
@@ -102,11 +131,11 @@ int main() {
         lmj::hash_table<int, int> m;
         for (int i = 0; i < 128; ++i)
             m[i] = i;
-        for (auto &[key, value]: m) {
+        for ([[maybe_unused]] auto &[key, value]: m) {
             assert(key == value);
         }
         lmj::hash_table<int, int> const m2 = m;
-        for (auto &[key, value]: m2)
+        for ([[maybe_unused]] auto &[key, value]: m2)
             assert(key == value);
         lmj::print("Test 4 passed!");
     }
@@ -116,7 +145,7 @@ int main() {
         lmj::hash_table<int, int, decltype(hash)> m;
         for (int i = 0; i < 1024; ++i)
             m[i] = i;
-        for (auto &[key, value]: m) {
+        for ([[maybe_unused]] auto &[key, value]: m) {
             assert(key == value);
         }
         lmj::print("Test 5 passed!");

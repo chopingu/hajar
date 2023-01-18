@@ -138,14 +138,19 @@ constexpr auto flog2(floating_point auto x) {
 constexpr auto integral_sqrt(const integral auto x) {
     using T = std::remove_cvref_t<decltype(x)>;
     if (x == 0) return T{0};
-    const auto l = flog2(x);
+    const std::uint64_t l = flog2(x);
     T low = 1ull << (l / 2), high = static_cast<T>(1) << (l / 2 + 1);
+    T last_low = 0, last_high = 0;
     while (low + 1 < high) {
-        auto mid = high - (high - low) / 2;
+        const auto mid = (low + high) / 2;
         if (mid <= x / mid)
             low = mid;
         else
             high = mid;
+        if (low == last_low && high == last_high)
+            break;
+        last_low = low;
+        last_high = high;
     }
     return low;
 }
@@ -155,16 +160,21 @@ constexpr auto integral_sqrt(const integral auto x) {
  * @return floor(sqrt(x))
  */
 constexpr auto integral_sqrt(const floating_point auto x) {
-    using T = std::uint64_t;
+    using T = std::remove_cvref_t<decltype(x)>;
     if (static_cast<T>(x) == 0) return T{0};
-    const auto l = flog2(static_cast<T>(x));
-    T low = 1ull << (l / 2), high = 1ull << (l / 2 + 1);
+    const std::uint64_t l = flog2(x);
+    T low = ipow<T>(2, l / 2), high = low * 2;
+    T last_low = 0, last_high = 0;
     while (low + 1 < high) {
-        auto mid = high - (high - low) / 2;
+        const auto mid = (low + high) / 2;
         if (mid <= x / mid)
             low = mid;
         else
             high = mid;
+        if (low == last_low && high == last_high)
+            break;
+        last_low = low;
+        last_high = high;
     }
     return low;
 }
@@ -206,15 +216,15 @@ constexpr auto hypot(numbers auto... nums) {
  * @param f integrand
  * @param low lower limit of integration
  * @param high upper limit of integration
- * @param steps number of steps between limits
+ * @param num_steps number of steps to take between limits
  * @return integral of f from low to high
  */
-constexpr auto integrate(auto &&f, long double low, long double high, std::uint64_t steps = 1e6) {
+constexpr auto integrate(auto &&f, long double low, long double high, std::uint64_t num_steps = 1e6) {
     long double sum = 0;
     long double last_y = f(low);
-    const long double step_size = (high - low) / static_cast<long double>(steps);
-    for (std::uint64_t step = 1; step < steps; ++step) {
-        const long double y = f(low + step_size * step);
+    const long double step_size = (high - low) / static_cast<long double>(num_steps);
+    for (std::uint64_t step = 1; step < num_steps; ++step) {
+        const long double y = f(low + step * step_size);
         sum += y + last_y;
         last_y = y;
     }
@@ -284,11 +294,13 @@ constexpr std::pair<std::uint64_t, std::uint64_t> farey(long double x, std::uint
 
 // tests
 
-static_assert(lmj::abs(lmj::integrate([](auto x) { return x * x; }, 0, 3, 1e5) - 9) < 1e-3);
+static_assert(lmj::abs(lmj::integrate([](auto x) { return x * x; }, 0, 3, 1e5) - 9) < 5e-4);
 static_assert(lmj::hypot(3, 4) == 5);
 static_assert(lmj::sqrt(25) == 5);
 static_assert(lmj::sqrt(9) == 3);
 static_assert(lmj::integral_sqrt(2147483647) == 46340);
+static_assert(lmj::integral_sqrt(18446744073709551615ull) == 4294967295);
+static_assert((lmj::integral_sqrt(1e100) - 1e50) / 1e50 < 1e-15);
 static_assert(lmj::ipow(0.5, 4) == 0.0625);
 static_assert(lmj::abs(lmj::exp(10) - 22026.465794806716516) < 1e-5);
 static_assert([] {

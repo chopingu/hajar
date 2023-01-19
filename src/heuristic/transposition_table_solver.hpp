@@ -5,20 +5,9 @@
 
 namespace heuristic {
 struct transposition_table_solver {
-    constexpr static usize hash_bytes(std::span<const char> bytes) {
-        usize result = sizeof(usize) == 8 ? 14695981039346656037ULL : 2166136261U;
-
-        for (auto i: bytes) {
-            result ^= i;
-            result *= sizeof(usize) == 8 ? 1099511628211ULL : 16777619U;
-        }
-        return result;
-    }
-
     struct compressed_board_hasher {
         constexpr usize operator()(gya::compressed_board const &b) const noexcept {
-            auto sp = std::span<const char>(std::bit_cast<const char *>(&b), sizeof(b));
-            return hash_bytes(sp);
+            return lmj::compute_hash(std::bit_cast<const char *>(&b), sizeof(b));
         };
     };
 
@@ -43,7 +32,11 @@ struct transposition_table_solver {
             return iter->second;
 
         eval_result best_eval = LOSING_MOVE;
-        for (u8 move: board.get_actions()) {
+        auto actions = board.get_actions();
+        std::sort(std::begin(actions), std::end(actions), [](u8 lhs, u8 rhs) {
+            return std::abs(lhs - gya::BOARD_WIDTH / 2) < std::abs(rhs - gya::BOARD_WIDTH / 2);
+        });
+        for (u8 move: actions) {
             eval_result eval = evaluate_board(board.play_copy(move), depth - 1).incremented();
             if (eval > best_eval) best_eval = eval;
             if (eval.is_winning()) break;
@@ -55,7 +48,7 @@ struct transposition_table_solver {
 
     [[nodiscard]] u8 operator()(gya::board const &board) {
         for (auto &[b, eval]: m_ttable)
-            if (gya::compressed_board::decompress(b).size < board.size) m_ttable.erase(b);
+            if (gya::compressed_board::decompress(b).num_played_moves() < board.num_played_moves()) m_ttable.erase(b);
         u8 best_move = gya::BOARD_WIDTH;
         eval_result best_eval = LOSING_MOVE;
         auto actions = board.get_actions();

@@ -23,16 +23,16 @@
 #include "pinguml/utils/tensor.hpp"
 
 int main() {
-    /*
     while (true) {
         gya::board b;
         int turn = 1;
         std::cout << "solver depth? ";
-        int depth;
+        u32 depth;
         std::cin >> depth;
-        heuristic::transposition_table_solver s{depth};
+        // heuristic::transposition_table_solver s{depth};
+        heuristic::A s{depth, 3};
         while (!b.has_won().is_game_over()) {
-            lmj::print((std::string) s.evaluate_board(b), s.m_ttable.size());
+            // lmj::print((std::string) s.evaluate_board(b), s.m_ttable.size());
             if (turn ^= 1) {
                 lmj::print(b.to_string());
                 u8 move;
@@ -50,7 +50,7 @@ int main() {
             }
         }
         lmj::print(b.to_string());
-        lmj::print((std::string) s.evaluate_board(b));
+        // lmj::print((std::string) s.evaluate_board(b));
 
         if (b.has_won().is_tie()) {
             std::puts("tie!");
@@ -60,7 +60,6 @@ int main() {
             std::puts("you lost!");
         }
     }
-    */
 
     pinguml::network nn("sgd");
 //    nn.enable_threads(20);

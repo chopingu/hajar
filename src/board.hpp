@@ -402,7 +402,8 @@ struct board {
         for (usize i = BOARD_HEIGHT; i-- > 0;) {
             ret += '|';
             for (usize j = 0; j < BOARD_WIDTH; ++j) {
-                ret += data[j][i] == 0 ? ' ' : data[j][i] == PLAYER_ONE ? 'X' : 'O';
+                ret += data[j][i] == 0 ? ' ' : data[j][i] == PLAYER_ONE ? 'X'
+                                                                        : 'O';
                 ret += '|';
             }
             ret += '\n';
@@ -429,13 +430,17 @@ struct board {
     [[nodiscard]] constexpr i8 turn() const {
         return size % 2 ? PLAYER_TWO : PLAYER_ONE;
     }
+
+    [[nodiscard]] constexpr u8 num_played_moves() const {
+        return size;
+    }
 };
 
 struct random_player {
 private:
     constexpr static auto SEEDS = std::array{123456789ull, 362436069ull, 521288629ull};
-
     u64 x = SEEDS[0], y = SEEDS[1], z = SEEDS[2];
+
 public:
     constexpr explicit random_player(u64 seed = -1) {
         if (std::is_constant_evaluated())
@@ -445,7 +450,7 @@ public:
     }
 
     void construct(u64 seed) {
-        static u64 offs = 0;
+        static std::atomic<usize> offs = 0;
         if (seed == -1ull)
             seed = ++offs * (std::chrono::system_clock::now().time_since_epoch().count() & 0xffffffff);
         set_seed(seed);
@@ -493,15 +498,39 @@ public:
 struct compressed_column {
 private:
     u8 data{};
+
+    u8 _get_height() const {
+        const static auto lookup_table = []() {
+            std::array<u8, 256> res{};
+            for (usize num_moves = 0; num_moves <= gya::BOARD_HEIGHT; ++num_moves) {
+                for (usize i = 0; i < (1ull << num_moves); ++i) {
+                    gya::board_column c;
+                    for (usize j = 0; j < num_moves; ++j)
+                        c.push((i & (1 << j)) ? 1 : -1);
+                    res[compress(c).data] = num_moves;
+                }
+            }
+            return res;
+        }();
+        return lookup_table[data];
+    }
+
 public:
     constexpr static auto TURN_BIT_POS = 7;
 
     [[nodiscard]] constexpr u8 height() const {
-        u8 res = 0;
-        for (res = BOARD_HEIGHT; res >= 1; --res)
-            if (data & (1 << (res - 1)))
-                break;
-        return res;
+        if (std::is_constant_evaluated()) {
+            u8 res = 0;
+            for (res = BOARD_HEIGHT; res >= 1; --res)
+                if (data & (1 << (res - 1)))
+                    break;
+            return res;
+
+            // const u8 temp = data & 0b00111111;
+            // return temp ? 8 - __builtin_clz((u32) temp << 24) : temp;
+        } else {
+            return _get_height();
+        }
     }
 
     static constexpr gya::board_column decompress(gya::compressed_column c) {
@@ -550,6 +579,7 @@ static_assert([] { // loop through all possible columns and verify they are comp
 struct compressed_board {
 private:
     std::array<compressed_column, BOARD_WIDTH> data;
+
 public:
     // explicitly default constructors, destructor, and assignment operators, "Rule of 3"
     constexpr compressed_board() = default;
@@ -560,10 +590,10 @@ public:
 
     constexpr compressed_board &operator=(compressed_board const &) = default;
 
-    // implicit since the conversion is cheap and to simplify usage
+    // implicit since the conversion is cheap, and to simplify usage
     constexpr compressed_board(gya::board const &b) : compressed_board{compress(b)} {}
 
-    // implicit since the conversion is cheap and to simplify usage
+    // implicit since the conversion is cheap, and to simplify usage
     constexpr operator gya::board() const {
         return decompress(*this);
     }
@@ -583,6 +613,13 @@ public:
         for (u8 i = 0; i < BOARD_WIDTH; ++i) {
             res.data[i] = gya::compressed_column::compress(b.data[i]);
         }
+        return res;
+    }
+
+    [[nodiscard]] constexpr u8 num_played_moves() const {
+        u8 res = 0;
+        for (auto i: data)
+            res += i.height();
         return res;
     }
 
@@ -611,3 +648,20 @@ static_assert([] { // test some randomly generated games to make sure they are c
     return true;
 }());
 } // namespace gya
+
+namespace util {
+
+template<class player1_t, class player2_t>
+gya::board test_game(player1_t &&player1, player2_t &&player2, gya::board b = {}) {
+    i32 turn = 0;
+    while (!b.has_won_test().is_game_over()) {
+        turn ^= 1;
+        if (turn) {
+            b.play(player1(b), 1);
+        } else {
+            b.play(player2(b), -1);
+        }
+    }
+    return b;
+}
+} // namespace util

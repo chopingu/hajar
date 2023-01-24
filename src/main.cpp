@@ -30,7 +30,7 @@ int main() {
         u32 depth;
         std::cin >> depth;
         // heuristic::transposition_table_solver s{depth};
-        heuristic::A s{depth, 3};
+        heuristic::Abias s{depth, 3};
         while (!b.has_won().is_game_over()) {
             // lmj::print((std::string) s.evaluate_board(b), s.m_ttable.size());
             if (turn ^= 1) {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../include.hpp"
+#include "../../include.hpp"
 #include "eval_result.hpp"
 
 namespace heuristic {
@@ -47,8 +47,8 @@ struct transposition_table_solver {
     }
 
     [[nodiscard]] u8 operator()(gya::board const &board) {
-        for (auto &[b, eval]: m_ttable)
-            if (gya::compressed_board::decompress(b).num_played_moves() < board.num_played_moves()) m_ttable.erase(b);
+        //for (auto &[b, eval]: m_ttable)
+            //if (gya::compressed_board::decompress(b).num_played_moves() < board.num_played_moves()) m_ttable.erase(b);
         u8 best_move = gya::BOARD_WIDTH;
         eval_result best_eval = LOSING_MOVE;
         auto actions = board.get_actions();

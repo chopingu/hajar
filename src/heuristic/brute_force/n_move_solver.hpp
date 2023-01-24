@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../include.hpp"
+#include "../../include.hpp"
 #include "eval_result.hpp"
 
 namespace heuristic {

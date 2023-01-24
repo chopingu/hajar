@@ -10,7 +10,7 @@ public:
     i32 m_score;
 
     node *m_parent;
-    std::vector<node*> m_children;
+    std::vector<node *> m_children;
     std::array<i32, 2> m_action;
 
     node(node *parent = nullptr, std::array<i32, 2> action = {}) {
@@ -25,4 +25,4 @@ public:
     }
 };
 
-}
+} // namespace mcts

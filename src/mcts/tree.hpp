@@ -15,4 +15,4 @@ public:
     }
 };
 
-}
+} // namespace mcts

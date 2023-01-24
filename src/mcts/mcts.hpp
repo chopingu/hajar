@@ -95,7 +95,7 @@ public:
         }
 
         for(auto node_to_update: nodes_to_update) {
-            i32 player_for_node = (node_to_update->action)[0];
+            i32 player_for_node = (node_to_update->m_action)[0];
             i32 node_score = m_score;
             if(player_for_node != player_id) 
                 node_score *= -1.f;
@@ -104,7 +104,7 @@ public:
         }
     }
 
-    u32 play(gya::board game, i32 player_id) {
+    u8 move(gya::board game, i32 player_id) {
         tree *tr = new tree();
 
         for(u32 i = 0; i < m_rollout_limit; i++) {

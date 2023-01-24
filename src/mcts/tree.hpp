@@ -8,11 +8,9 @@ namespace mcts {
 
 class tree {
 public:
-    node *m_root;
+    std::unique_ptr<node> m_root;
 
-    tree() {
-        m_root = new node();
-    }
+    tree() : m_root(std::make_unique<node>()) {}
 };
 
 } // namespace mcts

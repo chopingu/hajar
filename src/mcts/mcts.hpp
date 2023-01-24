@@ -17,20 +17,20 @@ public:
     mcts(u32 rollout_limit) : m_rollout_limit(rollout_limit) {}
 
     f32 ucb(node *v) {
-        if (!v->m_visits) return 1e9;
-        return v->m_score / (v->m_visits + 2.f * std::sqrt(std::log(v->m_parent->m_visits) / (v->m_visits)));
+        if (!v->m_visits) return std::numeric_limits<f32>::max();
+        return v->m_score / v->m_visits + 2.f * std::sqrt(std::log(v->m_parent->m_visits) / v->m_visits);
     }
 
     node *get_child_with_highest_ucb(node *v) {
         f32 mx_ucb = -std::numeric_limits<f32>::max();
-        std::vector<node *> mx_children;
-        for (auto child: v->m_children) {
-            f32 child_ucb = ucb(child);
+        std::vector<node*> mx_children;
+        for (auto &child: v->m_children) {
+            f32 child_ucb = ucb(child.get());
             if (child_ucb > mx_ucb) {
                 mx_ucb = child_ucb;
-                mx_children = {child};
+                mx_children = {child.get()};
             } else if (child_ucb == mx_ucb) {
-                mx_children.push_back(child);
+                mx_children.push_back(child.get());
             }
         }
 
@@ -40,18 +40,13 @@ public:
     void add_children(node *parent_node, gya::board b, i32 player_id) {
         auto moves = b.get_actions();
 
-        std::vector<node *> children;
-        for (auto m: moves) {
-            node *child_node = new node(parent_node, {player_id, m});
-            children.push_back(child_node);
-        }
-
-        parent_node->m_children = children;
+        for (auto m: moves) 
+            parent_node->m_children.push_back(std::make_unique<node> (node{parent_node, {player_id, m}}));
     }
 
     void simulate_game(gya::board game, tree *tr, i32 player_id) {
-        node *cur_node = tr->m_root;
-        std::vector<node *> nodes_to_update = {cur_node};
+        node *cur_node = tr->m_root.get();
+        std::vector<node *> nodes_to_update = {tr->m_root.get()};
 
         while (!cur_node->is_leaf()) {
             cur_node = get_child_with_highest_ucb(cur_node);
@@ -66,8 +61,7 @@ public:
             i32 next_player_id = game.turn();
             add_children(cur_node, game, next_player_id);
 
-            node *best_new_child_node = get_child_with_highest_ucb(cur_node);
-            game.play(best_new_child_node->m_action[1], next_player_id);
+            game.play(get_child_with_highest_ucb(cur_node)->m_action[1], next_player_id);
 
             while (1) {
                 gya::game_result result2 = game.has_won();
@@ -82,14 +76,10 @@ public:
         if (result.is_tie()) {
             m_draw = 1;
             m_win = 0;
-            m_score = 0;
-        } else if (result.player_1_won()) {
-            m_draw = 0;
-            m_win = (game.turn() == gya::board::PLAYER_ONE ? 1 : 0);
-            m_score = (m_win ? 1 : -1);
+            m_score = -0.1f;
         } else {
             m_draw = 0;
-            m_win = (game.turn() == gya::board::PLAYER_TWO ? 1 : 0);
+            m_win = (game.turn() == player_id ? 1 : 0);
             m_score = (m_win ? 1 : -1);
         }
 
@@ -113,10 +103,10 @@ public:
 
         node *mx_child = nullptr;
         i32 mx_visits = -1;
-        for (auto child: tr->m_root->m_children) {
+        for (auto &child: tr->m_root->m_children) {
             if (mx_visits < static_cast<i32>(child->m_visits)) {
                 mx_visits = child->m_visits;
-                mx_child = child;
+                mx_child = child.get();
             }
         }
 

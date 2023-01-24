@@ -10,15 +10,10 @@ public:
     i32 m_score;
 
     node *m_parent;
-    std::vector<node *> m_children;
+    std::vector<std::unique_ptr<node>> m_children;
     std::array<i32, 2> m_action;
 
-    node(node *parent = nullptr, std::array<i32, 2> action = {}) {
-        m_visits = 0;
-        m_score = 0;
-        m_parent = parent;
-        m_action = action;
-    }
+    node(node *parent = nullptr, std::array<i32, 2> action = {}) : m_visits(0), m_score(0), m_parent(parent), m_action(action) {}
 
     bool is_leaf() {
         return m_children.empty();

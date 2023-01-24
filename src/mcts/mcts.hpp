@@ -87,11 +87,13 @@ public:
         }
         else if(result.player_1_won()) {
             m_draw = 0;
-            m_score = m_win = (game.turn() == gya::board::PLAYER_ONE ? 1 : -1);
+            m_win = (game.turn() == gya::board::PLAYER_ONE ? 1 : 0);
+            m_score = (m_win ? 1 : -1);
         }
         else {
             m_draw = 0;
-            m_score = m_win = (game.turn() == gya::board::PLAYER_TWO ? 1 : -1);
+            m_win = (game.turn() == gya::board::PLAYER_TWO ? 1 : 0);
+            m_score = (m_win ? 1 : -1);
         }
 
         for(auto node_to_update: nodes_to_update) {
@@ -113,7 +115,7 @@ public:
         }
 
         node *mx_child;
-        u32 mx_visits = -1;
+        i32 mx_visits = -1;
         for(auto child: tr->m_root->m_children) 
             if(mx_visits < child->m_visits) {
                 mx_visits = child->m_visits;

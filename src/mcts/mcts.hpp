@@ -11,7 +11,7 @@ class mcts {
 public:
     bool m_win;
     bool m_draw;
-    i8 m_score;
+    i32 m_score;
     u32 m_rollout_limit;
 
     mcts(u32 rollout_limit) : m_rollout_limit(rollout_limit) {}
@@ -92,6 +92,15 @@ public:
         else {
             m_draw = 0;
             m_score = m_win = (game.turn() == gya::board::PLAYER_TWO ? 1 : -1);
+        }
+
+        for(auto node_to_update: nodes_to_update) {
+            i32 player_for_node = (node_to_update->action)[0];
+            i32 node_score = m_score;
+            if(player_for_node != player_id) 
+                node_score *= -1.f;
+            (node_to_update->m_visits)++;
+            (node_to_update->m_score) += node_score;
         }
     }
 

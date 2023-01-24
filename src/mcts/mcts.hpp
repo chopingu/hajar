@@ -104,11 +104,11 @@ public:
     }
 
     u8 move(gya::board game, i32 player_id) {
-        tree *tr = new tree();
+        std::unique_ptr<tree> tr = std::make_unique<tree>();
 
         for (u32 i = 0; i < m_rollout_limit; i++) {
             gya::board copy = game;
-            simulate_game(copy, tr, player_id);
+            simulate_game(copy, tr.get(), player_id);
         }
 
         node *mx_child = nullptr;

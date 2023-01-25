@@ -9,16 +9,13 @@ namespace mcts {
 
 class mcts {
 public:
-    bool m_win;
-    bool m_draw;
-    i32 m_score;
     u32 m_rollout_limit;
 
     mcts(u32 rollout_limit) : m_rollout_limit(rollout_limit) {}
 
     f32 ucb(node *v) {
         if (!v->m_visits) return std::numeric_limits<f32>::max();
-        return v->m_score / v->m_visits + 2.f * std::sqrt(std::log(v->m_parent->m_visits) / v->m_visits);
+        return v->m_score / v->m_visits + 0.1f * std::sqrt(std::log(v->m_parent->m_visits) / v->m_visits);
     }
 
     node *get_child_with_highest_ucb(node *v) {
@@ -72,20 +69,20 @@ public:
             }
         }
 
+        f32 score;
+        bool win;
         result = game.has_won();
         if (result.is_tie()) {
-            m_draw = 1;
-            m_win = 0;
-            m_score = -0.1f;
+            win = 0;
+            score = 0.f;
         } else {
-            m_draw = 0;
-            m_win = (game.turn() == player_id ? 1 : 0);
-            m_score = (m_win ? 1 : -1);
+            win = (game.turn() == player_id ? 1 : 0);
+            score = (win ? 1 : -1);
         }
 
         for (auto node_to_update: nodes_to_update) {
             i32 player_for_node = (node_to_update->m_action)[0];
-            i32 node_score = m_score;
+            i32 node_score = score;
             if (player_for_node != player_id)
                 node_score *= -1.f;
             (node_to_update->m_visits)++;

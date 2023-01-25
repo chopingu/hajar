@@ -3,10 +3,10 @@
 #include "../../include.hpp"
 
 namespace heuristic {
-struct n_move_solver_simple {
+struct simple_n_move_solver {
     u32 m_num_moves;
 
-    n_move_solver_simple(u32 num_moves) : m_num_moves(num_moves) {}
+    simple_n_move_solver(u32 num_moves) : m_num_moves(num_moves) {}
 
     f64 evaluate_board(gya::board const &b, u32 steps_left) const {
         if (gya::game_result result = b.has_won(); result.is_game_over()) {

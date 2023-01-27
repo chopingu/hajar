@@ -117,7 +117,8 @@ int main() {
     lmj::timer timer{false};
     i32 hours = 5;
     while (timer.elapsed() < hours * 60 * 60) {
-        benchmark(net);
+        if (iter % 100 == 0)
+            benchmark(net);
         lmj::debug(timer.elapsed());
         lmj::print(iter);
         if (!(iter % 1)) {

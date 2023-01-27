@@ -1,5 +1,3 @@
-#pragma once
-
 #include "include.hpp"
 
 #include "heuristic/brute_force/n_move_solver.hpp"
@@ -15,40 +13,53 @@
 
 using namespace tiny_dnn;
 
+std::string curr_date;
+
 int main() {
+
+    { // put current time in curr_date variable
+        // https://stackoverflow.com/questions/3673226/how-to-print-time-in-format-2009-08-10-181754-811
+        char buffer[1024]{};
+        time_t timer = time(NULL);
+        strftime(buffer, 26, "%Y-%m-%d-%H-%M-%S", localtime(&timer));
+        curr_date = buffer;
+        lmj::debug(curr_date);
+    }
+
+    size_t in_width = 7;
+    size_t in_height = 6;
+    size_t window_size = 4;
+    size_t in_channels = 1;
+    size_t out_channels = 256;
     network<sequential> net;
-    net << fully_connected_layer(43, 200)
+    net << convolutional_layer(in_width, in_height, window_size, in_channels, out_channels)
+        << tanh_layer(in_width - window_size + 1, in_height - window_size + 1, out_channels)
+        << fully_connected_layer((in_width - window_size + 1) * (in_height - window_size + 1) * out_channels, 64)
         << tanh_layer()
-        << fully_connected_layer(200, 200)
+        << fully_connected_layer(64, 64)
         << tanh_layer()
-        << fully_connected_layer(200, 200)
-        << tanh_layer()
-        << fully_connected_layer(200, 200)
-        << tanh_layer()
-        << fully_connected_layer(200, 7);
+        << fully_connected_layer(64, 7);
 
     const f32 learning_rate = 0.01f;
     const f32 discount_factor = 0.9f;
 
-    std::vector<u32> wins;
-    std::vector<u32> draws;
-    std::vector<u32> losses;
+    u32 win_cnt = 0;
+    u32 draw_cnt = 0;
+    u32 loss_cnt = 0;
 
-    u32 win_cnt;
-    u32 draw_cnt;
-    u32 loss_cnt;
-
-    heuristic::n_move_solver s(5);
+    std::ofstream win_loss_tie_data(curr_date + ".win_data");
 
     i32 iter = 10000;
     lmj::timer timer{false};
     i32 hours = 5;
     while (timer.elapsed() < hours * 60 * 60) {
         lmj::debug(timer.elapsed());
-        if (!(iter % 100)) {
-            wins.push_back(win_cnt);
-            draws.push_back(draw_cnt);
-            losses.push_back(loss_cnt);
+        lmj::print(iter);
+        if (!(iter % 1)) {
+            win_loss_tie_data << win_cnt << ' ';
+            win_loss_tie_data << draw_cnt << ' ';
+            win_loss_tie_data << loss_cnt << ' ';
+            win_loss_tie_data << std::endl;
             win_cnt = 0;
             draw_cnt = 0;
             loss_cnt = 0;
@@ -57,9 +68,10 @@ int main() {
         gya::board b;
 
         std::vector<vec_t> input_data;
-        std::vector<vec_t> output_data;
         std::vector<u8> moves;
-        std::vector<f32> qscore;
+        std::vector<i8> col_times(7, -1);
+
+        heuristic::n_move_solver s(5);
 
         u32 cnt = 0;
         i8 turn = 1;
@@ -71,30 +83,30 @@ int main() {
                 for (u32 j = 0; j < gya::BOARD_WIDTH; j++)
                     input.push_back(b[j][i]);
 
-            input.push_back(turn);
-
             input_data.push_back(input);
 
             vec_t result = net.predict(input);
 
-            output_data.push_back(result);
-
-            u32 move;
-            f32 mx_output = -100;
-            for (u32 col = 0; col < gya::BOARD_WIDTH; col++)
-                if (result[col] > mx_output && b[col].height < gya::BOARD_HEIGHT) {
-                    mx_output = result[col];
-                    move = col;
+            u32 move = 0;
+            std::srand(std::clock());
+            if(std::rand() % 15) {
+                f32 mx_output = -100;
+                for (u32 col = 0; col < gya::BOARD_WIDTH; col++) {
+                    if (result[col] > mx_output && b[col].height < gya::BOARD_HEIGHT) {
+                        mx_output = result[col];
+                        move = col;
+                    }
+                    if(b[col].height >= gya::BOARD_HEIGHT && col_times[col] == -1) 
+                        col_times[col] = cnt;
                 }
-
-            if (turn == -1) {
+            }
+            else {
+                //auto legal = b.get_actions();
+                //move = legal[std::rand() % legal.size()];
                 move = s(b);
-                mx_output = result[move];
             }
 
             moves.push_back(move);
-
-            if (cnt > 1) qscore.push_back(discount_factor * mx_output);
 
             b.play(move, turn);
 
@@ -102,35 +114,51 @@ int main() {
             cnt++;
         }
 
+        for(auto &i: col_times) 
+            if(i != -1) 
+                i = cnt - i - 1;
+
+        f32 qlast = 0, qnlast = 0;
+
         if (b.has_won().is_tie()) {
-            qscore.push_back(0);
-            qscore.push_back(0);
             draw_cnt++;
         } else {
-            qscore.push_back(-1);
-            qscore.push_back(1);
+            qlast = 1, qnlast = -1; 
             if (b.has_won().player_2_won())
                 loss_cnt++;
             else
                 win_cnt++;
         }
 
-        std::vector<vec_t> q_targets = output_data;
-
-        for (u32 i = 0; i < cnt; i++)
-            q_targets[i][moves[i]] += learning_rate * (qscore[i] - q_targets[i][moves[i]]);
-
-        size_t batch_size = 1;
-        size_t epochs = 1;
         adagrad opt;
 
+        std::reverse(moves.begin(), moves.end());
+        std::reverse(input_data.begin(), input_data.end());
+
+        for(u32 i = 0; i < cnt; i++) {
+            vec_t q = net.predict(input_data[i]);
+            q[moves[i]] += learning_rate * (qlast - q[moves[i]]);
+
+            net.fit<mse>(opt, std::vector<vec_t>{input_data[i]}, std::vector<vec_t>{q});
+            q = net.predict(input_data[i]);
+            qlast = qnlast;
+
+            f32 mx_q = -100;
+            for(u32 j = 0; j < gya::BOARD_WIDTH; j++) 
+                if(col_times[j] < (i8)i) {
+                    mx_q = std::max(mx_q, q[j]);
+                }
+
+            qnlast = mx_q * discount_factor;
+        }
+
         lmj::debug(input_data.size());
-        net.fit<mse>(opt, input_data, q_targets, batch_size, epochs);
 
         iter--;
     }
 
-    wins.push_back(win_cnt);
-    draws.push_back(draw_cnt);
-    losses.push_back(loss_cnt);
+    win_loss_tie_data << win_cnt << ' ';
+    win_loss_tie_data << draw_cnt << ' ';
+    win_loss_tie_data << loss_cnt << ' ';
+    win_loss_tie_data << std::endl;
 }

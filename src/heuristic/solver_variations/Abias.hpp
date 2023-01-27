@@ -24,7 +24,7 @@ struct Abias {
 
         f64 best_eval = -1e10;
         for (auto move: b.get_actions()) {
-            auto evaluation = evaluate_board(b.play_copy(move), steps_left - 1) * -1;
+            auto evaluation = evaluate_board(b.play_copy(move), steps_left - 1) * -1 * 1.1;
             if (b.play_copy(move).n_vertical_count(m_n, b.turn()) > b.n_vertical_count(m_n, b.turn()))
                 evaluation += 1e6;
             if (evaluation > best_eval)

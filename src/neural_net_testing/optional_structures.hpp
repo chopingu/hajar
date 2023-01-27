@@ -25,11 +25,6 @@ public:
         return m_layer_array.operator[](idx);
     }
 
-    constexpr usize size() const {
-        static_assert(used);
-        return m_layer_array.size();
-    }
-
     constexpr std::span<T> front() {
         static_assert(used);
         return m_layer_array.front();

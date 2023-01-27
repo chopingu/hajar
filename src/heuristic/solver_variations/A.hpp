@@ -14,17 +14,17 @@ struct A {
             if (result.is_tie()) {
                 return -1e5;
             } else if (result.player_1_won()) {
-                return (b.turn() == gya::board::PLAYER_ONE ? 1 : -1) * 1e9;
+                return (b.turn() == gya::board::PLAYER_ONE ? 1 : -1) * std::numeric_limits<f64>::max();
             } else {
-                return (b.turn() == gya::board::PLAYER_TWO ? 1 : -1) * 1e9;
+                return (b.turn() == gya::board::PLAYER_TWO ? 1 : -1) * std::numeric_limits<f64>::max();
             }
         }
 
         if (steps_left == 0) return 0;
 
-        f64 best_eval = -1e10;
+        f64 best_eval = -std::numeric_limits<f64>::max();
         for (auto move: b.get_actions()) {
-            const auto evaluation = evaluate_board(b.play_copy(move), steps_left - 1) * -1;
+            const auto evaluation = evaluate_board(b.play_copy(move), steps_left - 1) * -1 * 0.75;
             if (evaluation > best_eval)
                 best_eval = evaluation;
         }

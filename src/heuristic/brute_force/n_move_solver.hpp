@@ -48,9 +48,10 @@ struct n_move_solver {
         eval_result best_eval = LOSING_MOVE;
         auto actions = board.get_actions();
         // put indices closer to the middle first
-        std::sort(std::begin(actions), std::end(actions), [](u8 lhs, u8 rhs) {
-            return std::abs(lhs - gya::BOARD_WIDTH / 2) < std::abs(rhs - gya::BOARD_WIDTH / 2);
-        });
+        // std::sort(std::begin(actions), std::end(actions), [](u8 lhs, u8 rhs) {
+        //     return std::abs(lhs - gya::BOARD_WIDTH / 2) < std::abs(rhs - gya::BOARD_WIDTH / 2);
+        // });
+        lmj::random_shuffle(actions);
 
         if (!multi_thread || m_depth < 5) {
             for (u8 move: actions) {

@@ -22,7 +22,7 @@
 \newpage
 
 \begin{abstract}
-In October 2022 DeepMind announced an artificial intelligence in a preprint \cite{alphatensor} that was called AlphaTensor. It utilized \emph{artificial neural networks} in combination with \emph{heuristic algorithms} in order to solve the unsolved problem of finding faster algorithms for matrix multiplication. AlphaTensor was succesful and has shed light on the process of finding new algorithms. In this paper we aim to study the effectiveness of different \emph{neural networks} and \emph{heuristic algorithms} such as the one used in AlphaTensor. More precisely, we intend to analyze the efficiency of those networks and algorithms in combination with varying \emph{optimizations, parameters, hyperparameters} and \emph {architectures} applied to the classic games \emph{Connect Four} and \emph{Othello}. 
+In October 2022 DeepMind announced an artificial intelligence in a preprint \cite{alphatensor} that was called AlphaTensor. It utilized \emph{artificial neural networks} in combination with \emph{heuristic algorithms} in order to solve the unsolved problem of finding faster algorithms for matrix multiplication. AlphaTensor was succesful and has shed light on the process of finding new algorithms. In this paper we aim to study the effectiveness of different \emph{neural networks} and \emph{heuristic algorithms} such as the one used in AlphaTensor. More precisely, we intend to analyze the efficiency of those networks and algorithms in combination with varying \emph{optimizations, parameters, hyperparameters} and \emph {architectures} applied to the classic game \emph{Connect Four}. 
 
 \vskip 1cm
 
@@ -102,26 +102,154 @@ The greatest factors of an artificial neural network's success is its architectu
 
 \subsection{Analysis}
 
-In this paper we aim to analyse the effects various algorithms, parameters and training methods have on rate and quality of learning of an artificial intelligence.
-
-\vskip 1cm
+In this paper we aim to analyse the effects various algorithms, parameters and training methods have on rate and quality of learning of an artificial intelligence with the help of a board game. 
 
 \subsection{Delimitations}
 
-This project is limited to less complex games due to the limitations of computing power and time.
+\vskip 0.2cm
+
+\subsubsection{Choice of Game}
+This project is limited to a less complex game due to the limitations of computing power and time. Board games such as chess or shogi have large search spaces due to the number of different moves possible from each board state and are therefore not suitable for this project. 
+
+\subsubsection{Connect Four Implementation}
+No time will be put into making our \emph{Connect Four} board user-friendly since it is not the purpose of this project. Time will on the other hand be spent making the board and its operations efficient in order to make training and playing consume less time. 
 
 \newpage
 
-\subsection{Division of Work}
+\section{Connect Four}
 
-Different parts of this project have been divided amongst the authors in order to make to process more effective. 
-(More details coming) 
+\vskip 0.5cm
+
+\emph{Connect Four} is a two-player connection game, in which two players take turns dropping tokens of their chosen color into a vertically suspended grid with seven columns and six rows. A dropped token takes the lowest available space within the column it was dropped in and the objective of the game is to be the first to form a line of four tokens of the chosen color. Either horizontally, vertically or diagonally. Each player starts the game with 21 tokens of their chosen color. Let the colors, without loss of generality, be black and white and let the player with the black tokens be the first player. If all of the 42 spaces in the grid are filled and none of the players has won the game is drawn. Following are five example games. The first four games are won by the player with white tokens by having creatied a line of four white tokens vertically, horizontally and diagonally respectively. The last game where both players have used their 21 tokens and not won illustrates a tie.
+
+\vskip 0.75cm
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{connect4}
+    \caption{\scriptsize The player with white tokens wins with four white tokens connected in a line vertically}
+\end{figure}
+
+\vskip 0.3cm
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{connect4.2}
+    \caption{\scriptsize The player with the white tokens wins with four white tokens connected in a line horizontally}
+\end{figure}
 
 \newpage
 
-\section{Games}
-\subsection{Connect Four}
-\subsection{Othello}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{connect4.3}
+    \caption{\scriptsize The player with the white tokens wins with four white tokens connected in a line diagonally}
+\end{figure}
+
+\vskip 0.3cm
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{connect4.4}
+    \caption{\scriptsize The player with the white tokens wins with four white tokens connected in a line diagonally}
+\end{figure}
+
+\vskip 0.3cm
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{connect4.5}
+    \caption{\scriptsize All 42 tokens have been used and no line of four equal-colored tokens was created. It is therefore a tie.}
+\end{figure}
+
+\newpage
+
+\section{Reinforcement Learning}
+
+\vskip 0.5cm
+
+\subsection{Introduction}
+
+\vskip 0.3cm
+
+The nature of learning is often associated with the foundational idea of learning by interacting with the surrounding environment. When a child learns how to ride a bicycle, the child either falls or manages to stay in balance. Everytime parents speak to their children they indirectly correct the children's sentences by repeating them correctly. Constantly interacting with the environment produces a wealth of information about consequences of actions, about the cause and effect of them and about what actions to take in order to achieve a certain goal. These kinds of interactions undoubtedly play a major role throughout our lives as we learn about ourselves and the environment surrounding us. Whether it is learning how to ride a bike or how to speak, we are always aware of how the environment responds to our actions. By behaving in certain manner and choosing actions carefully, we can reach the goals we seek. \emph{Reinforcement learning} offers a computational approch to learning from interaction. By primarily exploring idealized learning situations and evaluting the effectiveness of various learning methods, \emph{reinforcement learning} focuses a lot more on goal-oriented learning from interaction than any other machine learning approach. 
+
+\subsection{Examples}
+
+\vskip 0.3cm
+
+Following are examples in order to better grasp the concept of \emph{reinforcement learning} and how it could be applied to real life problems.
+
+\vskip 0.3cm
+
+\begin{outline}
+    \1 Adam left his house five minutes ago and is on his way to school. He suddenly starts questioning whether he locked the front door or not. Turning home would at this point of time make him late to class but leaving the house unlocked has its risks. Adam makes his decision based on the time he gets home after school and how often he has actually forgotten to lock the door. 
+    \1 Hugo is playing chess against the current chess world champion Magnus Carlsen. In order to not lose, Hugo makes moves by intuitive judgement of the current position and by anticipating possible counterreplies. Since Hugo is familiar with the current position and has played it at home several times, he is quite confident in his decisions. 
+    \1 Romeo could hardly move his body the first few months after being born. One year later he was running at 1.6 meters per second.
+    \1 Jonathan is in a casino and suddenly sees 10 slot machines. He does not know the probability of hitting a jackpot on any of the machines but knows the cost of each lever pull and the reward given by a jackpot. Through repeated selections of slot machines, Jonathan manages to maximize his winnings by concentrating on the best levers. 
+\end{outline}
+
+\newpage
+
+\noindent
+All of the examples share features that are easily overlooked due to their simplicity. They all involve interaction between a decision-making agent and an environmnet, where the agent is trying to achieve a particular goal without knowing the full extent of the environment nor the consequences of its actions. The agent's actions are able to affect the environment (e.g., Hugo making a move against Magnus Carlsen changes the state of board) thereby affecting the actions available to the agent in the future. None of the actions, in all of the examples, can be predicted fully and the agent must instead observe the environment and how it changes based on actions in order to learn how to properly behave. 
+
+\subsection{Elements of Reinforcement Learning}
+
+\vskip 0.3cm
+
+As previously illustrated there are two main components of \emph{reinforcement learning}, an \emph{agent} and an \emph{environment}. It is one the other hand possible to recognize three more elements of a reinforcement learning system. Namely a policy, a reward signal and a value function. 
+
+\vskip 0.3cm
+
+\noindent
+A \emph{policy} describes an agent's way of deciding actions at given times. It could roughly be defined as a mapping from a state of the environment to actions to be taken at that state. 
+\vskip 0.3cm
+
+\noindent
+Further, the \emph{reward signal} determines the goal of the learning agent. After each decision the agent makes, the environment sends a reward signal and the goal is to maximize the total reward after all of the actions have been made. The reward signal thus determine what actions are and bad respectively. This could be compared to pain and pleasure in human beings. When a child falls of its bike it recieves a negative reward signal in the form of pain. On the other hand, maintaining balance on the bike for a certain amount of time sends a positive reward signal in the form of happiness. Since the child, the learning agent, wants to experience joy instead of pain the goal becomes riding a bike without falling off of it. 
+
+\vskip 0.3cm
+
+\noindent
+Lastly, whereas the \emph{reward signal} immediately tells the agent whether an action was good or bad, the \emph{value function} tries to tell whether an action is good or bad in the long run. It could roughly be defined as the expected total reward after a certain action while a reward signal only informs the agent about the immediate reward. 
+
+\subsection{Markov Decision Process}
+
+\vskip 0.2cm
+
+A \emph{Markov Decision Process}, MDP, is a more rigorous and mathematical way of describing a seqentual decision-making system. A MDP can formally defined as MDP$(S, A, \Upsilon, P, \gamma)$ where each parameter is defined as following:
+
+\vskip 0.3cm
+
+\begin{outline}
+    \1 $S$ is the set of all the possible states the environment take on.
+    \1 $A$ is the set of all possible actions that can be taken within the environment.
+    \1 $\Upsilon$ is the reward signal returned for each action taken.
+    \1 $P$ is a probability transition matrix
+    \1 $\gamma$ is the discount factor.
+\end{outline}
+
+\newpage
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.7]{MDP}
+    \caption{Illustration of Markov Decision Process}
+\end{figure}
+
+
+
+\newpage
+
+\subsection{Q-Learning}
+
+\subsection{Double Q-Learning}
+
+\newpage
+
+\subsection{Monte Carlo Tree Search}
+\subsubsection{Upper Confidence Bound}
 
 \newpage
 
@@ -173,13 +301,6 @@ Different parts of this project have been divided amongst the authors in order t
 
 \newpage
 
-\section{Reinforcement Learning}
-
-\subsection{Introduction}
-\subsection{Monte Carlo Tree Search}
-\subsubsection{Upper Confidence Bound}
-
-\newpage
 
 \section{Heuristic Algorithms}
 \subsection{MiniMax}

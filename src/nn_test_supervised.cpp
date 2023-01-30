@@ -57,7 +57,7 @@ void benchmark(network<sequential> &net) {
     // mcts::mcts{1000};
     // heuristic::two_move_solver;
     int w{}, t{}, l{};
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 50; ++i) {
         gya::board b1 = util::test_game(solver, heur);
         gya::board b2 = util::test_game(heur, solver);
         w += b1.has_won().player_1_won();

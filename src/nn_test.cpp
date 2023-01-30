@@ -72,7 +72,6 @@ void benchmark(network<sequential> &net) {
 }
 
 int main() {
-
     { // put current time in curr_date variable
         // https://stackoverflow.com/questions/3673226/how-to-print-time-in-format-2009-08-10-181754-811
         char buffer[1024]{};
@@ -88,7 +87,7 @@ int main() {
     std::cin >> learning_rate;
     std::cout << "random_rate: ";
     std::cin >> random_rate;
-    identifier = "K" + std::to_string(kernel_size) + "L" + std::to_string((int) learning_rate * 1000) + "R" + std::to_string(random_rate) + curr_date;
+    identifier = mode + "-K" + std::to_string(kernel_size) + "-L" + std::to_string(static_cast<i32>(learning_rate * 1000)) + "-R" + std::to_string(random_rate) + "-" + curr_date;
     lmj::debug(identifier);
 
     size_t in_width = 7;
@@ -97,6 +96,7 @@ int main() {
     size_t in_channels = 1;
     size_t out_channels = 256;
     network<sequential> net;
+    net_printer _net_printer(net);
     net << convolutional_layer(in_width, in_height, window_size, in_channels, out_channels)
         << tanh_layer(in_width - window_size + 1, in_height - window_size + 1, out_channels)
         << fully_connected_layer((in_width - window_size + 1) * (in_height - window_size + 1) * out_channels, 64)
@@ -155,7 +155,7 @@ int main() {
 
             u32 move = 0;
             std::srand(std::clock());
-            if (std::rand() % 15) {
+            if (std::rand() % random_rate) {
                 f32 mx_output = -100;
                 for (u32 col = 0; col < gya::BOARD_WIDTH; col++) {
                     if (result[col] > mx_output && b[col].height < gya::BOARD_HEIGHT) {

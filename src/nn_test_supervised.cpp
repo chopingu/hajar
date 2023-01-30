@@ -13,7 +13,62 @@
 
 using namespace tiny_dnn;
 
+int kernel_size;
+f32 discount_factor;
+const std::string mode = "S";
+const std::string path = "../data/";
 std::string curr_date;
+std::string identifier;
+
+struct net_printer {
+    network<sequential> const &net;
+
+    ~net_printer() {
+        std::ofstream out_file(path + identifier + ".network_data");
+        out_file << net;
+    }
+};
+
+void benchmark(network<sequential> &net) {
+    struct solver_from_network {
+        network<sequential> &net;
+
+        u8 operator()(gya::board &b) {
+            vec_t input;
+            for (i32 i = gya::BOARD_HEIGHT - 1; i >= 0; i--)
+                for (i32 j = 0; j < gya::BOARD_WIDTH; j++)
+                    input.push_back(b[j][i]);
+            vec_t result = net.predict(input);
+            f32 mx_output = -100;
+            u8 move = 0;
+            for (u32 col = 0; col < gya::BOARD_WIDTH; col++) {
+                if (result[col] > mx_output && b[col].height < gya::BOARD_HEIGHT) {
+                    mx_output = result[col];
+                    move = col;
+                }
+            }
+            return move;
+        }
+    };
+    solver_from_network solver{net};
+    static std::ofstream benchmark_data(path + identifier + ".benchmark_data");
+    static auto heur =
+            heuristic::n_move_solver{4};
+    // mcts::mcts{1000};
+    // heuristic::two_move_solver;
+    int w{}, t{}, l{};
+    for (int i = 0; i < 5; ++i) {
+        gya::board b1 = util::test_game(solver, heur);
+        gya::board b2 = util::test_game(heur, solver);
+        w += b1.has_won().player_1_won();
+        t += b1.has_won().is_tie();
+        l += b1.has_won().player_2_won();
+        l += b2.has_won().player_1_won();
+        t += b2.has_won().is_tie();
+        w += b2.has_won().player_2_won();
+    }
+    benchmark_data << w << ' ' << t << ' ' << l << std::endl;
+}
 
 int main() {
 
@@ -26,12 +81,20 @@ int main() {
         lmj::debug(curr_date);
     }
 
+    std::cout << "kernel_size: ";
+    std::cin >> kernel_size;
+    std::cout << "discount_factor: ";
+    std::cin >> discount_factor;
+    identifier = mode + "-K" + std::to_string(kernel_size) + "-D" + std::to_string(static_cast<i32>(discount_factor * 1000)) + "-" + curr_date;
+    lmj::debug(identifier);
+
     size_t in_width = 7;
     size_t in_height = 6;
     size_t window_size = 4;
     size_t in_channels = 1;
     size_t out_channels = 256;
     network<sequential> net;
+    net_printer _net_printer(net);
     net << convolutional_layer(in_width, in_height, window_size, in_channels, out_channels)
         << tanh_layer(in_width - window_size + 1, in_height - window_size + 1, out_channels)
         << fully_connected_layer((in_width - window_size + 1) * (in_height - window_size + 1) * out_channels, 64)
@@ -40,13 +103,11 @@ int main() {
         << tanh_layer()
         << fully_connected_layer(64, 7);
 
-    const f32 discount_factor = 0.9f;
-
     u32 win_cnt = 0;
     u32 draw_cnt = 0;
     u32 loss_cnt = 0;
 
-    std::ofstream win_loss_tie_data(curr_date + ".win_data");
+    std::ofstream win_loss_tie_data(path + identifier + ".win_data");
 
     i32 iter = 10000;
     lmj::timer timer{false};
@@ -55,6 +116,8 @@ int main() {
     heuristic::n_move_solver s(5);
 
     while (timer.elapsed() < hours * 60 * 60) {
+        if (iter % 100 == 0)
+            benchmark(net);
         lmj::debug(timer.elapsed());
         lmj::print(iter);
         if (!(iter % 1)) {
@@ -102,7 +165,7 @@ int main() {
             lmj::debug(input_data.size());
             continue;
         } else {
-            qlast = 1, qnlast = -1; 
+            qlast = 1, qnlast = -1;
             if (b.has_won().player_2_won())
                 loss_cnt++;
             else
@@ -114,7 +177,7 @@ int main() {
         std::reverse(moves.begin(), moves.end());
         std::reverse(input_data.begin(), input_data.end());
 
-        for(u32 i = 0; i < cnt; i++) {
+        for (u32 i = 0; i < cnt; i++) {
             vec_t target = net.predict(input_data[i]);
             target[moves[i]] = qlast;
 

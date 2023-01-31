@@ -54,9 +54,9 @@ void benchmark(network<sequential> &net) {
     solver_from_network solver{net};
     static std::ofstream benchmark_data(path + identifier + ".benchmark_data");
     static auto heur =
-            heuristic::n_move_solver{4};
-    // mcts::mcts{1000};
-    // heuristic::two_move_solver;
+            // heuristic::n_move_solver{2};
+            // [](auto const &board) { auto solver = mcts::mcts{2000}; return solver.move(board, board.turn()); };
+            heuristic::two_move_solver{};
     int w{}, t{}, l{};
     for (int i = 0; i < 50; ++i) {
         gya::board b1 = util::test_game(solver, heur);
@@ -117,7 +117,7 @@ int main() {
     lmj::timer timer{false};
     i32 hours = 5;
     while (timer.elapsed() < hours * 60 * 60) {
-        if (iter % 100 == 0)
+        if (iter % 10 == 0)
             benchmark(net);
         lmj::debug(timer.elapsed());
         lmj::print(iter);

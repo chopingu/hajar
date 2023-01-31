@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 def main():
     if len(sys.argv) < 2:
         print("pass file to plot as argument to the program")
+        print("example use: '$ python plot.py ../data/Q-K5-L10-R5-2023-01-30-23-56-23.benchmark_data'")
         exit(-1)
     with open(sys.argv[1]) as f:
         vals = [tuple(map(int, line.strip().split()))

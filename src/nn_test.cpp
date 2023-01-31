@@ -52,23 +52,39 @@ void benchmark(network<sequential> &net) {
         }
     };
     solver_from_network solver{net};
-    static std::ofstream benchmark_data(path + identifier + ".benchmark_data");
-    static auto heur =
-            // heuristic::n_move_solver{2};
-            // [](auto const &board) { auto solver = mcts::mcts{2000}; return solver.move(board, board.turn()); };
-            heuristic::two_move_solver{};
-    int w{}, t{}, l{};
-    for (int i = 0; i < 50; ++i) {
-        gya::board b1 = util::test_game(solver, heur);
-        gya::board b2 = util::test_game(heur, solver);
-        w += b1.has_won().player_1_won();
-        t += b1.has_won().is_tie();
-        l += b1.has_won().player_2_won();
-        l += b2.has_won().player_1_won();
-        t += b2.has_won().is_tie();
-        w += b2.has_won().player_2_won();
+    using heur_func = u8(const gya::board &);
+    static const std::pair<heur_func *, const char *> heuristics[]{
+            {+[](gya::board const &board) { return heuristic::n_move_solver{4}(board); }, "n_move_solver_4"},
+            {+[](gya::board const &board) { auto solver = mcts::mcts{500}; return solver.move(board, board.turn()); }, "mcts500"},
+            {+[](gya::board const &board) { auto solver = mcts::mcts{1000}; return solver.move(board, board.turn()); }, "mcts1000"},
+            {+[](gya::board const &board) { auto solver = mcts::mcts{2000}; return solver.move(board, board.turn()); }, "mcts2000"},
+            {+[](gya::board const &board) { return heuristic::two_move_solver{}(board); }, "two_move_solver"},
+    };
+
+    static std::vector<std::ofstream> outfiles = [&] {
+        std::vector<std::ofstream> result;
+        for (auto [_, name]: heuristics)
+            result.emplace_back(path + identifier + "-" + name + ".benchmark_data");
+        return result;
+    }();
+
+
+    for (usize i = 0; i < std::size(heuristics); ++i) {
+        i32 w = 0, t = 0, l = 0;
+        for (int game_idx = 0; game_idx < 50; ++game_idx) {
+            gya::board b1 = util::test_game(solver, heuristics[i].first);
+            gya::board b2 = util::test_game(heuristics[i].first, solver);
+
+            w += b1.has_won().player_1_won();
+            t += b1.has_won().is_tie();
+            l += b1.has_won().player_2_won();
+
+            l += b2.has_won().player_1_won();
+            t += b2.has_won().is_tie();
+            w += b2.has_won().player_2_won();
+        }
+        outfiles[i] << w << ' ' << t << ' ' << l << std::endl;
     }
-    benchmark_data << w << ' ' << t << ' ' << l << std::endl;
 }
 
 int main() {
@@ -117,7 +133,7 @@ int main() {
     lmj::timer timer{false};
     i32 hours = 5;
     while (timer.elapsed() < hours * 60 * 60) {
-        if (iter % 10 == 0)
+        if (iter % 100 == 0)
             benchmark(net);
         lmj::debug(timer.elapsed());
         lmj::print(iter);

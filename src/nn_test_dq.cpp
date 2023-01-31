@@ -16,7 +16,7 @@ using namespace tiny_dnn;
 int kernel_size;
 f32 learning_rate;
 int random_rate;
-const std::string mode = "Q";
+const std::string mode = "DQ";
 const std::string path = "../data/";
 std::string curr_date;
 std::string identifier;
@@ -121,6 +121,15 @@ int main() {
         << tanh_layer()
         << fully_connected_layer(64, 7);
 
+    network<sequential> net2;
+    net2 << convolutional_layer(in_width, in_height, window_size, in_channels, out_channels)
+         << tanh_layer(in_width - window_size + 1, in_height - window_size + 1, out_channels)
+         << fully_connected_layer((in_width - window_size + 1) * (in_height - window_size + 1) * out_channels, 64)
+         << tanh_layer()
+         << fully_connected_layer(64, 64)
+         << tanh_layer()
+         << fully_connected_layer(64, 7);
+
     const f32 discount_factor = 0.9f;
 
     u32 win_cnt = 0;
@@ -166,19 +175,28 @@ int main() {
             input_data.push_back(input);
 
             vec_t result = net.predict(input);
+            vec_t result2 = net2.predict(input);
 
-            u32 move = 0;
+            u32 move = 0, move2 = 0;
             std::srand(std::clock());
             if (std::rand() % random_rate) {
                 f32 mx_output = -100;
+                f32 mx_output2 = -100;
                 for (u32 col = 0; col < gya::BOARD_WIDTH; col++) {
                     if (result[col] > mx_output && b[col].height < gya::BOARD_HEIGHT) {
                         mx_output = result[col];
                         move = col;
                     }
+                    if (result2[col] > mx_output2 && b[col].height < gya::BOARD_HEIGHT) {
+                        mx_output2 = result2[col];
+                        move2 = col;
+                    }
                     if (b[col].height >= gya::BOARD_HEIGHT && col_times[col] == -1)
                         col_times[col] = cnt;
                 }
+
+                if(std::rand() % 2) 
+                    move = move2;
             } else {
                 auto legal = b.get_actions();
                 move = legal[std::rand() % legal.size()];
@@ -197,11 +215,13 @@ int main() {
                 i = cnt - i - 1;
 
         f32 qlast = 0, qnlast = 0;
+        f32 q2last = 0, q2nlast = 0;
 
         if (b.has_won().is_tie()) {
             draw_cnt++;
         } else {
             qlast = 1, qnlast = -1;
+            q2last = 1, q2nlast = -1;
             if (b.has_won().player_2_won())
                 loss_cnt++;
             else
@@ -215,19 +235,36 @@ int main() {
 
         for (u32 i = 0; i < cnt; i++) {
             vec_t q = net.predict(input_data[i]);
+            vec_t q2 = net2.predict(input_data[i]);
             q[moves[i]] += learning_rate * (qlast - q[moves[i]]);
+            q2[moves[i]] += learning_rate * (q2last - q2[moves[i]]);
 
             net.fit<mse>(opt, std::vector<vec_t>{input_data[i]}, std::vector<vec_t>{q});
+            net2.fit<mse>(opt, std::vector<vec_t>{input_data[i]}, std::vector<vec_t>{q2});
+
             q = net.predict(input_data[i]);
+            q2 = net2.predict(input_data[i]);
+
             qlast = qnlast;
+            q2last = q2nlast;
 
             f32 mx_q = -100;
+            f32 mx_q2 = -100;
+            u32 move = 0, move2 = 0;
             for (u32 j = 0; j < gya::BOARD_WIDTH; j++)
                 if (col_times[j] < (i8) i) {
-                    mx_q = std::max(mx_q, q[j]);
+                    if(mx_q < q[j]) {
+                        mx_q = q[j];
+                        move = j;
+                    }
+                    if(mx_q2 < q2[j]) {
+                        mx_q2 = q2[j];
+                        move2 = j;
+                    }
                 }
 
-            qnlast = mx_q * discount_factor;
+            qnlast = discount_factor * q2[move];
+            q2nlast = discount_factor * q[move2];
         }
 
         lmj::debug(input_data.size());

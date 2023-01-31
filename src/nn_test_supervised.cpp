@@ -106,7 +106,7 @@ int main() {
 
     size_t in_width = 7;
     size_t in_height = 6;
-    size_t window_size = 4;
+    size_t window_size = kernel_size;
     size_t in_channels = 1;
     size_t out_channels = 256;
     network<sequential> net;

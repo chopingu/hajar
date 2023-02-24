@@ -4,10 +4,12 @@
 \usepackage{ebgaramond-maths}
 \usepackage[T1]{fontenc}
 \usepackage[Symbol]{upgreek}
-\usepackage{nicefrac, amsmath, amsthm}
+\usepackage{nicefrac, amsmath, amsthm, amssymb}
+\usepackage[c]{esvect}
 
 % clickable references
 \usepackage{hyperref}
+\usepackage{bookmark}
 
 % nomenclature
 \usepackage{nomencl}
@@ -52,9 +54,18 @@
 % hyphen
 \usepackage{hyphenat}
 
+% captions
+\usepackage{caption}
+\captionsetup[figure]{font=small}
+
 % draw stuff
 \usepackage{graphicx}
+\graphicspath{ {./images/} }
 
 % argmin function
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
+
+% Indentation
+\usepackage{enumitem}
+\usepackage{outlines}

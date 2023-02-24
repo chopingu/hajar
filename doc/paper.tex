@@ -4,16 +4,22 @@
 
 \title{
     \textbf{ANALYSIS OF \\
-    DEEP REINFORCEMENT \\
-    APPLIED TO A BOARD GAME}
+    NEURAL NETWORKS \\
+    APPLIED TO CONNECT FOUR} \\[0.5cm]
+    \rule{10cm}{0.3mm} \\[0.5cm] 
+    \small \scshape{A closer look into the intricacies of artificial neural networks} \\[0.4cm]
+    \rule{10cm}{0.3mm}
+    \vskip -0.3cm
 }
 
 \author{
-    \rule{8cm}{0.3mm} \\[1.3cm] 
     \small \scshape{Adam Amanbaev, Jonathan Hallström, Alvar Edvardsson} \\ 
-    \small \scshape{Hugo Åkerfeldt, Romeo Patzer} \\[1cm]
-    \small \scshape{Supervisor: Ulf Backlund}
+    \small \scshape{Hugo Åkerfeldt, Romeo Patzer} \\[0.5cm]
+    \small \scshape{Supervisor: Ulf Backlund} \\
+    \scriptsize \scshape{Danderyds Gymnasium}
 }
+
+\vskip 5cm
 
 \begin{document}
 
@@ -22,7 +28,7 @@
 \newpage
 
 \begin{abstract}
-    In October 2022 DeepMind announced an artificial intelligence in a preprint \cite{alphatensor} that was called AlphaTensor. It utilized \emph{artificial neural networks} and \emph{reinforcement learning} in order to solve the unsolved problem of finding more efficient algorithms for matrix multiplication. AlphaTensor was successful and illustrated the impact of \emph{artificial neural networks} combined with \emph{reinforcement learning}. This paper takes a closer look into the effectiveness of \emph{artificial neural networks} and \emph{reinforcement learning} strategies such as the ones used in AlphaTensor. More precisely, the effects the parameters \emph{kernel size}, \emph{learning rate}, \emph{discount factor} and \emph{noise} have on the networks' performance in the board game \emph{Connect Four} are analyzed. Furthermore the results show whether the parameters have a small or great impact on the performance.
+    In October 2022 DeepMind announced an artificial intelligence in a preprint \cite{alphatensor} that was called AlphaTensor. It utilized \emph{artificial neural networks} and \emph{reinforcement learning} in order to solve the unsolved problem of finding more efficient algorithms for matrix multiplication. AlphaTensor was successful and illustrated the impact of \emph{artificial neural networks} combined with \emph{reinforcement learning}. This paper takes a closer look into the effectiveness of \emph{artificial neural networks} and \emph{reinforcement learning} strategies such as the ones used in AlphaTensor. More precisely, the effects the parameters \emph{kernel size}, \emph{learning rate} and \emph{noise} have on the networks' performance in the board game \emph{Connect Four} are analyzed.
 
 \vskip 1cm
 
@@ -74,7 +80,6 @@ I am a forest, and a night of dark trees: but he who is not afraid of my darknes
 \nomenclature{$\argmin_x f(x)$}{\{$x \mid f(x) = \min_{x'} f(x')$\}}
 \nomenclature{$\argmax_x f(x)$}{\{$x \mid f(x) = \max_{x'} f(x')$\}}
 \nomenclature{$\leftarrow$}{assignment}
-\nomenclature{$P(a \mid b)$}{probability of a given b}
 
 \printnomenclature[3cm]
 
@@ -234,7 +239,9 @@ The following are examples to better grasp the concept of reinforcement learning
     \1 Adam left his house five minutes ago and is on his way to school. He suddenly starts questioning whether he locked the front door or not. Turning home would at this point make him late to class but leaving the house unlocked has its risks. Adam makes his decision based on the time he gets home after school and how often he has forgotten to lock the door. 
     \1 Hugo is playing chess against the current chess world champion Magnus Carlsen. In order not to lose, Hugo makes moves by evaluating the current position intuitively, and anticipating possible counterreplies. Since Hugo is familiar with the current position and has played it at home several times, he is quite confident in his decisions. 
     \1 Romeo could hardly move his body the first few months after being born. One year later, he was running at 1.6 meters per second.
-    \1 Jonathan is in a casino and suddenly sees ten slot machines. He does not know the probability of getting a jackpot on any of the machines but knows the cost of each lever pull and the reward given by a jackpot. Through repeated selections of slot machines, Jonathan manages to maximize his winnings by concentrating on the best levers. \end{outline}
+    \1 Jonathan is in a casino and suddenly sees ten slot machines. He does not know the probability of getting a jackpot on any of the machines but knows the cost of each lever pull and the reward given by a jackpot. Through repeated selections of slot machines, Jonathan manages to maximize his winnings by concentrating on the best levers. 
+    \1 Alvar is cleaning his very large house. It is so large that he needs to refuel his body with cereal in order to clean everything. Before entering a new room to clean, Alvar decides whether he should start trying to find his way back to the kitchen where the cereal is or pick up the trash in the new room. Alvar makes his decision based on how tired he feels and how quickly and easy he has been able to find his to way to the kitchen in the past.
+\end{outline}
 
 \vskip 0.2cm
 
@@ -267,7 +274,7 @@ Lastly, whereas the reward signal immediately tells the agent whether an action 
 
 A Markov Decision Process \cite{sutton}, MDP, is a more rigorous and mathematical way of describing a sequential decision-making system. An MDP can formally be defined as MDP$(S, A, R)$ where each parameter is defined as follows:
 
-\newpage
+\vskip 0.3cm
 
 \begin{outline}
     \1 $S$ is the set of all the possible states the environment take on.
@@ -277,7 +284,7 @@ A Markov Decision Process \cite{sutton}, MDP, is a more rigorous and mathematica
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.7]{MDP}
+    \includegraphics[scale=0.6]{MDP}
     \caption{Illustration of Markov Decision Process}
 \end{figure}
 
@@ -298,7 +305,7 @@ In our case, with Connect Four, the board becomes the environment, and the playe
 \vskip 0.2cm
 In 1989 Watkins \cite{sutton} released one of the early breakthroughs in reinforcement learning. It was the algorithm known as Q-learning which is a way for an agent to learn how to optimally navigate in a Markov Decision Process (3.4). The Q-learning algorithm is an action-value function which maps actions to values, where the action values are called Q-values. The Q-learning algorithm evaluates how beneficial a certain action is in a given situation and a higher Q-value corresponds to a better action. The evaluations made by the algorithm improve over time. The algorithm \cite{sutton} is formally defined as follows:
 
-\vskip 0.5cm
+\newpage
 
 \begin{figure}[h]
     \centerline{$Q_{new}(S_{t}, A_{t}) \leftarrow Q(S_{t}, A_{t}) + \alpha[R_{t+1} + \gamma\max_{a}Q(S_{t+1}, a) - Q(S_{t}, A_{t})]$}

@@ -1,3 +1,0 @@
-1. benchmarking functionality for different nets/solvers
-winrate / time
-  

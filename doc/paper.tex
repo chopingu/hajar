@@ -28,7 +28,7 @@
 \newpage
 
 \begin{abstract}
-In October 2022 DeepMind announced an artificial intelligence in a preprint \cite{alphatensor} that was called AlphaTensor. It utilized \emph{artificial neural networks} and \emph{reinforcement learning} in order to solve the unsolved problem of finding more efficient algorithms for matrix multiplication. AlphaTensor was successful and illustrated the impact of \emph{artificial neural networks} combined with \emph{reinforcement learning}. This paper takes a closer look into the effectiveness of \emph{artificial neural networks} and \emph{reinforcement learning} strategies such as the ones used in AlphaTensor. More precisely, the effects the parameters \emph{kernel size}, \emph{learning rate} and \emph{noise} have on the networks' performance in the board game \emph{Connect Four} are analyzed.
+    In October 2022 DeepMind announced an artificial intelligence in a preprint \cite{alphatensor} that was called AlphaTensor. It utilized \emph{artificial neural networks} and \emph{reinforcement learning} in order to solve the unsolved problem of finding more efficient algorithms for matrix multiplication. AlphaTensor was successful and illustrated the impact of \emph{artificial neural networks} combined with \emph{reinforcement learning}. This paper takes a closer look into the effectiveness of \emph{artificial neural networks} and \emph{reinforcement learning} strategies such as the ones used in AlphaTensor. More precisely, the effects the parameters \emph{kernel size}, \emph{learning rate} and \emph{noise} have on the networks' performance in the board game \emph{Connect Four} are analyzed.
 
 \vskip 1cm
 
@@ -570,7 +570,7 @@ Notice that $w$ is the only variable in the error and is exactly what needs to b
 \vskip 0.2cm
 
 \noindent
-As Figure 15 shows the local minimum of the MSE and finding a weight $w$ such that the loss function is at the local minimum is equivalent to minimizing the error, which is desired as described in section 4.4.1. One way of finding that local minimum is to descend the loss function by using its slope at the current weight, also known as the derivative at that point. Note that we assume that the loss function is defined and differentiable around that point. Since the slope describes the 'steepness' of the loss function in the current point, following the direction of that slope will either lead you to a local maximum or minimum. It could be thought of as walking up or down a hill as illustrated by Figure 15 above. The slope of the MSE changes as one walks down the slope, assuring that the movement is towards the minimum. This type of descent will be described more rigorously in the following sections.
+As Figure 16 shows the local minimum of the MSE and finding a weight $w$ such that the loss function is at the local minimum is equivalent to minimizing the error, which is desired as described in section 4.4.1. One way of finding that local minimum is to descend the loss function by using its slope at the current weight, also known as the derivative at that point. Note that we assume that the loss function is defined and differentiable around that point. Since the slope describes the 'steepness' of the loss function in the current point, following the direction of that slope will either lead you to a local maximum or minimum. It could be thought of as walking up or down a hill as illustrated by Figure 16 above. The slope of the MSE changes as one walks down the slope, assuring that the movement is towards the minimum. This type of descent will be described more rigorously in the following sections.
 
 \newpage
 
@@ -640,7 +640,7 @@ Just as the derivative was used in a previous section $(4.4.2)$ to descend the M
 \vskip 0.3cm
 
 \noindent
-For a small enough learning rate $\gamma \in \mathbb{R}_{+}$, then  $f(\mathbf{w}_{n+1}) \leq f(\mathbf{w}_{n})$. If one, with this observation in mind, starts at a point $\mathbf{w}_{0}$ and considers the sequence $\mathbf{w}_{0}, \mathbf{w}_{1}, \mathbf{w}_{2}, ...$ such that the recursive algorithm in Figure 16 holds, then we get the following monotonic sequence:
+For a small enough learning rate $\gamma \in \mathbb{R}_{+}$, then  $f(\mathbf{w}_{n+1}) \leq f(\mathbf{w}_{n})$. If one, with this observation in mind, starts at a point $\mathbf{w}_{0}$ and considers the sequence $\mathbf{w}_{0}, \mathbf{w}_{1}, \mathbf{w}_{2}, ...$ such that the recursive algorithm in Figure 17 holds, then we get the following monotonic sequence:
 
 \vskip 0.5cm
 
@@ -684,7 +684,7 @@ Consider a path of nodes where $v_{1}, v_{2}, ..., v_{k}$ both denote the nodes 
 \newpage
 
 \noindent
-The above expression assumes that there only exists a single path from the node $v_{1}$ to $o$ in the neural network, even though an exponential number of such paths might exist. A generalization of the chain rule used above in Figure 18, referred to as the \emph{multivariable chain rule}, can compute the gradient of the loss function with respect to a weight connection that has more than one path to $o$. It is done by adding the compositions along the paths from the node $v_{1}$ to $o$ \cite{charu}. Let $P$ be the set of paths from the node $v_{1}$ to $o$. The generalization of the expression in Figure 18 becomes as follows \cite{charu}:
+The above expression assumes that there only exists a single path from the node $v_{1}$ to $o$ in the neural network, even though an exponential number of such paths might exist. A generalization of the chain rule used above in Figure 19, referred to as the \emph{multivariable chain rule}, can compute the gradient of the loss function with respect to a weight connection that has more than one path to $o$. It is done by adding the compositions along the paths from the node $v_{1}$ to $o$ \cite{charu}. Let $P$ be the set of paths from the node $v_{1}$ to $o$. The generalization of the expression in Figure 19 becomes as follows \cite{charu}:
 
 \vskip 0.3cm
 
@@ -697,7 +697,7 @@ The above expression assumes that there only exists a single path from the node 
 \vskip 0.3cm
 
 \noindent
-The computation of the term $\frac{\delta v_{i}}{\delta w_{(i-1, i)}}$ on the right-hand side of the equation in Figure 19 is quite simple and is discussed below. The term $\triangle (v_{i}, o)$ is however computed over an exponentially increasing number of paths which at first sight seems quite troublesome. This is where dynamic programming is used and it is based on the insight that the graph of a neural network does not have any cycles, it is acyclic. Dynamic programming, simply put, employs a certain order of computing in order to reduce the number of computations necessary. By first computing $\triangle (v_{i}, o)$ for nodes $v_{i}$ with direct connections to the output $o$ and then recursively computing these values for nodes in earlier layers in terms of values in later layers we reduce the number of computations. Since we this way never recompute the gradient for a node or a connection, the number of computations becomes the number of nodes plus the number of connections in the network. The time complexity is in other words $O(E + V)$, where $E$ and $V$ are the numbers of edges and nodes in the graph representation of the network, respectively. In summary, the dynamic programming technique allowed us to reduce the number of computations from an exponential to a linear amount thanks to the acyclic property of the neural network. The recursion for $\triangle (v_{i}, o)$ using dynamic programming can be defined using the multivariate chain rule as follows:
+The computation of the term $\frac{\delta v_{i}}{\delta w_{(i-1, i)}}$ on the right-hand side of the equation in Figure 20 is quite simple and is discussed below. The term $\triangle (v_{i}, o)$ is however computed over an exponentially increasing number of paths which at first sight seems quite troublesome. This is where dynamic programming is used and it is based on the insight that the graph of a neural network does not have any cycles, it is acyclic. Dynamic programming, simply put, employs a certain order of computing in order to reduce the number of computations necessary. By first computing $\triangle (v_{i}, o)$ for nodes $v_{i}$ with direct connections to the output $o$ and then recursively computing these values for nodes in earlier layers in terms of values in later layers we reduce the number of computations. Since we this way never recompute the gradient for a node or a connection, the number of computations becomes the number of nodes plus the number of connections in the network. The time complexity is in other words $O(E + V)$, where $E$ and $V$ are the numbers of edges and nodes in the graph representation of the network, respectively. In summary, the dynamic programming technique allowed us to reduce the number of computations from an exponential to a linear amount thanks to the acyclic property of the neural network. The recursion for $\triangle (v_{i}, o)$ using dynamic programming can be defined using the multivariate chain rule as follows:
 
 \vskip 0.3cm
 
@@ -732,7 +732,7 @@ Since each $v$ is in a later layer than $v_{i}$, the term $\triangle (v, o)$ on 
 \vskip 0.3cm
 
 \noindent
-Using the expression in Figure 21 in combination with the expression in Figure 20 the following recursion is attained:
+Using the expression in Figure 22 in combination with the expression in Figure 21 the following recursion is attained:
 
 \vskip 0.3cm
 
@@ -754,7 +754,7 @@ Using the expression in Figure 21 in combination with the expression in Figure 2
 \vskip 0.2cm
 
 \noindent
-Using the recursive formula in Figure 22, gradients are successively calculated in the backwards direction, and each node and edge in the neural network is processed exactly once in the backwards pass. Finally, the computation of the term $\frac{\delta v_{i}}{\delta w_{(i-1, i)}}$ is necessary for the expression in Figure 19. The computation can be done as follows:
+Using the recursive formula in Figure 23, gradients are successively calculated in the backwards direction, and each node and edge in the neural network is processed exactly once in the backwards pass. Finally, the computation of the term $\frac{\delta v_{i}}{\delta w_{(i-1, i)}}$ is necessary for the expression in Figure 20. The computation can be done as follows:
 
 \vskip 0.3cm
 
@@ -767,7 +767,7 @@ Using the recursive formula in Figure 22, gradients are successively calculated 
 \vskip 0.2cm
 
 \noindent
-Every term in the expression in Figure 19 is now computable with the expressions in Figures 22 and 23, which themselves are computable with values that are gathered and saved during the forward pass. We can now efficiently calculate the gradient of the loss function with respect to every weight connection, which then can be adjusted by the gradient descent algorithm, described in section 4.4.4, for each available training instance (each training instance being some input values and their corresponding output targets).
+Every term in the expression in Figure 20 is now computable with the expressions in Figures 23 and 24, which themselves are computable with values that are gathered and saved during the forward pass. We can now efficiently calculate the gradient of the loss function with respect to every weight connection, which then can be adjusted by the gradient descent algorithm, described in section 4.4.4, for each available training instance (each training instance being some input values and their corresponding output targets).
 
 \newpage
 
@@ -790,7 +790,7 @@ In this section, we introduce the convolutional neural network, which was invent
 
 \vskip 0.2cm
 
-A convolutional neural network \cite{skansi} is a neural network that consists of one or more convolutional layers. A convolutional layer \cite{skansi} takes an image, a 2-dimensional grid with values, as input and passes a local receptive field, also known as \emph{kernel}, over the whole image. The kernel is a square grid with weights in each cell and starts in the top left corner of the input image and proceeds to move stepwise from left to right, row by row. At each place the kernel visits, it computes a value for the output image by adding all of the weights multiplied by their corresponding value in the input image, a weighted sum. One thing to notice is that the output image will be smaller than the input image. If we use a 3 by 3 local receptive field to scan a 17 by 8 image, we will get a 15 by 6 output image. Getting the image smaller means packing the information in a more compact and deeper representation, which is computationally beneficial. This whole process is illustrated in Figure 24 \cite{skansi} below. 
+A convolutional neural network \cite{skansi} is a neural network that consists of one or more convolutional layers. A convolutional layer \cite{skansi} takes an image, a 2-dimensional grid with values, as input and passes a local receptive field, also known as \emph{kernel}, over the whole image. The kernel is a square grid with weights in each cell and starts in the top left corner of the input image and proceeds to move stepwise from left to right, row by row. At each place the kernel visits, it computes a value for the output image by adding all of the weights multiplied by their corresponding value in the input image, a weighted sum. One thing to notice is that the output image will be smaller than the input image. If we use a 3 by 3 local receptive field to scan a 17 by 8 image, we will get a 15 by 6 output image. Getting the image smaller means packing the information in a more compact and deeper representation, which is computationally beneficial. This whole process is illustrated in Figure 25 \cite{skansi} below. 
 
 \vskip 0.3cm
 
@@ -812,7 +812,7 @@ One might wonder why the local receptive field of a convolutional layer is usefu
 \vskip 0.2cm
 
 \noindent
-The idea of collecting information about various correlations in an input image by using a local receptive field can be further improved. Instead of using a single local receptive field in a convolutional layer, one can use several, each of the same size but initialized with varying weights. We pass each local receptive field independently over the input image and create as many output images as there are receptive fields. Feeding a 10 by 10 image into a convolutional layer with 3 4 by 4 kernels would create 3 7 by 7 output images. We say that the output image has 3 \emph{channels}. The intuition behind having several kernels is that we increase the probability that one of the kernels "sees" an important correlation, which in turn increases the overall performance of the network. Figure 25 below illustrates this concept of channels.
+The idea of collecting information about various correlations in an input image by using a local receptive field can be further improved. Instead of using a single local receptive field in a convolutional layer, one can use several, each of the same size but initialized with varying weights. We pass each local receptive field independently over the input image and create as many output images as there are receptive fields. Feeding a 10 by 10 image into a convolutional layer with 3 4 by 4 kernels would create 3 7 by 7 output images. We say that the output image has 3 \emph{channels}. The intuition behind having several kernels is that we increase the probability that one of the kernels "sees" an important correlation, which in turn increases the overall performance of the network. Figure 26 below illustrates this concept of channels.
 
 \vskip 0.4cm
 
@@ -826,7 +826,7 @@ The idea of collecting information about various correlations in an input image 
 \vskip 0.2cm
 
 \noindent
-As shown in Figure 25, a convolutional neural network ends with fully connected layers, where the first one takes the output image of the preceding convolutional layer converted into a 1-dimensional vector as input. The same backpropagation algorithm, section 4.4.5, is then used to train the network, as for a standard multilayer neural network.
+As shown in Figure 26, a convolutional neural network ends with fully connected layers, where the first one takes the output image of the preceding convolutional layer converted into a 1-dimensional vector as input. The same backpropagation algorithm, section 4.4.5, is then used to train the network, as for a standard multilayer neural network.
 
 \newpage
 
@@ -943,17 +943,17 @@ In order to compare the benchmarking data and draw conclusions about certain par
 
 \vskip 0.5cm
 
-Figures 27, 28 and 29 show graphs of the win percentage with respect to which generation of the neural network was playing. One generation is in this case equivalent to 100 epochs, with each epoch being a self-play training game. Each of the three neural networks was benchmarked against a Monte Carlo Tree Search player with a rollout limit set at 2000, where each data point is 100 games against it.
+Figures 28, 29 and 30 show graphs of the win percentage with respect to which generation of the neural network was playing. One generation is in this case equivalent to 100 epochs, with each epoch being a self-play training game. Each of the three neural networks was benchmarked against a Monte Carlo Tree Search player with a rollout limit set at 2000, where each data point is 100 games against it.
 
 \vskip 0.2cm
 
 \noindent
-The first phenomenon noticeable in the data presented by the diagrams in Figures 27, 28 and 29, is \emph{catastrophic interference}, also referred to as \emph{catastrophic forgetting} \cite{catastrophic}. Notice the very sudden spikes in win rate for each of the neural networks followed by sudden drops in win rate. This pattern seems to repeat itself through the generations and it almost seems like the neural networks at some points learn how to win games but then suddenly forget what they have learnt. This is what we call catastrophic forgetting, which is defined as a tendency of a neural network to abruptly and drastically forget previously learnt information up learning new information \cite{catastrophic}. It is generally a challenge to create a neural network that is sensitive enough to detect small details, such as patterns in the Connect Four board, without being disrupted by new information \cite{catastrophic}. Catastrophic forgetting occurs when many of the weights that have been adjusted and learnt something, for example, the pattern of 3 tokens of the same color in a line, are changed by new data instances. It then becomes unlikely that the weights still "remember" what they had learnt previously since the latest information is being superimposed on top of the old information.
+The first phenomenon noticeable in the data presented by the diagrams in Figures 28, 29 and 30, is \emph{catastrophic interference}, also referred to as \emph{catastrophic forgetting} \cite{catastrophic}. Notice the very sudden spikes in win rate for each of the neural networks followed by sudden drops in win rate. This pattern seems to repeat itself through the generations and it almost seems like the neural networks at some points learn how to win games but then suddenly forget what they have learnt. This is what we call catastrophic forgetting, which is defined as a tendency of a neural network to abruptly and drastically forget previously learnt information up learning new information \cite{catastrophic}. It is generally a challenge to create a neural network that is sensitive enough to detect small details, such as patterns in the Connect Four board, without being disrupted by new information \cite{catastrophic}. Catastrophic forgetting occurs when many of the weights that have been adjusted and learnt something, for example, the pattern of 3 tokens of the same color in a line, are changed by new data instances. It then becomes unlikely that the weights still "remember" what they had learnt previously since the latest information is being superimposed on top of the old information.
 
 \vskip 0.2cm
 
 \noindent
-Furthermore, one can see that the neural networks with kernel sizes 4 and 5 in Figures 27 and 28 have win rates that more frequently reach a percentage of 50 and above in comparison with the convolutional network with kernel size 2. Figure 29 shows that the convolutional neural network with kernel size 2 generally spends a lot more time with a win rate of 30 percent and below when compared with the data in Figures 27 and 28. One could conclude that this is due to the 2 by 2 kernel, local receptive field, being a lot smaller than the 4 by 4 and 5 by 5 kernels. As described in section 4.5.2, the local receptive field is able to learn correlations in the input image. In our case, this enables the convolutional neural networks to learn and recognize patterns in the Connect Four board such as 3 tokes of the same color being in a line. That specific pattern is already quite important as it would be necessary to block such a line if it were of the opponent's color. Otherwise, the opponent could simply, if possible, complete that line and connect four of their tokens earning them a win. However, in order for a local receptive field to "spot" and recognize such a line of 3 tokens, it would need a size of at least 3. There is a possibility that the convolutional neural network with 2 by 2 local receptive fields simply could not learn such patterns and therefore performed worse than the networks with 4 by 4 and 5 by 5 receptive fields. Conversely, the convolutional networks with kernel sizes 4 and 5, respectively, were probably able to recognize such patterns a lot better and therefore also performed better against the opponent.
+Furthermore, one can see that the neural networks with kernel sizes 4 and 5 in Figures 28 and 29 have win rates that more frequently reach a percentage of 50 and above in comparison with the convolutional network with kernel size 2. Figure 30 shows that the convolutional neural network with kernel size 2 generally spends a lot more time with a win rate of 30 percent and below when compared with the data in Figures 28 and 29. One could conclude that this is due to the 2 by 2 kernel, local receptive field, being a lot smaller than the 4 by 4 and 5 by 5 kernels. As described in section 4.5.2, the local receptive field is able to learn correlations in the input image. In our case, this enables the convolutional neural networks to learn and recognize patterns in the Connect Four board such as 3 tokes of the same color being in a line. That specific pattern is already quite important as it would be necessary to block such a line if it were of the opponent's color. Otherwise, the opponent could simply, if possible, complete that line and connect four of their tokens earning them a win. However, in order for a local receptive field to "spot" and recognize such a line of 3 tokens, it would need a size of at least 3. There is a possibility that the convolutional neural network with 2 by 2 local receptive fields simply could not learn such patterns and therefore performed worse than the networks with 4 by 4 and 5 by 5 receptive fields. Conversely, the convolutional networks with kernel sizes 4 and 5, respectively, were probably able to recognize such patterns a lot better and therefore also performed better against the opponent.
 
 \subsection{Learning Rate}
 
